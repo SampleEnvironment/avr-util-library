@@ -1,0 +1,577 @@
+// xbee.c - Copyright 2016, HZB, ILL/SANE & ISIS
+#define RELEASE_XBEE 1.00
+
+// HISTORY -------------------------------------------------------------
+// 1.00 - First release on May 2016
+
+//#include <avr/io.h>
+#include <util/delay.h>
+#include <string.h>
+#include <stdbool.h>
+
+#include "display_utilities.h"
+#include "keyboard.h"
+#include "main.h"
+#include "timer_utilities.h"
+#include "usart.h"
+#include "xbee_utilities.h"
+#include "xbee.h"
+#ifdef DISP_3000
+#include "StringPixelCoordTable.h"
+#endif
+#ifdef ili9341
+#include "StringPixelCoordTable_ili9341.h"
+//#include "StringPixelCoordTable.h"
+#endif
+
+//char ltemp[20];
+char infostr[20];
+
+
+/**
+* @brief Holds Function to print Infoline
+*
+* Paints an info message on the LCD
+*/
+void (*print_info)(char * infotext,_Bool update);
+
+//=========================================================================
+// XBee variables
+//=========================================================================
+XbeeType xbee = {
+	.dest_low = 0,
+	.dest_high = 0,
+	.sleep_period = 1,
+	.awake_period = 120,
+	.sleeping = false,
+	.status_byte = 0
+};
+
+void_xbee_init(void *(printInfoFun)(char *,_Bool)){
+	print_info = printInfoFun;
+}
+
+void xbee_set_sleeping(_Bool sleeping){
+	xbee.sleeping = sleeping;
+}
+
+_Bool xbee_get_sleeping(void){
+	return xbee.sleeping;
+}
+
+void xbee_set_awake_period(uint8_t awake_period){
+	xbee.awake_period = awake_period;
+}
+
+uint8_t xbee_get_awake_period(void){
+	return xbee.awake_period;
+}
+
+void xbee_set_sleep_period(uint8_t sleep_period){
+	xbee.sleep_period = sleep_period;
+}
+
+uint8_t xbee_get_sleep_period(void){
+	return xbee.sleep_period;
+}
+
+
+
+void xbee_set_status_byte(uint8_t status_byte){
+	xbee.status_byte = status_byte;
+}
+
+uint8_t xbee_get_status_byte(void){
+	return xbee.status_byte;
+}
+
+
+void SET_ERROR(enum StatusBit Bit){
+	xbee.status_byte|=(1<<Bit);
+}
+
+void CLEAR_ERROR(enum StatusBit Bit){
+	xbee.status_byte&=~(1<<Bit);
+}
+
+_Bool CHECK_ERROR(enum StatusBit Bit){
+	return xbee.status_byte & (1<<Bit);
+}
+
+
+// wake up xbee and set timer and status variables
+inline void xbee_wake_up_plus(void)
+{
+	if (xbee.sleeping)
+	{
+		xbee_wake_up();
+	
+	}
+
+	// Clear then set the timeout for awake time
+	set_timeout(0, TIMER_5, RESET_TIMER);
+	set_timeout(xbee.awake_period, TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
+
+	xbee.sleeping = false;									// Xbee module is not sleeping anymore
+
+}
+
+
+
+
+
+inline void xbee_sleep_plus(void)
+{
+	xbee_sleep();
+	xbee.sleeping = true;
+	// Clear then set the timeout for sleeping time
+	set_timeout(0, TIMER_5, RESET_TIMER);
+	set_timeout(xbee.sleep_period*60, TIMER_5, USE_TIMER);
+	//	LCD_Print("xbee_sleep_plus", 5, 40, 2, 1, 1, FGC, BGC);
+}
+
+
+
+// Set XBee module to sleep mode
+inline void xbee_sleep(void)
+{
+	#ifdef ALLOW_XBEE_SLEEP				// Right defined in main.c
+	PORTA|=(1<<PA6);				// Set PA6 as true
+	_delay_ms(20);
+	#endif
+}
+
+// Wake up XBee module
+inline void xbee_wake_up(void)
+{
+	#ifdef ALLOW_XBEE_SLEEP				// Right defined in main.c
+	PORTA&=~(1<<PA6);				// Set PA6 as false
+	_delay_ms(30);
+	#endif
+	
+}
+
+
+uint8_t xbee_is_connected(void)
+{
+	uint8_t buffer[SINGLE_FRAME_LENGTH];  		
+	uint8_t reply_Id = 0;
+
+	
+	// API command "AI" => Reads possible errors with the last association request, result 0: everything is o.k.
+	buffer[0] = (uint8_t)'A';
+	buffer[1] = (uint8_t)'I';
+	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "AI" command
+	
+	// Send packed command to the coordinator in order to check the connection
+	reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AI_MSG_TYPE, 1000);
+
+	#ifdef ALLOW_DEBUG
+	print_info("AI Message", 0);
+	_delay_ms(1000);
+	#endif
+	
+	if (reply_Id== 0xFF)  	// NO Answer from xbee --> not associated
+	{
+		return 1;
+	}
+	if (frameBuffer[reply_Id].data[0] != 0)
+	{
+		// not associated with Coordinator
+		return frameBuffer[reply_Id].data[0];
+	}
+
+	//Xbee is associated to a Coordinator
+	return 0;
+
+}
+
+
+uint16_t xbee_hardware_version(void){
+	uint8_t buffer[SINGLE_FRAME_LENGTH];
+	
+	buffer[0] = (uint8_t)'H';
+	buffer[1] = (uint8_t)'V';
+	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
+	
+	
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, HV_MSG_TYPE, 1000);
+
+	if(reply_Id == 0xFF) return 0;
+	
+	
+	return (frameBuffer[reply_Id].data[0] << 8) + frameBuffer[reply_Id].data[1] ;
+	
+}
+
+
+// Reset connection with the xbee coordinator and initiate a new one
+// Returns true if reconnection is successful, false otherwise
+_Bool xbee_reset_connection(void)
+{
+
+	// Clear frame_buffer if there is still some information in the queue
+	buffer_init();
+
+	uint8_t buffer[SINGLE_FRAME_LENGTH];  		// put DA here then send
+	
+	// API command "DA" => Force Disassociation.
+	// End Device will immediately disassociate from a Coordinator (if associated) and reattempt to associate.
+	buffer[0] = (uint8_t)'D';
+	buffer[1] = (uint8_t)'A';
+	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "DA" command
+	
+	// Send packed command to the Xbee-Module in order to Force Reassociation
+	if (xbee_send_and_get_reply(buffer, temp_bytes_number, DA_MSG_TYPE, 1000) == 0xFF)
+	return 0;											// couldn't disassociate (= no reply from xbee on my request)
+	//dont need any data from DA so nothing else happens
+
+
+	
+	uint8_t timeout_count = 0;
+
+
+
+	while(1){
+		
+		_delay_ms(100);
+		print_info("Reassociating.  ",1);
+		
+		_delay_ms(100);
+		print_info("Reassociating . ",1);
+		
+		_delay_ms(100);
+		print_info("Reassociating  .",1);
+		
+		if((LVM.version->hw_version_xbee == XBEE_V_S1)&& Xbee_Associated){
+			print_info("Device Associated",1);
+			return 1;
+			
+		}
+
+		if(LVM.version->hw_version_xbee == XBEE_V_SC2 && xbee_is_connected() == 0){
+			print_info("Device Associated",1);
+			return 1;
+		}
+		
+		
+		if (timeout_count > 30)
+		{
+			print_info("",0);
+			print_info("failed",1);
+			_delay_ms(1000);
+			print_info("",0);
+			return 0;
+		}
+		timeout_count ++;
+		
+		
+	}
+	
+	
+
+	
+}
+
+// Try a new connection with the server
+uint8_t xbee_reconnect(void)
+{
+	_delay_ms(300);
+	#ifdef ALLOW_COM
+	if(!xbee_reset_connection())
+	{
+		SET_ERROR(NETWORK_ERROR);
+		print_info(STR_NETWORK_ERROR, 0);
+		_delay_ms(300);
+		return 1;
+	}
+	else if (!((xbee.dest_low = xbee_get_address_block(DL_MSG_TYPE)) && (xbee.dest_high = xbee_get_address_block(DH_MSG_TYPE))))
+	{
+		SET_ERROR(NETWORK_ERROR);
+		print_info(STR_NETWORK_ERROR_ADDR , 0);
+		_delay_ms(300);
+		return 1;
+	}
+	CLEAR_ERROR(NETWORK_ERROR);		// Successfully reconnected, clear network error
+	
+	
+	_delay_ms(1000);
+	return 0;
+
+	#endif
+}
+
+// Start USART0 transmission to XBee module
+void xbee_send(uint8_t *data)
+{
+	send_str_reader = data;						// point to data
+	
+	USART_IODR = *send_str_reader++;			// Send first data byte (ISR_Tx will do the rest)
+	sending_cmd--;								// 1 byte is sent, so decrease counter
+	
+}
+
+// Send message via XBee module
+void xbee_send_msg(uint8_t *buffer, uint8_t length)
+{
+	if (!length) return;
+	
+	sending_cmd = length;		//bytes number to send
+	xbee_send(buffer);			//send first
+	
+	_delay_ms(100);
+}
+
+// Send message and look for reply from database and copy data to the buffer
+uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_type, uint16_t delay)
+{
+	uint8_t reply_Id = 0xFF;
+
+	// if length not 0 get and delete all old replies of this db_cmd_type
+	if (length)
+	do
+	{
+		reply_Id = xbee_hasReply(db_cmd_type, EQUAL);	//check for reply
+		if (reply_Id != 0xFF)							//reply available
+		buffer_removeData(reply_Id);				//mark as read
+	}
+	while (reply_Id!= 0xFF);
+
+	// send message (only if length not 0) and wait
+	xbee_send_msg(buffer, length);
+	
+	//reset timer!
+	set_timeout(0, TIMER_3, RESET_TIMER);
+	set_timeout(COM_TIMEOUT_TIME, TIMER_3, USE_TIMER);
+	
+	uint16_t retransmitcounter = 1;
+	
+	// main part
+	while(1)
+	{
+		if(!set_timeout(0,TIMER_3, USE_TIMER))
+		{
+			break;			//stop trying on timeout return bad reply
+		}
+
+		
+		// Check for reply
+		reply_Id = xbee_hasReply(db_cmd_type, EQUAL);
+		
+		if (reply_Id == 0xFF)
+		{//no reply - send again - wait delay ms
+			//xbee_send_msg(buffer, length); no retrys for now
+		}
+		else
+		{//valid reply - mark as read - finish
+			frameBuffer[reply_Id].status = 0xFF;											//mark as read
+			memcpy(buffer, (uint8_t*)frameBuffer[reply_Id].data, frameBuffer[reply_Id].data_len); 	//copy data to buffer
+			return reply_Id;
+		}
+	
+		if ((retransmitcounter%100) == 0 )
+		{
+			xbee_send_msg(buffer, length);
+		}
+			retransmitcounter++;
+		
+		_delay_ms(50);
+		
+	}
+	return 0xFF;
+}
+
+
+
+uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length){
+	uint8_t reply_Id = 0xFF;
+	
+
+	// Any network error
+	print_info(STR_SENDING, 0);
+
+	//pack packet
+	uint8_t sendbuffer[SINGLE_FRAME_LENGTH];
+	
+	memcpy(sendbuffer,buffer,length);
+
+	uint8_t temp_bytes_number = xbee_pack_tx64_frame(db_cmd_type, sendbuffer, length, xbee.dest_high, xbee.dest_low);
+	
+	reply_Id = xbee_send_and_get_reply(sendbuffer, temp_bytes_number, db_cmd_type, 2000);
+	
+	if(reply_Id == 0xFF)	//request failed!
+	{
+		print_info(STR_SENDING_ERROR, 0);
+		_delay_ms(300);
+		SET_ERROR(NO_REPLY_ERROR);
+	}
+	else {
+		memcpy(buffer, (uint8_t*)frameBuffer[reply_Id].data, frameBuffer[reply_Id].data_len);
+		
+		print_info(STR_SENDING_OK, 0);
+		_delay_ms(300);
+		xbee.status_byte = 0;   // Clears all ERRORS
+	}
+	
+	
+
+	
+	return reply_Id; //if you want to get reply data afterwards
+	//note, that data copied to buffer anyway, delete memcpy and use frameBuffer[index].data[] instead
+}
+
+
+
+// Send request and receive answer
+uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
+{
+	
+	
+	// =================================================================
+	// ========= TRY TO RESOLVE EXISTING NETWORK ERRORS ================
+	// =================================================================
+	uint8_t reply_Id = 0xFF;
+	uint8_t recon_already_tried = 0;
+
+	if (  xbee_is_connected() ||  /*CHECK_ERROR(NO_REPLY_ERROR) ||*/ CHECK_ERROR(NETWORK_ERROR) )
+	{
+		print_info(STR_CHECK_NETWORK, 0);
+		
+		recon_already_tried = 1;
+		
+		if (xbee_reconnect()){
+			return reply_Id;
+		}
+	}
+	
+	//===================================================================
+	// =============== DEVICE IS SUCCESSFULLY REASSOCIATED ==============
+	// ========= OR THERE WAS NO PREEXISTING NETWORK ERROR ==============
+	// ==================================================================
+	//       !but there might still be an undetected network error!
+	
+	reply_Id = xbee_send_request_only(db_cmd_type, buffer,  length);
+	
+	if (reply_Id == 0xFF) 	// Transmit Failed
+	{
+		if (!recon_already_tried){ // Try reconnect then send again
+			if (!xbee_reconnect())
+			{	// reconn successful
+				reply_Id = xbee_send_request_only( db_cmd_type,buffer,  length);
+			}
+			
+			
+		}
+		
+	}
+
+	
+	// ================================================================
+	// ====== THE TRANSMISSION FAILED SET ERRORS ACCORDINGLY ==========
+	// ================================================================
+	if (reply_Id == 0xFF)
+	{
+		// Network error occurred
+		print_info(STR_NO_NETWORK, 0);
+		_delay_ms(1000);
+		switch(db_cmd_type)
+		{
+			case FILLING_BEGIN_MSG:
+			SET_ERROR(STARTED_FILLING_ERROR);
+			break;
+			case FILLING_END_MSG:
+			SET_ERROR(STOPPED_FILLING_ERROR);
+			break;
+			case OPTIONS_CHANGED_MSG:
+			SET_ERROR(CHANGED_OPTIONS_ERROR);
+			break;
+			case LONG_INTERVAL_MSG:
+			SET_ERROR(SLOW_TRANSMISSION_ERROR);
+			break;
+			//				case LETTERS_REQUEST:
+			//							SET_ERROR(LETTERS_ERROR);
+			break;
+		}
+	}
+
+	return reply_Id;
+}
+
+
+// Send message (and don't receive answer)
+uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
+{
+
+	
+	//	LCD_Print("test connection  ", 5, 20, 2, 1, 1, FGC, BGC);
+
+	if (/* !xbee_is_connected() || */ CHECK_ERROR(NETWORK_ERROR) )
+	{
+		if (CHECK_ERROR(NETWORK_ERROR))
+		{
+			print_info(STR_NETWORK_ERROR, 0);
+			_delay_ms(300);
+		}
+		print_info(STR_RECONNECTING, 0);
+
+		xbee_reconnect();
+	}
+	
+	if(!CHECK_ERROR(NETWORK_ERROR))
+	{
+		// Any network error
+		#ifdef ALLOW_DEBUG
+		print_info(STR_SENDING_MESSAGE, 0);
+		#endif
+
+		//pack packet
+		uint8_t temp_bytes_number = xbee_pack_tx64_frame(db_cmd_type, buffer, length, xbee.dest_high, xbee.dest_low);
+		
+		xbee_send_msg(buffer, temp_bytes_number);
+		return 1;
+	}
+	else
+	{
+		// Network error occurred
+		print_info(STR_NO_NETWORK, 0);
+		_delay_ms(1000);
+		switch(db_cmd_type)
+		{
+			case FILLING_BEGIN_MSG:
+			SET_ERROR(STARTED_FILLING_ERROR);
+			break;
+			case FILLING_END_MSG:
+			SET_ERROR(STOPPED_FILLING_ERROR);
+			break;
+			case OPTIONS_CHANGED_MSG:
+			SET_ERROR(CHANGED_OPTIONS_ERROR);
+			break;
+			case LONG_INTERVAL_MSG:
+			SET_ERROR(SLOW_TRANSMISSION_ERROR);
+			break;
+			//			case LETTERS_REQUEST:
+			//			SET_ERROR(LETTERS_ERROR);
+			break;
+		}
+		return 0;
+	}
+}
+
+_Bool xbee_get_server_adrr(void){
+	xbee.dest_low = xbee_get_address_block(DL_MSG_TYPE);
+	xbee.dest_high = xbee_get_address_block(DH_MSG_TYPE);
+	
+	if (xbee.dest_low && xbee.dest_high)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+
+void delay_ms(uint16_t period)	 //delay routine (milliseconds)
+{
+	for(unsigned int i=0; i<=period; i++)
+	_delay_ms(1);
+}
