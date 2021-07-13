@@ -250,8 +250,11 @@ uint8_t xbee_pack_tx64_frame(uint8_t db_cmd_type, uint8_t *params, uint8_t param
 	
 	
 	index = 19 + DEVICE_ID_STRING_LEN;
+	#else
 	
+	index = 19;
 	#endif
+	
 
 	
 	

@@ -11,10 +11,6 @@
 
 
 
-//TODO REMOVE
-#define LEVELMETER
-
-
 
 #ifdef LEVELMETER
 #define XBEE_AI_MESSAGE "AI Message"

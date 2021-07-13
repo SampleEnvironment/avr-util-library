@@ -24,9 +24,24 @@ typedef struct{
 }VersionType;
 
 
+
+
 extern volatile uint32_t  count_t_elapsed;
 
+void version_INIT(uint16_t Fw_version,uint8_t Branch_id,uint16_t FW_eeprom_changed);
 
+//################## PORT DEFINITIONS PER DEVICE ##################
+ 
+#ifdef LEVELMETER
+ #define SDA PINC4
+ #define SCL PINC2 
+#endif
+
+
+#ifdef GASCOUNTER_MODULE
+  #define SDA PINC1
+  #define SCL PINC0
+#endif
 
 
 
