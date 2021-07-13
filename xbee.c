@@ -8,32 +8,26 @@
 #include <util/delay.h>
 #include <string.h>
 #include <stdbool.h>
+#include <avr/io.h>
 
-#include "display_utilities.h"
-#include "keyboard.h"
-#include "main.h"
-#include "timer_utilities.h"
+
+
 #include "usart.h"
 #include "xbee_utilities.h"
 #include "xbee.h"
-#ifdef DISP_3000
-#include "StringPixelCoordTable.h"
-#endif
-#ifdef ili9341
-#include "StringPixelCoordTable_ili9341.h"
-//#include "StringPixelCoordTable.h"
-#endif
+#include "module_globals.h"
+#include "printInfo_strings.h"
 
-//char ltemp[20];
-char infostr[20];
+
+
 
 
 /**
-* @brief Holds Function to print Infoline
+* @brief Holds device specific Function to print Infoline
 *
 * Paints an info message on the LCD
 */
-void (*print_info)(char * infotext,_Bool update);
+void (*print_info)(char *, _Bool )  = NULL;
 
 //=========================================================================
 // XBee variables
@@ -44,10 +38,11 @@ XbeeType xbee = {
 	.sleep_period = 1,
 	.awake_period = 120,
 	.sleeping = false,
-	.status_byte = 0
+	.status_byte = 0,
+	.associated = 0
 };
 
-void_xbee_init(void *(printInfoFun)(char *,_Bool)){
+void xbee_init(void (*printInfoFun)(char *,_Bool)){
 	print_info = printInfoFun;
 }
 
@@ -99,7 +94,9 @@ _Bool CHECK_ERROR(enum StatusBit Bit){
 }
 
 
+//TODO remove xbee_wake_up_plus() and xbee_sleep_plus()
 // wake up xbee and set timer and status variables
+/*
 inline void xbee_wake_up_plus(void)
 {
 	if (xbee.sleeping)
@@ -129,25 +126,22 @@ inline void xbee_sleep_plus(void)
 	set_timeout(xbee.sleep_period*60, TIMER_5, USE_TIMER);
 	//	LCD_Print("xbee_sleep_plus", 5, 40, 2, 1, 1, FGC, BGC);
 }
-
+*/
 
 
 // Set XBee module to sleep mode
 inline void xbee_sleep(void)
 {
-	#ifdef ALLOW_XBEE_SLEEP				// Right defined in main.c
 	PORTA|=(1<<PA6);				// Set PA6 as true
 	_delay_ms(20);
-	#endif
+
 }
 
 // Wake up XBee module
 inline void xbee_wake_up(void)
 {
-	#ifdef ALLOW_XBEE_SLEEP				// Right defined in main.c
 	PORTA&=~(1<<PA6);				// Set PA6 as false
 	_delay_ms(30);
-	#endif
 	
 }
 
@@ -167,7 +161,7 @@ uint8_t xbee_is_connected(void)
 	reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AI_MSG_TYPE, 1000);
 
 	#ifdef ALLOW_DEBUG
-	print_info("AI Message", 0);
+	print_info(XBEE_AI_MESSAGE, 0);
 	_delay_ms(1000);
 	#endif
 	
@@ -187,7 +181,7 @@ uint8_t xbee_is_connected(void)
 }
 
 
-uint16_t xbee_hardware_version(void){
+uint8_t xbee_hardware_version(void){
 	uint8_t buffer[SINGLE_FRAME_LENGTH];
 	
 	buffer[0] = (uint8_t)'H';
@@ -200,8 +194,12 @@ uint16_t xbee_hardware_version(void){
 	if(reply_Id == 0xFF) return 0;
 	
 	
-	return (frameBuffer[reply_Id].data[0] << 8) + frameBuffer[reply_Id].data[1] ;
+	uint16_t hw_version_16 = (frameBuffer[reply_Id].data[0] << 8) + frameBuffer[reply_Id].data[1] ;
 	
+	
+	version.hw_version_xbee = (hw_version_16 > 0x2000)? XBEE_V_SC2 : XBEE_V_S1;
+
+	return version.hw_version_xbee;
 }
 
 
@@ -235,32 +233,32 @@ _Bool xbee_reset_connection(void)
 	while(1){
 		
 		_delay_ms(100);
-		print_info("Reassociating.  ",1);
+		print_info(XBEE_REASSOCIATE_  ,1);
 		
 		_delay_ms(100);
-		print_info("Reassociating . ",1);
+		print_info(XBEE_REASSOCIATE__ ,1);
 		
 		_delay_ms(100);
-		print_info("Reassociating  .",1);
+		print_info(XBEE_REASSOCIATE___,1);
 		
-		if((LVM.version->hw_version_xbee == XBEE_V_S1)&& Xbee_Associated){
-			print_info("Device Associated",1);
+		if((version.hw_version_xbee  == XBEE_V_S1)&& xbee.associated){
+			print_info(XBEE_DEVICE_ASSOCIATED,1);
 			return 1;
 			
 		}
 
-		if(LVM.version->hw_version_xbee == XBEE_V_SC2 && xbee_is_connected() == 0){
-			print_info("Device Associated",1);
+		if(version.hw_version_xbee == XBEE_V_SC2 && xbee_is_connected() == 0){
+			print_info(XBEE_DEVICE_ASSOCIATED,1);
 			return 1;
 		}
 		
 		
 		if (timeout_count > 30)
 		{
-			print_info("",0);
-			print_info("failed",1);
+			print_info(XBEE_PRINT_NULL,0);
+			print_info(XBEE_FAILED,1);
 			_delay_ms(1000);
-			print_info("",0);
+			print_info(XBEE_PRINT_NULL,0);
 			return 0;
 		}
 		timeout_count ++;
@@ -277,18 +275,18 @@ _Bool xbee_reset_connection(void)
 uint8_t xbee_reconnect(void)
 {
 	_delay_ms(300);
-	#ifdef ALLOW_COM
+
 	if(!xbee_reset_connection())
 	{
 		SET_ERROR(NETWORK_ERROR);
-		print_info(STR_NETWORK_ERROR, 0);
+		print_info(XBEE_NETWORK_ERROR, 0);
 		_delay_ms(300);
 		return 1;
 	}
 	else if (!((xbee.dest_low = xbee_get_address_block(DL_MSG_TYPE)) && (xbee.dest_high = xbee_get_address_block(DH_MSG_TYPE))))
 	{
 		SET_ERROR(NETWORK_ERROR);
-		print_info(STR_NETWORK_ERROR_ADDR , 0);
+		print_info(XBEE_NETWORK_ERROR_ADDR , 0);
 		_delay_ms(300);
 		return 1;
 	}
@@ -298,7 +296,7 @@ uint8_t xbee_reconnect(void)
 	_delay_ms(1000);
 	return 0;
 
-	#endif
+
 }
 
 // Start USART0 transmission to XBee module
@@ -341,15 +339,14 @@ uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_
 	xbee_send_msg(buffer, length);
 	
 	//reset timer!
-	set_timeout(0, TIMER_3, RESET_TIMER);
-	set_timeout(COM_TIMEOUT_TIME, TIMER_3, USE_TIMER);
-	
-	uint16_t retransmitcounter = 1;
+	uint32_t time_first_try = count_t_elapsed;
+	uint8_t delta_t;
 	
 	// main part
 	while(1)
 	{
-		if(!set_timeout(0,TIMER_3, USE_TIMER))
+		delta_t = count_t_elapsed - time_first_try;
+		if(delta_t > COM_TIMEOUT_TIME)
 		{
 			break;			//stop trying on timeout return bad reply
 		}
@@ -357,9 +354,11 @@ uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_
 		
 		// Check for reply
 		reply_Id = xbee_hasReply(db_cmd_type, EQUAL);
+		_delay_ms(10);
 		
 		if (reply_Id == 0xFF)
 		{//no reply - send again - wait delay ms
+			// NO RETRYS
 			//xbee_send_msg(buffer, length); no retrys for now
 		}
 		else
@@ -368,14 +367,6 @@ uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_
 			memcpy(buffer, (uint8_t*)frameBuffer[reply_Id].data, frameBuffer[reply_Id].data_len); 	//copy data to buffer
 			return reply_Id;
 		}
-	
-		if ((retransmitcounter%100) == 0 )
-		{
-			xbee_send_msg(buffer, length);
-		}
-			retransmitcounter++;
-		
-		_delay_ms(50);
 		
 	}
 	return 0xFF;
@@ -388,7 +379,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 	
 
 	// Any network error
-	print_info(STR_SENDING, 0);
+	print_info(XBEE_SENDING, 0);
 
 	//pack packet
 	uint8_t sendbuffer[SINGLE_FRAME_LENGTH];
@@ -401,14 +392,14 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 	
 	if(reply_Id == 0xFF)	//request failed!
 	{
-		print_info(STR_SENDING_ERROR, 0);
+		print_info(XBEE_SENDING_ERROR, 0);
 		_delay_ms(300);
 		SET_ERROR(NO_REPLY_ERROR);
 	}
 	else {
 		memcpy(buffer, (uint8_t*)frameBuffer[reply_Id].data, frameBuffer[reply_Id].data_len);
 		
-		print_info(STR_SENDING_OK, 0);
+		print_info(XBEE_SENDING_OK, 0);
 		_delay_ms(300);
 		xbee.status_byte = 0;   // Clears all ERRORS
 	}
@@ -435,7 +426,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 
 	if (  xbee_is_connected() ||  /*CHECK_ERROR(NO_REPLY_ERROR) ||*/ CHECK_ERROR(NETWORK_ERROR) )
 	{
-		print_info(STR_CHECK_NETWORK, 0);
+		print_info(XBEE_CHECK_NETWORK, 0);
 		
 		recon_already_tried = 1;
 		
@@ -472,7 +463,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	if (reply_Id == 0xFF)
 	{
 		// Network error occurred
-		print_info(STR_NO_NETWORK, 0);
+		print_info(XBEE_NO_NETWORK, 0);
 		_delay_ms(1000);
 		switch(db_cmd_type)
 		{
@@ -509,10 +500,10 @@ uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	{
 		if (CHECK_ERROR(NETWORK_ERROR))
 		{
-			print_info(STR_NETWORK_ERROR, 0);
+			print_info(XBEE_NETWORK_ERROR, 0);
 			_delay_ms(300);
 		}
-		print_info(STR_RECONNECTING, 0);
+		print_info(XBEE_RECONNECTING, 0);
 
 		xbee_reconnect();
 	}
@@ -521,7 +512,7 @@ uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	{
 		// Any network error
 		#ifdef ALLOW_DEBUG
-		print_info(STR_SENDING_MESSAGE, 0);
+		print_info(XBEE_SENDING_MESSAGE, 0);
 		#endif
 
 		//pack packet
@@ -533,7 +524,7 @@ uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	else
 	{
 		// Network error occurred
-		print_info(STR_NO_NETWORK, 0);
+		print_info(XBEE_NO_NETWORK, 0);
 		_delay_ms(1000);
 		switch(db_cmd_type)
 		{

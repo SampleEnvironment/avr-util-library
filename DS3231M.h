@@ -60,9 +60,9 @@
 extern struct tm Time;
 extern time_t last_Valid_Time;
 
-uint8_t init_DS3231M(void *(printInfoFun)(char *,_Bool));
+uint8_t init_DS3231M(void (*printInfoFun)(char *,_Bool));
 uint8_t DS3231M_read_register(uint8_t register_address);
-void DS3231M_read_time(bool For_Meas);
+void DS3231M_read_time(void);
 void DS3231M_set_time(struct tm *newtime);
 void DS3231M_write_register(uint8_t register_address, uint8_t data);
 uint8_t check_valid_ranges(struct tm * newtime);

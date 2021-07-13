@@ -16,13 +16,13 @@
 volatile BuffType *setPtr;
 volatile BuffType frameBuffer[BUFFER_LENGTH];
 volatile uint8_t bufferSize;
-volatile uint8_t Xbee_Associated = 0;
 
 
 
 
 
-// 
+
+//
 void buffer_init(void)
 {
 	setPtr = (BuffType*)&frameBuffer; 	// Set up the IN pointer to the start of the buffer
@@ -54,32 +54,32 @@ uint8_t xbee_hasReply(uint8_t cmd_type, uint8_t range)
 	switch(range)
 	{
 		case EQUAL:
-			for(uint8_t i = 0; i < bufferSize; ++i)
-			{	
-				if((frameBuffer[i].status == 0x00) && (frameBuffer[i].type == cmd_type))
-				{
-					return i;
-				}
+		for(uint8_t i = 0; i < bufferSize; ++i)
+		{
+			if((frameBuffer[i].status == 0x00) && (frameBuffer[i].type == cmd_type))
+			{
+				return i;
 			}
-			break;
-// 		case LESS_THAN:
-// 			for(uint8_t i = 0; i < bufferSize; ++i)
-// 			{	
-// 				if((frameBuffer[i].status == 0x00) && (frameBuffer[i].type < cmd_type))
-// 				{
-// 					return i;
-// 				}
-// 			}
-// 			break;
+		}
+		break;
+		// 		case LESS_THAN:
+		// 			for(uint8_t i = 0; i < bufferSize; ++i)
+		// 			{
+		// 				if((frameBuffer[i].status == 0x00) && (frameBuffer[i].type < cmd_type))
+		// 				{
+		// 					return i;
+		// 				}
+		// 			}
+		// 			break;
 		case GREATER_THAN:
-			for(uint8_t i = 0; i < bufferSize; ++i)
-			{	
-				if((frameBuffer[i].status == 0x00) && (frameBuffer[i].type > cmd_type))
-				{
-					return i;
-				}
+		for(uint8_t i = 0; i < bufferSize; ++i)
+		{
+			if((frameBuffer[i].status == 0x00) && (frameBuffer[i].type > cmd_type))
+			{
+				return i;
 			}
-			break;
+		}
+		break;
 	}
 	return 0xFF;
 }
@@ -114,32 +114,32 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 	switch(newFrame.api_id)
 	{
 		case AT_ID:
-					newFrame.status = buffer[7];
-					newFrame.type = get_at_frame_type((char*) &buffer[5], 2);
-					
-					//write data
-					if (length < (8+1)) return;
-					for (uint8_t i = 8; i < length; ++i)
-						newFrame.data[data_counter++] = buffer[i];
-					newFrame.data_len = --data_counter;
-					break;
+		newFrame.status = buffer[7];
+		newFrame.type = get_at_frame_type((char*) &buffer[5], 2);
+		
+		//write data
+		if (length < (8+1)) return;
+		for (uint8_t i = 8; i < length; ++i)
+		newFrame.data[data_counter++] = buffer[i];
+		newFrame.data_len = --data_counter;
+		break;
 		case RX_ID:
-					
-					newFrame.type = buffer[14];
-					newFrame.status = buffer[15];
-					
-					if (length < (16+1)) return;
-					for (uint8_t i = 16; i < length; ++i)
-						newFrame.data[data_counter++] = buffer[i];
-					newFrame.data_len = --data_counter;
-					break;
+		
+		newFrame.type = buffer[14];
+		newFrame.status = buffer[15];
+		
+		if (length < (16+1)) return;
+		for (uint8_t i = 16; i < length; ++i)
+		newFrame.data[data_counter++] = buffer[i];
+		newFrame.data_len = --data_counter;
+		break;
 		case STA_ID:
 		if (buffer[4]==2)
 		{
-			Xbee_Associated = 1;
+			xbee.associated = 1;
 			
 			}else if(buffer[4]==3){
-			Xbee_Associated = 0;
+			xbee.associated = 0;
 		}
 		newFrame.status =  0xFF;
 		newFrame.type = STATUS_MSG_TYPE;
@@ -180,7 +180,7 @@ uint8_t xbee_pack_tx_frame(uint8_t *params, uint8_t paramsNumber)
 	uint8_t *temp = params;
 
 	temp_buffer[0] = 0x7E;		// Start delimiter
-	// Let index 1 & 2 free for storing frame length 
+	// Let index 1 & 2 free for storing frame length
 	temp_buffer[3] = 0x08;   	// API Identifier Value for AT Command type allows for module parameters to be queried or set.
 	temp_buffer[4] = 0x42;		// Constant Frame ID arbitrarily selected / Different of 0 to get an answer
 	
@@ -196,7 +196,7 @@ uint8_t xbee_pack_tx_frame(uint8_t *params, uint8_t paramsNumber)
 	temp_buffer[2] = (index-3);
 	
 	memcpy(temp, temp_buffer, index+1);		// Store frame in the params array
-		
+	
 	return index+1;		// Return number of bytes packed
 }
 // Function provided for convenience.
@@ -214,11 +214,11 @@ uint8_t xbee_pack_tx64_frame(uint8_t db_cmd_type, uint8_t *params, uint8_t param
 	uint8_t *temp = params;
 	
 	temp_buffer[0] = 0x7E;		// Start delimiter
-	// Let index 1 & 2 free for storing frame length 
+	// Let index 1 & 2 free for storing frame length
 	temp_buffer[3] = 0x00;   	// API Identifier Value for 64-bit TX Request message will cause the module to send RF Data as an RF Packet.
 	temp_buffer[4] = 0x00;		// Constant Frame ID arbitrarily selected
-								// Identifies the UART data frame for the host to correlate with a subsequent ACK (acknowledgment).
-								// Setting Frame ID to ‘0' will disable response frame.
+	// Identifies the UART data frame for the host to correlate with a subsequent ACK (acknowledgment).
+	// Setting Frame ID to ‘0' will disable response frame.
 	
 	// 32-bit destination address high
 	temp_buffer[5] = (uint8_t)(dest_high >> 24);
@@ -236,11 +236,12 @@ uint8_t xbee_pack_tx64_frame(uint8_t db_cmd_type, uint8_t *params, uint8_t param
 	temp_buffer[14] = db_cmd_type;		// Database command type
 	
 	temp_buffer[15] = MESSAGEFOPRMAT_IDENTIFIER;
-	temp_buffer[16] = LVM.version->Branch_id;
-	temp_buffer[17] = (uint8_t)( LVM.version->Fw_version >> 8); //MSB
-	temp_buffer[18] = (uint8_t) (LVM.version->Fw_version );  //LSB
+	temp_buffer[16] = version.Branch_id;
+	temp_buffer[17] = (uint8_t)( version.Fw_version>> 8); //MSB
+	temp_buffer[18] = (uint8_t) (version.Fw_version );  //LSB
 
 	
+	#ifdef LEVELMETER
 	// Pack entered device number in buffer
 	for(uint8_t i = 0; i < DEVICE_ID_STRING_LEN; i++){
 		temp_buffer[i+19] = LVM.vars->Device_ID_Str[i];
@@ -250,12 +251,15 @@ uint8_t xbee_pack_tx64_frame(uint8_t db_cmd_type, uint8_t *params, uint8_t param
 	
 	index = 19 + DEVICE_ID_STRING_LEN;
 	
+	#endif
+
+	
 	
 
 	// Parameter
 	while (paramsNumber)
 	{
-		temp_buffer[index] = *params++;	
+		temp_buffer[index] = *params++;
 		index++;
 		paramsNumber--;
 	}
@@ -313,7 +317,7 @@ uint8_t xbee_get_packet_len(uint8_t *buffer)
 // Used only with "DL" and "DH" command type
 uint32_t xbee_get_address_block(uint8_t cmd_type)
 {
-	uint32_t dest_addr;	
+	uint32_t dest_addr;
 	uint8_t send_buffer[SINGLE_FRAME_LENGTH];
 	
 	if(cmd_type == DL_MSG_TYPE)

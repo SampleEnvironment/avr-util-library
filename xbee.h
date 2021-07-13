@@ -4,7 +4,8 @@
 #define XBEE_H_
 
 #include <util/delay.h>
-#include "main.h"
+#include "module_globals.h"
+
 
 
 //====================================================================
@@ -20,6 +21,7 @@ typedef struct
 	uint8_t		awake_period;     // in seconds
 	_Bool 		sleeping ;
 	uint8_t     status_byte;				// Status byte
+	volatile uint8_t associated ;
 	
 }XbeeType;
 
@@ -35,17 +37,28 @@ enum StatusBit
 	STOPPED_FILLING_ERROR,
 	CHANGED_OPTIONS_ERROR,
 	SLOW_TRANSMISSION_ERROR,
-	LETTERS_ERROR,
+	LETTERS_ERROR
 };
+
+enum XBEE_HW_VERSION
+{
+	XBEE_V_S1 = 1,
+	XBEE_V_SC2
+	
+};
+
+#define COM_TIMEOUT_TIME 	10 // timeout for xbee connection in seconds
+
 
 //TODO RF Data can only be 100 Bytes --> TEST CASE
 #define SINGLE_FRAME_LENGTH 	256		// Full length of one frame  ATTENTION if changed then change DATA_LENGTH in xbee_utilities.h as well
-
 
 //#define XBEE_AWAKE_TIME			30		// Time in seconds
 
 extern volatile uint8_t *send_str_reader;			// Pointer to the next byte to send via USART
 extern volatile uint8_t sending_cmd;				// Number of bytes to send via USART
+extern VersionType version;
+
 
 //==============================================================
 // Database server commands
@@ -93,8 +106,6 @@ extern volatile uint8_t sending_cmd;				// Number of bytes to send via USART
 
 
 
-extern volatile uint8_t Xbee_Associated;
-
 
 
 
@@ -102,6 +113,8 @@ extern volatile uint8_t Xbee_Associated;
 //==============================================================
 // XBee commands
 //==============================================================
+
+void xbee_init(void (*printInfoFun)(char *,_Bool));
 
 void xbee_set_busy(_Bool busy_state);
 _Bool xbee_get_busy(void);
@@ -123,7 +136,7 @@ void xbee_sleep_plus(void);
 uint8_t xbee_is_connected(void);           // checks if xbee is connected to coordinator
 _Bool xbee_reset_connection(void);		// Reset connection with the xbee coordinator and initiate a new one
 // Returns true if reconnection is successfull, false otherwise
-uint16_t xbee_hardware_version(void);
+uint8_t xbee_hardware_version(void);
 uint8_t xbee_reconnect(void);			// Try a new connection with the server
 void xbee_send(uint8_t *data);			// Start USART0 transmission to XBee module
 void xbee_send_msg(uint8_t *buffer, uint8_t length);	// Send message via XBee module

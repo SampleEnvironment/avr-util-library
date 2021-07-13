@@ -5,9 +5,13 @@
 
 // Includes
 #include <avr/io.h>
-#include "main.h"
+#include "xbee.h"
 
-extern void (*print_info)(char * infotext,_Bool update);
+#define BUFFER_LENGTH	10        		    // maximum frames
+#define DATA_LENGTH		256-16				// maximum data in frame   ATTENTION if changed then change SINGLE_FRAME_LENGTH in xbee.h as well
+
+
+extern XbeeType xbee;
 
 #define BUFF_ClearBuffer()     bufferSize = 0;
 
@@ -37,10 +41,11 @@ enum  reply_type{
 
 
 
+#define MESSAGEFOPRMAT_IDENTIFIER 128	// Identifier used, to differentiate between old and new messageformat
 
 
 
-extern LVM_ModelType LVM;
+
 
 
 //==============================================================

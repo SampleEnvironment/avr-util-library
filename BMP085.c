@@ -10,11 +10,13 @@
 */
 
 #include <string.h>
+#include <util/delay.h>
 
 #include "BMP085.h"
 #include "I2C_utilities.h"
+#include "status.h"
 
-static uint8_t BMP_OSS = 1;  /**< @brief  chose oversampling setting : precision 0 = low power, 1 = standard, 2 = high, 3 ultra high  */
+
 
 // specific constants varying from BMP to BMP
 volatile int16_t AC1;
@@ -60,7 +62,7 @@ void (*print_info)(char * infotext,_Bool update);
 *
 * @return uint8_t zero on success or a non-zero error value otherwise
 */
-uint8_t init_BMP(void *(printInfoFun)(char *,_Bool))
+uint8_t init_BMP(void (*printInfoFun)(char *,_Bool))
 {
 	
 	print_info = printInfoFun;

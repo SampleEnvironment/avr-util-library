@@ -53,6 +53,7 @@
 	  uint8_t TWI;			  /**< @brief  Indication of I2C-Bus connectivity for preventing loops  */
   }connectedType;
 
+extern connectedType connected;
 
 uint8_t I2C_read_from(uint8_t I2C_Bus_address ,uint8_t register_address, uint8_t * data,uint8_t lenght);
 uint8_t I2C_write_to(uint8_t I2C_Bus_address, uint8_t register_address, uint8_t *data,uint8_t length);

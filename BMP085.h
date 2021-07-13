@@ -28,8 +28,10 @@
 extern volatile int16_t	BMP_Temperature;  /**< @brief  Temerature measured by the BMP in 0.1K   */
 extern volatile uint32_t	BMP_Pressure;  /**< @brief Pressure measured by the BMP in mbar  */
 
+#define  BMP_OSS 1   /**< @brief  chose oversampling setting : precision 0 = low power, 1 = standard, 2 = high, 3 ultra high  */
 
-uint8_t init_BMP(void *(printInfoFun)(char *,_Bool));
+
+uint8_t init_BMP(void (*printInfoFun)(char *,_Bool));
 int16_t BMP_get_value_from_address(uint8_t address);
 uint8_t BMP_Connected(void);
 int16_t BMP_calc_temperature(uint16_t UT);

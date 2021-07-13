@@ -3,6 +3,8 @@
 #ifndef USART_H
 #define USART_H
 
+#include <avr/interrupt.h>
+
 //RS232 USART constants
 #define USART_BAUDRATE 	9600			// Define USART0 baudrate
 #define USART_IODR 		UDR0			// Define USART0 I/O Data Register

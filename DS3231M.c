@@ -46,7 +46,7 @@ struct tm Time;
 *
 * Paints an info message on the LCD 
 */
-void (*print_info)(char * infotext,_Bool update);
+void (*print_info)(char * ,_Bool ) = NULL;
 
 
 
@@ -59,7 +59,7 @@ void (*print_info)(char * infotext,_Bool update);
 * @return uint8_t  0 on success and greater zero if initialization was unsuccessful
 *
 */
-uint8_t init_DS3231M(void *(printInfoFun)(char *,_Bool))
+uint8_t init_DS3231M(void (*printInfoFun)(char *,_Bool))
 {
 	print_info = printInfoFun;
 
@@ -203,7 +203,7 @@ void DS3231M_set_time(struct tm *newtime)
 *
 * @return void
 */
-void DS3231M_read_time()
+void DS3231M_read_time(void)
 {
 	//Funtrace_enter(13);
 	if (!connected.TWI)	{return;}
