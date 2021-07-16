@@ -38,8 +38,19 @@
 
 ;******----- Adapt these SCA and SCL port and pin definition to your target !!
 ;
-#define SDA             4           // SDA Port C, Pin 4   
-#define SCL             2           // SCL Port C, Pin 2
+#ifdef LEVELMETER
+ #define SDA 4
+ #define SCL 2 
+#endif
+
+
+#ifdef GASCOUNTER_MODULE
+  #define SDA 1
+  #define SCL 0
+#endif
+
+
+
 #define SDA_PORT        PORTC       // SDA Port C
 #define SCL_PORT        PORTC       // SCL Port C         
 
