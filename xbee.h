@@ -71,7 +71,14 @@ extern VersionType version;
 #define STATUS_MSG				10		// Send levels and status to the database server							ATTENTION: in the case of failing communication with database server: store measurement for future transmission
 
 
+
+#ifdef LEVELMETER
 #define LAST_NON_CMD_MSG		10		// Search no ack commands only (see xbee_hasReply)
+#endif
+
+#ifdef GASCOUNTER_MODULE
+#define LAST_NON_CMD_MSG		95		// Search no ack commands only (see xbee_hasReply)
+#endif
 
 // Requests without answer sent from the device
 #define UNKNOWN_MSG				11		// Unknown command received from database server
