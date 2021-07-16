@@ -13,6 +13,7 @@
 
 #include <util/delay.h>
 #include "i2cmaster.h"
+#include "module_globals.h"
 
 
   #define LOW 0
