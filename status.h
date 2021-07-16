@@ -37,6 +37,8 @@ void CLEAR_ALL(void);
 void set_status_byte(uint16_t status_byte);
 uint8_t get_status_byte(void);
 
+uint8_t get_status_byte_levelmeter(void);
+
 
 
 

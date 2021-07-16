@@ -116,8 +116,7 @@ void xbee_set_awake_period(uint8_t awake_period);
 uint8_t xbee_get_awake_period(void);
 void xbee_set_sleep_period(uint8_t sleep_period);
 uint8_t xbee_get_sleep_period(void);
-void xbee_set_status_byte(uint8_t status_byte);
-uint8_t xbee_get_status_byte(void);
+
 
 
 void xbee_sleep(void);			// Set XBee module to sleep mode
