@@ -41,6 +41,10 @@
 struct tm Time;
 
 
+int8_t temp_MSB;
+uint8_t temp_LSB;
+
+
 /**
 * @brief Holds Function to print Infoline 
 *
@@ -265,6 +269,35 @@ void DS3231M_read_time(void)
 
 	
 	
+}
+
+void DS3231M_read_temperature(void)
+{
+	uint8_t data[2];
+
+	uint8_t i2c_ret_code = I2C_read_from(DS3231M_address,DS3231M_address_temp_MSB,data,2);
+	
+	if(i2c_ret_code == I2C_ERROR ){
+		print_info("i2cERR",0);
+		connected.TWI = 0;
+		SET_ERROR(I2C_BUS_ERROR);
+		SET_ERROR(TIMER_ERROR);
+		_delay_ms(2000);
+		return;
+	}
+	if(i2c_ret_code == DEVICE_NOT_CONNECTED){
+		connected.DS3231M = 0;
+		SET_ERROR(I2C_BUS_ERROR);
+		SET_ERROR(TIMER_ERROR);
+		return;
+	}
+
+	
+	temp_MSB=data[0];
+	temp_LSB=data[1];
+
+	
+	DS3231M_Temperature = ((float) temp_MSB + ((float) (temp_LSB >> 6) / 4) + 273);
 }
 
 
