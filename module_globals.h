@@ -28,6 +28,8 @@ typedef struct{
 
 extern volatile uint32_t  count_t_elapsed;
 
+extern VersionType version;
+
 void version_INIT(uint16_t Fw_version,uint8_t Branch_id,uint16_t FW_eeprom_changed);
 
 //################## PORT DEFINITIONS PER DEVICE ##################

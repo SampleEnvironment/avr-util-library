@@ -76,41 +76,6 @@ uint8_t xbee_get_sleep_period(void){
 
 
 
-//TODO remove xbee_wake_up_plus() and xbee_sleep_plus()
-// wake up xbee and set timer and status variables
-/*
-inline void xbee_wake_up_plus(void)
-{
-	if (xbee.sleeping)
-	{
-		xbee_wake_up();
-	
-	}
-
-	// Clear then set the timeout for awake time
-	set_timeout(0, TIMER_5, RESET_TIMER);
-	set_timeout(xbee.awake_period, TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
-
-	xbee.sleeping = false;									// Xbee module is not sleeping anymore
-
-}
-
-
-
-
-
-inline void xbee_sleep_plus(void)
-{
-	xbee_sleep();
-	xbee.sleeping = true;
-	// Clear then set the timeout for sleeping time
-	set_timeout(0, TIMER_5, RESET_TIMER);
-	set_timeout(xbee.sleep_period*60, TIMER_5, USE_TIMER);
-	//	LCD_Print("xbee_sleep_plus", 5, 40, 2, 1, 1, FGC, BGC);
-}
-*/
-
-
 // Set XBee module to sleep mode
 inline void xbee_sleep(void)
 {
