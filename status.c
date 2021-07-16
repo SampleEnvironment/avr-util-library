@@ -12,8 +12,10 @@ void set_status(uint16_t new_status){
 	status = new_status;
 }
 
+
+//TODO per Module definition needed
 uint16_t get_status(void){
-	return status;
+	return  (uint8_t )status;
 }
 
 

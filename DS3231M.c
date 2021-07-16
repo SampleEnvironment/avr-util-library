@@ -43,6 +43,7 @@ struct tm Time;
 
 int8_t temp_MSB;
 uint8_t temp_LSB;
+double DS3231M_Temperature;
 
 
 /**
