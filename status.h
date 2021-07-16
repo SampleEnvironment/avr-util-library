@@ -32,6 +32,7 @@ enum StatusBit
 void SET_ERROR(enum StatusBit Bit);
 void CLEAR_ERROR(enum StatusBit Bit);
 _Bool CHECK_ERROR(enum StatusBit Bit);
+void CLEAR_ALL(void);
 
 void set_status_byte(uint16_t status_byte);
 uint16_t get_status_byte(void);

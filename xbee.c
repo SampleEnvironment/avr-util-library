@@ -17,6 +17,7 @@
 #include "xbee.h"
 #include "module_globals.h"
 #include "printInfo_strings.h"
+#include "status.h"
 
 
 
@@ -38,7 +39,6 @@ XbeeType xbee = {
 	.sleep_period = 1,
 	.awake_period = 120,
 	.sleeping = false,
-	.status_byte = 0,
 	.associated = 0
 	
 };
@@ -74,27 +74,6 @@ uint8_t xbee_get_sleep_period(void){
 }
 
 
-
-void xbee_set_status_byte(uint8_t status_byte){
-	xbee.status_byte = status_byte;
-}
-
-uint8_t xbee_get_status_byte(void){
-	return xbee.status_byte;
-}
-
-
-void SET_ERROR(enum StatusBit Bit){
-	xbee.status_byte|=(1<<Bit);
-}
-
-void CLEAR_ERROR(enum StatusBit Bit){
-	xbee.status_byte&=~(1<<Bit);
-}
-
-_Bool CHECK_ERROR(enum StatusBit Bit){
-	return xbee.status_byte & (1<<Bit);
-}
 
 
 //TODO remove xbee_wake_up_plus() and xbee_sleep_plus()
@@ -404,7 +383,9 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 		
 		print_info(XBEE_SENDING_OK, 0);
 		_delay_ms(300);
-		xbee.status_byte = 0;   // Clears all ERRORS
+		
+		//TODO this is dangerous --> maybee a per device solution is needed
+		CLEAR_ALL();  // Clears all ERRORS
 	}
 	
 	

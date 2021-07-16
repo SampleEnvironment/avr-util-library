@@ -20,7 +20,6 @@ typedef struct
 	uint8_t		sleep_period;		// in minutes
 	uint8_t		awake_period;     // in seconds
 	_Bool 		sleeping ;
-	uint8_t     status_byte;				// Status byte
 	volatile uint8_t associated ;
 	char * dev_id_str;  // pointer to device ID
 	uint8_t dev_id_str_len; // max len of dev_id
@@ -31,16 +30,7 @@ typedef struct
 // Device status
 //==============================================================
 
-enum StatusBit
-{
-	NETWORK_ERROR,
-	NO_REPLY_ERROR,
-	STARTED_FILLING_ERROR,
-	STOPPED_FILLING_ERROR,
-	CHANGED_OPTIONS_ERROR,
-	SLOW_TRANSMISSION_ERROR,
-	LETTERS_ERROR
-};
+
 
 enum XBEE_HW_VERSION
 {
@@ -150,9 +140,7 @@ uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length);
 
 _Bool xbee_get_server_adrr(void);
 
-void SET_ERROR(enum StatusBit Bit);
-void CLEAR_ERROR(enum StatusBit Bit);
-_Bool CHECK_ERROR(enum StatusBit Bit);
+
 
 
 void delay_ms(uint16_t period);	 // User defined delay routine (milliseconds)

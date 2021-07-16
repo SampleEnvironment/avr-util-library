@@ -28,3 +28,7 @@ void CLEAR_ERROR(enum StatusBit Bit){
 _Bool CHECK_ERROR(enum StatusBit Bit){
 	return status & (1<<Bit);
 }
+
+void CLEAR_ALL(void){
+	status = 0;
+}
