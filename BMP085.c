@@ -53,7 +53,7 @@ volatile uint8_t BMP_temp_LSB = 0;
 *
 * Paints an info message on the LCD
 */
-void (*print_info)(char * infotext,_Bool update);
+void (*print_info_BMP)(char * infotext,_Bool update);
 
 
 /**
@@ -65,7 +65,7 @@ void (*print_info)(char * infotext,_Bool update);
 uint8_t init_BMP(void (*printInfoFun)(char *,_Bool))
 {
 	
-	print_info = printInfoFun;
+	print_info_BMP = printInfoFun;
 	
 	if (!(AC1 = BMP_get_value_from_address(0xAA)))
 	return 1;
@@ -379,7 +379,7 @@ uint8_t BMP_Temp_and_Pressure(void){
 
 void BMP_I2C_ERROR_handling(uint8_t i2c_ret_code){
 	if(i2c_ret_code == I2C_ERROR && connected.BMP_on_Startup ){
-		print_info("i2cERR",0);
+		print_info_BMP("i2cERR",0);
 		connected.TWI = 0;
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TEMPPRESS_ERROR);

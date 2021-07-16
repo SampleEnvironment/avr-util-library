@@ -50,7 +50,7 @@ uint8_t temp_LSB;
 *
 * Paints an info message on the LCD 
 */
-void (*print_info)(char * ,_Bool ) = NULL;
+void (*print_info_DS3231M)(char * ,_Bool ) = NULL;
 
 
 
@@ -65,7 +65,7 @@ void (*print_info)(char * ,_Bool ) = NULL;
 */
 uint8_t init_DS3231M(void (*printInfoFun)(char *,_Bool))
 {
-	print_info = printInfoFun;
+	print_info_DS3231M = printInfoFun;
 
 	Time.tm_sec = 0;
 	Time.tm_min = 0;
@@ -184,7 +184,7 @@ void DS3231M_set_time(struct tm *newtime)
 	uint8_t i2c_ret_code = I2C_write_to(DS3231M_address,DS3231M_address_seconds, data, 7);
 	
 	if(i2c_ret_code == I2C_ERROR ){
-		print_info("i2cERR",0);
+		print_info_DS3231M("i2cERR",0);
 		connected.TWI = 0;
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TIMER_ERROR);
@@ -216,7 +216,7 @@ void DS3231M_read_time(void)
 	uint8_t i2c_ret_code = I2C_read_from(DS3231M_address,DS3231M_address_seconds,data,7);
 	
 	if(i2c_ret_code == I2C_ERROR ){
-		print_info("i2cERR",0);
+		print_info_DS3231M("i2cERR",0);
 		connected.TWI = 0;
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TIMER_ERROR);
@@ -278,7 +278,7 @@ void DS3231M_read_temperature(void)
 	uint8_t i2c_ret_code = I2C_read_from(DS3231M_address,DS3231M_address_temp_MSB,data,2);
 	
 	if(i2c_ret_code == I2C_ERROR ){
-		print_info("i2cERR",0);
+		print_info_DS3231M("i2cERR",0);
 		connected.TWI = 0;
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TIMER_ERROR);

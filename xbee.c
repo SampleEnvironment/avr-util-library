@@ -28,7 +28,7 @@
 *
 * Paints an info message on the LCD
 */
-void (*print_info)(char *, _Bool )  = NULL;
+void (*print_info_xbee)(char *, _Bool )  = NULL;
 
 //=========================================================================
 // XBee variables
@@ -44,7 +44,7 @@ XbeeType xbee = {
 };
 
 void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len){
-	print_info = printInfoFun;
+	print_info_xbee = printInfoFun;
 	xbee.dev_id_str = dev_ID_str;
 	xbee.dev_id_str_len = max_devid_str_len;
 }
@@ -108,7 +108,7 @@ uint8_t xbee_is_connected(void)
 	reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AI_MSG_TYPE, 1000);
 
 	#ifdef ALLOW_DEBUG
-	print_info(XBEE_AI_MESSAGE, 0);
+	print_info_xbee(XBEE_AI_MESSAGE, 0);
 	_delay_ms(1000);
 	#endif
 	
@@ -180,32 +180,32 @@ _Bool xbee_reset_connection(void)
 	while(1){
 		
 		_delay_ms(100);
-		print_info(XBEE_REASSOCIATE_  ,1);
+		print_info_xbee(XBEE_REASSOCIATE_  ,1);
 		
 		_delay_ms(100);
-		print_info(XBEE_REASSOCIATE__ ,1);
+		print_info_xbee(XBEE_REASSOCIATE__ ,1);
 		
 		_delay_ms(100);
-		print_info(XBEE_REASSOCIATE___,1);
+		print_info_xbee(XBEE_REASSOCIATE___,1);
 		
 		if((version.hw_version_xbee  == XBEE_V_S1)&& xbee.associated){
-			print_info(XBEE_DEVICE_ASSOCIATED,1);
+			print_info_xbee(XBEE_DEVICE_ASSOCIATED,1);
 			return 1;
 			
 		}
 
 		if(version.hw_version_xbee == XBEE_V_SC2 && xbee_is_connected() == 0){
-			print_info(XBEE_DEVICE_ASSOCIATED,1);
+			print_info_xbee(XBEE_DEVICE_ASSOCIATED,1);
 			return 1;
 		}
 		
 		
 		if (timeout_count > 30)
 		{
-			print_info(XBEE_PRINT_NULL,0);
-			print_info(XBEE_FAILED,1);
+			print_info_xbee(XBEE_PRINT_NULL,0);
+			print_info_xbee(XBEE_FAILED,1);
 			_delay_ms(1000);
-			print_info(XBEE_PRINT_NULL,0);
+			print_info_xbee(XBEE_PRINT_NULL,0);
 			return 0;
 		}
 		timeout_count ++;
@@ -226,14 +226,14 @@ uint8_t xbee_reconnect(void)
 	if(!xbee_reset_connection())
 	{
 		SET_ERROR(NETWORK_ERROR);
-		print_info(XBEE_NETWORK_ERROR, 0);
+		print_info_xbee(XBEE_NETWORK_ERROR, 0);
 		_delay_ms(300);
 		return 1;
 	}
 	else if (!((xbee.dest_low = xbee_get_address_block(DL_MSG_TYPE)) && (xbee.dest_high = xbee_get_address_block(DH_MSG_TYPE))))
 	{
 		SET_ERROR(NETWORK_ERROR);
-		print_info(XBEE_NETWORK_ERROR_ADDR , 0);
+		print_info_xbee(XBEE_NETWORK_ERROR_ADDR , 0);
 		_delay_ms(300);
 		return 1;
 	}
@@ -326,7 +326,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 	
 
 	// Any network error
-	print_info(XBEE_SENDING, 0);
+	print_info_xbee(XBEE_SENDING, 0);
 
 	//pack packet
 	uint8_t sendbuffer[SINGLE_FRAME_LENGTH];
@@ -339,14 +339,14 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 	
 	if(reply_Id == 0xFF)	//request failed!
 	{
-		print_info(XBEE_SENDING_ERROR, 0);
+		print_info_xbee(XBEE_SENDING_ERROR, 0);
 		_delay_ms(300);
 		SET_ERROR(NO_REPLY_ERROR);
 	}
 	else {
 		memcpy(buffer, (uint8_t*)frameBuffer[reply_Id].data, frameBuffer[reply_Id].data_len);
 		
-		print_info(XBEE_SENDING_OK, 0);
+		print_info_xbee(XBEE_SENDING_OK, 0);
 		_delay_ms(300);
 		
 		//TODO this is dangerous --> maybee a per device solution is needed
@@ -375,7 +375,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 
 	if (  xbee_is_connected() ||  /*CHECK_ERROR(NO_REPLY_ERROR) ||*/ CHECK_ERROR(NETWORK_ERROR) )
 	{
-		print_info(XBEE_CHECK_NETWORK, 0);
+		print_info_xbee(XBEE_CHECK_NETWORK, 0);
 		
 		recon_already_tried = 1;
 		
@@ -412,7 +412,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	if (reply_Id == 0xFF)
 	{
 		// Network error occurred
-		print_info(XBEE_NO_NETWORK, 0);
+		print_info_xbee(XBEE_NO_NETWORK, 0);
 		_delay_ms(1000);
 		switch(db_cmd_type)
 		{
@@ -449,10 +449,10 @@ uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	{
 		if (CHECK_ERROR(NETWORK_ERROR))
 		{
-			print_info(XBEE_NETWORK_ERROR, 0);
+			print_info_xbee(XBEE_NETWORK_ERROR, 0);
 			_delay_ms(300);
 		}
-		print_info(XBEE_RECONNECTING, 0);
+		print_info_xbee(XBEE_RECONNECTING, 0);
 
 		xbee_reconnect();
 	}
@@ -461,7 +461,7 @@ uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	{
 		// Any network error
 		#ifdef ALLOW_DEBUG
-		print_info(XBEE_SENDING_MESSAGE, 0);
+		print_info_xbee(XBEE_SENDING_MESSAGE, 0);
 		#endif
 
 		//pack packet
@@ -473,7 +473,7 @@ uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	else
 	{
 		// Network error occurred
-		print_info(XBEE_NO_NETWORK, 0);
+		print_info_xbee(XBEE_NO_NETWORK, 0);
 		_delay_ms(1000);
 		switch(db_cmd_type)
 		{
