@@ -22,6 +22,8 @@ typedef struct
 	_Bool 		sleeping ;
 	uint8_t     status_byte;				// Status byte
 	volatile uint8_t associated ;
+	char * dev_id_str;  // pointer to device ID
+	uint8_t dev_id_str_len; // max len of dev_id
 	
 }XbeeType;
 
@@ -114,7 +116,7 @@ extern VersionType version;
 // XBee commands
 //==============================================================
 
-void xbee_init(void (*printInfoFun)(char *,_Bool));
+void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len);
 
 void xbee_set_busy(_Bool busy_state);
 _Bool xbee_get_busy(void);

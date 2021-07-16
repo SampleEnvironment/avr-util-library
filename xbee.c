@@ -40,10 +40,13 @@ XbeeType xbee = {
 	.sleeping = false,
 	.status_byte = 0,
 	.associated = 0
+	
 };
 
-void xbee_init(void (*printInfoFun)(char *,_Bool)){
+void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len){
 	print_info = printInfoFun;
+	xbee.dev_id_str = dev_ID_str;
+	xbee.dev_id_str_len = max_devid_str_len;
 }
 
 void xbee_set_sleeping(_Bool sleeping){

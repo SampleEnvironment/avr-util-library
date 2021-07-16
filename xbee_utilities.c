@@ -243,13 +243,11 @@ uint8_t xbee_pack_tx64_frame(uint8_t db_cmd_type, uint8_t *params, uint8_t param
 	
 	#ifdef LEVELMETER
 	// Pack entered device number in buffer
-	for(uint8_t i = 0; i < DEVICE_ID_STRING_LEN; i++){
-		temp_buffer[i+19] = LVM.vars->Device_ID_Str[i];
+	for(uint8_t i = 0; i < xbee.dev_id_str_len; i++){
+		temp_buffer[i+19] = xbee.dev_id_str[i];
 	}
-	
-	
-	
-	index = 19 + DEVICE_ID_STRING_LEN;
+		
+	index = 19 + xbee.dev_id_str_len;
 	#else
 	
 	index = 19;
