@@ -21,9 +21,7 @@
   
   #define  OUTPUT |=
   
-  #define SDA PINC1
-  #define SCL PINC0
-  
+ 
   #define pinMode(X,Y) (DDRC Y (_BV(X)))
   
   #define  INPUT_PULLUP(X) DDRC &= ~ (_BV(X)); PORTC |= _BV(X);
