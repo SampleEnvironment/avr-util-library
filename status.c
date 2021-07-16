@@ -8,14 +8,29 @@
 
 uint16_t status; 
 
-void set_status(uint16_t new_status){
+void set_status_byte(uint16_t new_status){
 	status = new_status;
 }
 
 
 //TODO per Module definition needed
-uint16_t get_status(void){
-	return  (uint8_t )status;
+uint8_t get_status_byte(void){
+	
+
+	uint8_t reduced_status = 0;
+	
+	#ifdef LEVELMETER
+	if(CHECK_ERROR(NETWORK_ERROR))	reduced_status |= (1 << NETWORK_ERROR);
+	if(CHECK_ERROR(NO_REPLY_ERROR))	reduced_status |= (1 << NO_REPLY_ERROR);
+	if(CHECK_ERROR(STARTED_FILLING_ERROR))	reduced_status |= (1 << STARTED_FILLING_ERROR);
+	if(CHECK_ERROR(STOPPED_FILLING_ERROR))	reduced_status |= (1 << STOPPED_FILLING_ERROR);
+	if(CHECK_ERROR(CHANGED_OPTIONS_ERROR))	reduced_status |= (1 << CHANGED_OPTIONS_ERROR);
+	if(CHECK_ERROR(SLOW_TRANSMISSION_ERROR))	reduced_status |= (1 << SLOW_TRANSMISSION_ERROR);
+	if(CHECK_ERROR(LETTERS_ERROR))	reduced_status |= (1 << LETTERS_ERROR);
+	#endif
+	
+	
+	return  reduced_status;
 }
 
 
