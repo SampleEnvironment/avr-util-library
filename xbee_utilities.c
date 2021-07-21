@@ -20,6 +20,20 @@ volatile uint8_t bufferSize;
 
 
 
+/************************************************************************/
+/*  LAN-Gascounter IPv4 Address                                         */
+/************************************************************************/
+// Put Gascounter IP here:
+#ifdef USE_LAN
+volatile uint8_t IP_1_octet = 192;		/**< @brief  1.octet of IPv4 Address */
+volatile uint8_t IP_2_octet = 168;		/**< @brief  2.octet of IPv4 Address */
+volatile uint8_t IP_3_octet = 178;		/**< @brief  3.octet of IPv4 Address */
+volatile uint8_t IP_4_octet = 38;		/**< @brief  4.octet of IPv4 Address */
+#endif
+//************************************************************************/
+
+
+
 
 
 //
@@ -111,6 +125,52 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 	newFrame.data_len = 0;	//init
 	newFrame.type = 0;		//init
 	
+	#ifdef USE_LAN
+	switch (newFrame.api_id)
+	{
+		case API_TX_64: //0x00
+		newFrame.type = buffer[14];
+		newFrame.status = 0;// buffer[15];
+		
+		if (length < (15+1)) return;
+		for (uint8_t i = 15; i < length; ++i)
+		newFrame.data[data_counter++] = buffer[i];
+		newFrame.data_len = --data_counter;
+		
+		if (newFrame.type == (CMD_received_set_options_96||CMD_send_registration_90))
+		{
+			
+			IP_1_octet = buffer[5];
+			IP_2_octet = buffer[7];
+			IP_3_octet = buffer[9];
+			IP_4_octet = buffer[11];
+		}
+		
+		break;
+		
+		case API_AT_CMD: //0x08
+		
+		if (buffer[4] && (buffer[5] == (uint8_t) 'C') && (buffer[6] == (uint8_t) 'E'))
+		{
+			newFrame.type = CMD_received_simulate_xBee_100;
+			newFrame.status = 0;
+		}
+		else
+		{
+			newFrame.status = 0xFF;
+		}
+		break;
+		
+		default:
+		
+		return;
+		break;
+		
+	}
+
+	#endif
+	
+	#ifdef USE_XBEE
 	switch(newFrame.api_id)
 	{
 		case AT_ID:
@@ -149,6 +209,8 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 		default:
 		newFrame.status = 0xFF;
 	}
+	#endif
+	
 	buffer_storeData(newFrame);
 }
 
@@ -213,6 +275,8 @@ uint8_t xbee_pack_tx64_frame(uint8_t db_cmd_type, uint8_t *params, uint8_t param
 	
 	uint8_t *temp = params;
 	
+	#ifdef USE_XBEE
+
 	temp_buffer[0] = 0x7E;		// Start delimiter
 	// Let index 1 & 2 free for storing frame length
 	temp_buffer[3] = 0x00;   	// API Identifier Value for 64-bit TX Request message will cause the module to send RF Data as an RF Packet.
@@ -235,6 +299,30 @@ uint8_t xbee_pack_tx64_frame(uint8_t db_cmd_type, uint8_t *params, uint8_t param
 	temp_buffer[13] = 0x01;				// Disable acknowledgment
 	temp_buffer[14] = db_cmd_type;		// Database command type
 	
+	#endif
+	
+	#ifdef USE_LAN
+	temp_buffer[0] = 0x7E;
+	//len
+	temp_buffer[3] = 0x80;   	//API ID 64 bit RX // must be together 0x80 to be compatible with the xBee frame structure for the server
+	
+	temp_buffer[4] = IP_1_octet;
+	temp_buffer[5] = 46;
+	temp_buffer[6] = IP_2_octet;
+	temp_buffer[7] = 46;
+	
+	temp_buffer[8] = IP_3_octet;
+	temp_buffer[9] = 46;
+	temp_buffer[10] = IP_4_octet;
+	temp_buffer[11] = 0;
+	
+	temp_buffer[12] = 0x00;
+	temp_buffer[13] = 0x03;
+	temp_buffer[14] = db_cmd_type;
+	
+	
+	#endif
+	
 	temp_buffer[15] = MESSAGEFOPRMAT_IDENTIFIER;
 	temp_buffer[16] = version.Branch_id;
 	temp_buffer[17] = (uint8_t)( version.Fw_version>> 8); //MSB
@@ -246,7 +334,7 @@ uint8_t xbee_pack_tx64_frame(uint8_t db_cmd_type, uint8_t *params, uint8_t param
 	for(uint8_t i = 0; i < xbee.dev_id_str_len; i++){
 		temp_buffer[i+19] = xbee.dev_id_str[i];
 	}
-		
+	
 	index = 19 + xbee.dev_id_str_len;
 	#else
 	
@@ -346,3 +434,50 @@ uint32_t xbee_get_address_block(uint8_t cmd_type)
 	else return 0;		// Couldn't read addr_high or addr_low
 }
 
+/**
+* @brief Used for the LAN-Variant of the Gascounters. Necessary for Xbee simulation.
+*
+* @param CMD_NAME_FC
+* @param CMD_NAME_SC
+* @param status
+* @param values
+* @param value_length
+*
+* @return void
+*/
+void xbee_pseudo_send_AT_response( char CMD_NAME_FC, char CMD_NAME_SC, uint8_t status, uint8_t *values, uint8_t value_length)
+{
+
+	uint8_t temp_buffer[50];
+	uint16_t i;
+	
+	uint8_t *temp = values;
+	
+	temp_buffer[0] = 0x7E;
+	//length
+	temp_buffer[3] = API_AT_CMD_RESPONSE;
+	temp_buffer[4] = 1;// FRAME_ID;
+	temp_buffer[5] = (uint8_t) CMD_NAME_FC;
+	temp_buffer[6] = (uint8_t) CMD_NAME_SC;
+	temp_buffer[7] = status;
+	
+	i = 8;
+	
+	while (value_length)
+	{
+		temp_buffer[i++] = *values++;
+		value_length--;
+	}
+	
+	//checksum
+	temp_buffer[i] = xbee_getChecksum(temp_buffer,3,i);
+	
+	//add length
+	temp_buffer[1] = ((i-3) >> 8);
+	temp_buffer[2] = (i-3);
+	
+	memcpy(temp, temp_buffer, i+1);
+	xbee_send_msg(temp,i+1);
+	
+	
+}
