@@ -53,7 +53,7 @@ double DS3231M_Temperature;
 *
 * Paints an info message on the LCD 
 */
-void (*print_info_DS3231M)(char * ,_Bool ) = NULL;
+void (*print_info_DS3231M)(char * ,bool ) = NULL;
 
 
 
@@ -66,7 +66,7 @@ void (*print_info_DS3231M)(char * ,_Bool ) = NULL;
 * @return uint8_t  0 on success and greater zero if initialization was unsuccessful
 *
 */
-uint8_t init_DS3231M(void (*printInfoFun)(char *,_Bool))
+uint8_t init_DS3231M(void (*printInfoFun)(char *,bool))
 {
 	print_info_DS3231M = printInfoFun;
 

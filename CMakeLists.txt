@@ -22,6 +22,7 @@ add_subdirectory(googletest)
 
 set(Headers
     DS3231M.h
+    status.h
     TestMocks/Mock_main.h
     TestMocks/Mock_I2C_utilities.h
     TestMocks/Mock_LCD.h
@@ -29,6 +30,7 @@ set(Headers
 
 set(Sources 
     DS3231M.c
+    status.c
     TestMocks/Mock_main.c
     TestMocks/Mock_I2C_utilities.c
     TestMocks/Mock_LCD.c

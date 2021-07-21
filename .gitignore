@@ -1,0 +1,6 @@
+Debug/
+.vs/
+build/
+
+#allow library File
+!Debug/libavr-util-library.a
