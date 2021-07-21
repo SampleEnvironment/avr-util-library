@@ -83,5 +83,5 @@ uint8_t xbee_getChecksum(uint8_t *buffer, uint8_t start, uint8_t stop);	// Calcu
 _Bool xbee_chkChecksum(uint8_t *buffer);		// Return true if checksum is correct, false otherwise
 uint8_t xbee_get_packet_len(uint8_t *buffer);	// Return the length of the passed XBee-frame
 uint32_t xbee_get_address_block(uint8_t cmd_type);		// Get high and low bytes of basis station
-
+void xbee_pseudo_send_AT_response( char CMD_NAME_FC, char CMD_NAME_SC, uint8_t status, uint8_t *values, uint8_t value_length);
 #endif /* XBEE_UTILITIES_H_ */
