@@ -34,7 +34,8 @@ typedef struct
 
 enum XBEE_HW_VERSION
 {
-	XBEE_V_S1 = 1,
+	XPORT,
+	XBEE_V_S1 ,
 	XBEE_V_SC2
 	
 };
