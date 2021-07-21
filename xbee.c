@@ -381,8 +381,8 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 		}
 		_delay_ms(300);
 		
-		//TODO this is dangerous --> maybee a per device solution is needed
-		CLEAR_ALL();  // Clears all ERRORS
+
+		CLEAR_ALL();  // Clears all newtwork related ERRORS
 	}
 	
 	
