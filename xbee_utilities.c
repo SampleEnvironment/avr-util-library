@@ -10,7 +10,7 @@
 
 #include "xbee.h"
 #include "xbee_utilities.h"
-
+#include "module_globals.h"
 
 // Global Variables
 volatile BuffType *setPtr;
@@ -125,11 +125,11 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 		break;
 		case RX_ID:
 		
-		newFrame.type = buffer[14];
-		newFrame.status = buffer[15];
+		newFrame.type = buffer[OPCODE_INDEX];
+		newFrame.status = STATUS_BYTE;
 		
-		if (length < (16+1)) return;
-		for (uint8_t i = 16; i < length; ++i)
+		if (length < (DATA_INDEX+1)) return;
+		for (uint8_t i = DATA_INDEX; i < length; ++i)
 		newFrame.data[data_counter++] = buffer[i];
 		newFrame.data_len = --data_counter;
 		break;

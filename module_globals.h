@@ -1,9 +1,9 @@
 /*
- * module_globals.h
- *
- * Created: 13.07.2021 13:23:46
- *  Author: qfj
- */ 
+* module_globals.h
+*
+* Created: 13.07.2021 13:23:46
+*  Author: qfj
+*/
 
 
 #ifndef MODULE_GLOBALS_H_
@@ -33,17 +33,26 @@ extern VersionType version;
 void version_INIT(uint16_t Fw_version,uint8_t Branch_id,uint16_t FW_eeprom_changed);
 
 //################## PORT DEFINITIONS PER DEVICE ##################
- 
+
 #ifdef LEVELMETER
- #define SDA PINC4
- #define SCL PINC2 
-#endif
+#define SDA PINC4
+#define SCL PINC2
+
+#define OPCODE_INDEX 14
+#define STATUS_BYTE  buffer[15]
+#define DATA_INDEX   16
+
+#endif  
 
 
 #ifdef GASCOUNTER_MODULE
-  #define SDA PINC1
-  #define SCL PINC0
-#endif
+#define SDA PINC1
+#define SCL PINC0
+
+#define OPCODE_INDEX 14
+#define STATUS_BYTE  0
+#define DATA_INDEX   15
+#endif  
 
 
 
