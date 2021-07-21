@@ -129,6 +129,8 @@ uint8_t xbee_is_connected(void)
 
 
 uint8_t xbee_hardware_version(void){
+	#ifdef USE_XBEE
+
 	uint8_t buffer[SINGLE_FRAME_LENGTH];
 	
 	buffer[0] = (uint8_t)'H';
@@ -145,7 +147,11 @@ uint8_t xbee_hardware_version(void){
 	
 	
 	version.hw_version_xbee = (hw_version_16 > 0x2000)? XBEE_V_SC2 : XBEE_V_S1;
-
+	#endif // USE_XBEE
+	#ifdef USE_LAN
+	version.hw_version_xbee = XPORT;
+	#endif
+	
 	return version.hw_version_xbee;
 }
 
