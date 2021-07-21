@@ -398,6 +398,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	uint8_t reply_Id = 0xFF;
 	uint8_t recon_already_tried = 0;
 
+	#ifdef USE_XBEE
 	if (  xbee_is_connected() ||  /*CHECK_ERROR(NO_REPLY_ERROR) ||*/ CHECK_ERROR(NETWORK_ERROR) )
 	{
 		print_info_xbee(XBEE_CHECK_NETWORK, 0);
@@ -409,6 +410,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		}
 	}
 	
+	#endif
 	//===================================================================
 	// =============== DEVICE IS SUCCESSFULLY REASSOCIATED ==============
 	// ========= OR THERE WAS NO PREEXISTING NETWORK ERROR ==============
@@ -417,6 +419,8 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	
 	reply_Id = xbee_send_request_only(db_cmd_type, buffer,  length);
 	
+	#ifdef USE_XBEE
+
 	if (reply_Id == 0xFF) 	// Transmit Failed
 	{
 		if (!recon_already_tried){ // Try reconnect then send again
@@ -429,7 +433,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		}
 		
 	}
-
+	#endif // USE_XBEE
 	
 	// ================================================================
 	// ====== THE TRANSMISSION FAILED SET ERRORS ACCORDINGLY ==========
