@@ -52,6 +52,17 @@ extern volatile uint8_t sending_cmd;				// Number of bytes to send via USART
 extern VersionType version;
 
 
+
+
+
+
+
+
+
+
+
+//TODO clean up message Codes
+
 //==============================================================
 // Database server commands
 //==============================================================
@@ -103,6 +114,34 @@ extern VersionType version;
 
 #define ILM_BROADCAST_MSG       99      // ILM messages are sent in broadcast mode and are ignored by other devices
 
+
+
+//==============================================================
+// Database server commands GASCOUNTER_MODULE
+//==============================================================
+// Requests with answer sent from the device
+#define CMD_send_registration_90				90 /**< @brief Command for Registration with the Server. The server will answer a #CMD_received_set_options_96 message  */
+#define CMD_send_data_91						91 /**< @brief Command for sending Data to the Server. It is unanswered by the server */
+#define CMD_send_Ping_95						95 /**< @brief Command for Ping, the server will send a Pong with #CMD_received_Pong_89  */
+
+// Requests with answer (or without answer if ALLOW_COM is false) sent from the device
+
+// Requests without answer sent from the device
+#define CMD_send_funtrace_88					88 /**< @brief Answering the funtrace request from the Server   */
+#define CMD_send_options_92						92 /**< @brief Command for sending current #options to the Server as an answer to #CMD_received_send_options_98  */
+#define CMD_send_response_options_set_93		93 /**< @brief Sent to the server after options were received and set (#CMD_received_set_options_96) */
+#define CMD_send_response_send_data_94			94 /**< @brief Same as #CMD_send_data_91, but it is only sent as an answer to a #CMD_received_send_data_97 message   */
+
+
+// Requests sent from the database server
+#define CMD_received_Pong_89					89 /**< @brief Command is received as an answer to a #CMD_send_Ping_95 message*/
+#define CMD_received_set_options_96				96 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
+#define CMD_received_send_data_97				97 /**< @brief Prompts device to send measurement data to the server */
+#define CMD_received_send_options_98			98 /**< @brief Prompts device to send current #options to the server */
+#define CMD_received_ILM_Ignore_99				99 /**< @brief broadcasted ILM message, ignored by Gascounter module */
+#define CMD_received_simulate_xBee_100			   100
+#define CMD_received_Funtrace_toggle_101           101 /**< @brief Command for enabling or disabling the Functiontrace saving in eeprom */
+#define CMD_received_send_Funtrace_102			   102 /**< @brief Command prompting the device to send the function Trace that was saved in its eeprom*/
 
 
 

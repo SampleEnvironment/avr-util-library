@@ -95,7 +95,7 @@ inline void xbee_wake_up(void)
 
 uint8_t xbee_is_connected(void)
 {
-	uint8_t buffer[SINGLE_FRAME_LENGTH];  		
+	uint8_t buffer[SINGLE_FRAME_LENGTH];
 	uint8_t reply_Id = 0;
 
 	
@@ -325,9 +325,12 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 	uint8_t reply_Id = 0xFF;
 	
 
-	// Any network error
-	print_info_xbee(XBEE_SENDING, 0);
-
+	if(db_cmd_type == CMD_send_Ping_95){
+		// Any network error
+		print_info_xbee(XBEE_PING, 0);
+		}else{
+		print_info_xbee(XBEE_SENDING, 0);
+	}
 	//pack packet
 	uint8_t sendbuffer[SINGLE_FRAME_LENGTH];
 	
