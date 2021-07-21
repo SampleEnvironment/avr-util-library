@@ -30,6 +30,7 @@
 #define XBEE_RECONNECTING       "reconnecting..."
 #define XBEE_SENDING_MESSAGE    "sending message..."
 #define XBEE_PING				"Ping.."
+#define XBEE_PING_OK            "PingOK"
 #endif
 
 #ifdef  GASCOUNTER_MODULE
@@ -50,6 +51,7 @@
 #define XBEE_RECONNECTING       "recon."
 #define XBEE_SENDING_MESSAGE    "SendMs"
 #define XBEE_PING				"Ping.."
+#define XBEE_PING_OK            "PingOK"
 #endif
 
 
