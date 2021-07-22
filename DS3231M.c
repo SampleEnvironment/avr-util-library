@@ -78,12 +78,8 @@ uint8_t init_DS3231M(void (*printInfoFun)(char *,bool))
 	Time.tm_year = 0;
 	Time.tm_isdst =0;
 	
-	
-
-	
+		
 	uint8_t data[2];
-	
-	
 	
 	if (I2C_read_from(DS3231M_address,DS3231M_address_temp_MSB,data,2))
 	{

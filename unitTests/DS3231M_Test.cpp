@@ -3,6 +3,7 @@ extern "C" {
     #include "../DS3231M.h"
     #include "../TestMocks/Mock_I2C_utilities.h"
     #include "../TestMocks/Mock_main.h"
+    #include "../TestMocks/Mock_LCD.h"
 }
 
 #include <gtest/gtest.h>
@@ -33,6 +34,9 @@ struct  DS3231M_Test
 
 
     virtual void SetUp() override{
+
+
+
         setServer(30,30,12,15,7,21);
 
         DS_state.connected = 1;
@@ -44,7 +48,20 @@ struct  DS3231M_Test
     }
 };
 
+TEST_F(DS3231M_Test,init){
+    DS_state.temp[0] = 128;
+    DS_state.temp[1] = 128;
 
+    DS_state.controlReg = 128;
+
+
+    uint8_t init_ret_code =  init_DS3231M(&LCD_paint_info_line);
+
+    EXPECT_EQ(init_ret_code,0); // init success
+
+    EXPECT_EQ(DS_state.controlReg, 128 | DS3231M_control_reg_CONV);
+
+}
 
 TEST_F(DS3231M_Test,SetTime_mid){
     DS3231M_set_time(&ServerTime);

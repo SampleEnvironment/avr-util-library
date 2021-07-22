@@ -14,6 +14,8 @@
 typedef struct{
     struct tm currT;
     uint8_t date[7];
+    uint8_t temp[2];
+    uint8_t controlReg;
     uint8_t connected;
     uint8_t error;
 

@@ -3,11 +3,16 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
+#include <assert.h>
+
+#include "../DS3231M.h"
+
+#define assertm(exp, msg) assert(((void)msg, exp))
 
 DS3231MType DS_state;
 
 
-uint8_t I2C_read_from(uint8_t I2C_Bus_address ,uint8_t register_address, uint8_t * data,uint8_t lenght)
+uint8_t I2C_read_from(uint8_t I2C_Bus_address ,uint8_t register_address, uint8_t * data,uint8_t length)
 {
 	
     switch (I2C_Bus_address)
@@ -22,8 +27,23 @@ uint8_t I2C_read_from(uint8_t I2C_Bus_address ,uint8_t register_address, uint8_t
         {
             return I2C_ERROR;
         }
+        switch (register_address)
+        {
+        case DS3231M_address_temp_MSB:
+            memcpy(data,DS_state.temp,length);
+            break;
+        case DS3231M_address_control_reg:
+            data[0] = DS_state.controlReg ;
+            assertm(length == 1,"lenght must equal 1 for reading from control_reg" );
+            break;
+        case DS3231M_address_seconds:
+            memcpy(data,DS_state.date,length);
+        break;
         
-        memcpy(data,DS_state.date,lenght);
+        default:
+            break;
+        }
+
         return I2C_SUCCESS;
         
         break;
@@ -53,8 +73,20 @@ uint8_t I2C_write_to(uint8_t I2C_Bus_address, uint8_t register_address, uint8_t 
         {
             return I2C_ERROR;
         }
-        
-        memcpy(DS_state.date,data,length);
+        switch (register_address)
+        {
+        case DS3231M_address_temp_MSB:
+            memcpy(DS_state.temp,data,length);
+            break;
+        case DS3231M_address_control_reg:
+            DS_state.controlReg = data[0] ;
+            assertm(length == 1,"lenght must equal 1 for writing to control_reg" );
+            break;
+        case DS3231M_address_seconds:
+            memcpy(DS_state.date,data,length);
+            break;
+        }
+
         return I2C_SUCCESS;
         
         break;
