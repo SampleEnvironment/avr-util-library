@@ -229,39 +229,48 @@ void DS3231M_read_time(void)
 		return;
 	}
 
-	uint8_t sec = data[0];
-	uint8_t min = data[1];
-	uint8_t hour = data[2];
-	uint8_t mday = data[4];
-	uint8_t mon = data[5];
-	uint8_t year = data[6];
+	uint8_t sec = decodeDS3231M(data[0]);
+	uint8_t min = decodeDS3231M(data[1]);
+	uint8_t hour = decodeDS3231M(data[2]);
+	uint8_t mday = decodeDS3231M(data[4]);
+	uint8_t mon = decodeDS3231M(data[5]);
+	uint8_t year = decodeDS3231M(data[6]);
 	
-	if ((sec == 0) && (min == 0) && (hour == 0) && (mday == 0) && (mon == 0) && (year == 0))
+	if (
+		INRANGE(sec,0,59) && 
+		INRANGE(min,0,59) && 
+		INRANGE(hour,0,23) &&
+		INRANGE(mday,1,31) &&
+		INRANGE(mon,1,12) &&
+		INRANGE(year,0,99))
 	{
-		connected.DS3231M = 0;
-		SET_ERROR(TIMER_ERROR);
-		return;
-		}else{
 		connected.DS3231M = 1;
 		connected.TWI =1;
 		
 		CLEAR_ERROR(TIMER_ERROR);
+
+
+		}else{
+		SET_ERROR(TIMER_ERROR);
+		SET_ERROR(I2C_BUS_ERROR);
+		return;
+
 	}
 	
 	//  Bits 7-4 are for the tens digits and bits 0-3 are for unit digits
 	
 	//			   | 3210 |		 | 7654|
-	Time.tm_sec  = (sec & 0x0F) + (sec >> 4)*10;
+	Time.tm_sec  = sec ;
 	
-	Time.tm_min  = (min & 0x0F) + (min >> 4)*10;
+	Time.tm_min  = min ;
 
-	Time.tm_hour = (hour & 0x0F) + (hour >> 4)*10;
+	Time.tm_hour = hour;
 
-	Time.tm_mday = (mday & 0x0F) + (mday>> 4)*10;
+	Time.tm_mday = mday ;
 
-	Time.tm_mon  = (mon & 0x0F) + (mon >> 4)*10;
+	Time.tm_mon  = mon;
 
-	Time.tm_year = (year & 0x0F) + (year >> 4)*10 ;
+	Time.tm_year = year;
 	
 
 	
@@ -300,3 +309,10 @@ void DS3231M_read_temperature(void)
 }
 
 
+    uint8_t encodeDS3231M(uint8_t element){
+       return ((element / 10) << 4)  | (element % 10);
+    }
+
+ uint8_t decodeDS3231M(uint8_t element){
+       return (element & 0x0F) + (element >> 4)*10;
+    }

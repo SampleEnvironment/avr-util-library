@@ -21,7 +21,21 @@ typedef struct{
 
 }DS3231MType;
 
+
+  /**
+  * @brief Connection Status of BMP and DS3231M
+  *
+  * Holds the Status of the connection to the BMP sensor (Pressure and Temperature Sensor) and the DS3231M (Time and Date) Chip.
+  */
+  typedef struct{
+	  uint8_t BMP;            /**< @brief BMP Connection */
+	  uint8_t BMP_on_Startup; /** @brief BMP connected on Startup */
+	  uint8_t DS3231M;		  /**< @brief DS3231M Connection */
+	  uint8_t TWI;			  /**< @brief  Indication of I2C-Bus connectivity for preventing loops  */
+  }connectedType;
+
 extern DS3231MType DS_state;
+extern connectedType connected;
 
 uint8_t I2C_read_from(uint8_t I2C_Bus_address ,uint8_t register_address, uint8_t * data,uint8_t lenght);
 uint8_t I2C_write_to(uint8_t I2C_Bus_address, uint8_t register_address, uint8_t *data,uint8_t length);

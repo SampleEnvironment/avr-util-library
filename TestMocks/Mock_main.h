@@ -189,18 +189,6 @@ typedef struct{
 
 
 
-/**
-* @brief Connection Status of BMP and DS3231M
-*
-* Holds the Status of the connection to the BMP sensor (Pressure and Temperature Sensor) and the DS3231M (Time and Date) Chip.
-*/
-typedef struct{
-	uint8_t BMP;  /**< @brief BMP Connection */
-	uint8_t BMP_on_Startup; /** @brief BMP connected on Startup */
-	uint8_t DS3231M; /**< @brief DS3231M Connection */
-	uint8_t TWI; /**< @brief  Indication of TWI bue connectivity for preventing loops  */
-}connectedType;
-
 
 /**
 * @brief Status related information
@@ -223,7 +211,7 @@ typedef struct
 
 
 
- extern connectedType connected ;
+
 extern volatile uint32_t count_t_elapsed;
 extern volatile statusType status;
 
