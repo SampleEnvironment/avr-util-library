@@ -70,7 +70,7 @@ void DS3231M_write_register(uint8_t register_address, uint8_t data);
 uint8_t check_valid_ranges(struct tm * newtime);
 void DS3231M_read_temperature(void);
 uint8_t encodeDS3231M(uint8_t element);
- uint8_t decodeDS3231M(uint8_t element);
-
+uint8_t decodeDS3231M(uint8_t element);
+void DS3231M_estimate_sys_Time(void);
 
 #endif 

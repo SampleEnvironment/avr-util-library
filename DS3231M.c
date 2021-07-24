@@ -24,7 +24,7 @@
 #include "I2C_utilities.h"
 #include <util/eu_dst.h>
 #else
-
+#include <stdio.h>
 #include "TestMocks/Mock_I2C_utilities.h"
 #include "TestMocks/Mock_main.h"
 #include "TestMocks/Mock_LCD.h"
@@ -46,6 +46,9 @@ time_t last_Valid_Time;
 int8_t temp_MSB;
 uint8_t temp_LSB;
 double DS3231M_Temperature;
+
+
+uint32_t syst_at_last_Valid_Time;
 
 
 /**
@@ -178,6 +181,7 @@ void DS3231M_set_time(struct tm *newtime)
 	
 	
 	last_Valid_Time = mktime(&Time_copy);
+	syst_at_last_Valid_Time = count_t_elapsed;
 
 	
 	uint8_t i2c_ret_code = I2C_write_to(DS3231M_address,DS3231M_address_seconds, data, 7);
@@ -220,12 +224,16 @@ void DS3231M_read_time(void)
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TIMER_ERROR);
 		_delay_ms(2000);
+
+		DS3231M_estimate_sys_Time();
 		return;
 	}
 	if(i2c_ret_code == DEVICE_NOT_CONNECTED){
 		connected.DS3231M = 0;
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TIMER_ERROR);
+
+		DS3231M_estimate_sys_Time();
 		return;
 	}
 
@@ -242,7 +250,7 @@ void DS3231M_read_time(void)
 		INRANGE(hour,0,23) &&
 		INRANGE(mday,1,31) &&
 		INRANGE(mon,1,12) &&
-		INRANGE(year,0,99))
+		INRANGE(year,21,99))
 	{
 		connected.DS3231M = 1;
 		connected.TWI =1;
@@ -252,7 +260,9 @@ void DS3231M_read_time(void)
 
 		}else{
 		SET_ERROR(TIMER_ERROR);
-		SET_ERROR(I2C_BUS_ERROR);
+		
+		DS3231M_estimate_sys_Time();
+
 		return;
 
 	}
@@ -273,10 +283,7 @@ void DS3231M_read_time(void)
 	Time.tm_year = year;
 	
 
-	
-
-	
-	
+	return;
 }
 
 void DS3231M_read_temperature(void)
@@ -290,7 +297,7 @@ void DS3231M_read_temperature(void)
 		connected.TWI = 0;
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TIMER_ERROR);
-		_delay_ms(2000);
+	    _delay_ms(2000);
 		return;
 	}
 	if(i2c_ret_code == DEVICE_NOT_CONNECTED){
@@ -309,10 +316,26 @@ void DS3231M_read_temperature(void)
 }
 
 
-    uint8_t encodeDS3231M(uint8_t element){
+uint8_t encodeDS3231M(uint8_t element){
        return ((element / 10) << 4)  | (element % 10);
-    }
+}
 
  uint8_t decodeDS3231M(uint8_t element){
        return (element & 0x0F) + (element >> 4)*10;
-    }
+}
+
+void DS3231M_estimate_sys_Time(void){
+
+			 
+
+	time_t curr_time = last_Valid_Time + (count_t_elapsed - syst_at_last_Valid_Time);
+
+	struct tm * curr_t_est  = gmtime(&curr_time);	
+
+	Time.tm_sec  = curr_t_est->tm_sec;
+	Time.tm_min  = curr_t_est->tm_min;
+	Time.tm_hour = curr_t_est->tm_hour;
+	Time.tm_mday = curr_t_est->tm_mday;
+	Time.tm_mon  = curr_t_est->tm_mon  + 1;   // tm_mon (0...11) but in ds3231m --> 1..12
+	Time.tm_year = curr_t_est->tm_year - 100; // tm_year (1900...) but in ds3231m --> 2000...
+}
