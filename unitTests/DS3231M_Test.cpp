@@ -5,12 +5,15 @@ extern "C" {
     #include "../TestMocks/Mock_I2C_utilities.h"
     #include "../TestMocks/Mock_main.h"
     #include "../TestMocks/Mock_LCD.h"
+
 }
 
 #include <gtest/gtest.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "DS3231M_Test.hh"
 
 struct  DS3231M_Test
     :public ::testing::Test
@@ -81,6 +84,9 @@ int set_env(const char *name, const char *value)
         DS_state.connected = 1;
         DS_state.error = 0;
         count_t_elapsed = 0;
+        temp_LSB = 0;
+        temp_MSB = 0;
+        
     }
 };
 
@@ -297,7 +303,7 @@ TEST_F(DS3231M_Test,SetTime_TWI_not_Connected){
 }
 
 //#########################################################
-// DS3231M_read_time() TESTS 
+// DS3231M_read_time() && time estimates  TESTS 
 //#########################################################
 TEST_F(DS3231M_Test,ReadTime_mid){
         DS3231M_read_time();
@@ -600,3 +606,9 @@ TEST_F(DS3231M_Test,ReadTime_TWI_not_Connected){
 }
 
 
+//#########################################################
+// DS3231M_read_temperature() TESTS 
+//#########################################################
+TEST_F(DS3231M_Test,Temperature_mid){
+    
+}
