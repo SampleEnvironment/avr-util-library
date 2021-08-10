@@ -5,6 +5,7 @@
 
 #include <util/delay.h>
 #include "module_globals.h"
+#include "usart.h"
 
 
 
@@ -48,8 +49,8 @@ enum XBEE_HW_VERSION
 
 //#define XBEE_AWAKE_TIME			30		// Time in seconds
 
-extern volatile uint8_t *send_str_reader;			// Pointer to the next byte to send via USART
-extern volatile uint8_t sending_cmd;				// Number of bytes to send via USART
+
+extern UsartType USART0;
 extern VersionType version;
 
 

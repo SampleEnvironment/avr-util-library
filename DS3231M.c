@@ -308,6 +308,7 @@ void DS3231M_read_temperature(void)
 	}
 
 	
+
 	temp_MSB=data[0];
 	temp_LSB=data[1];
 

@@ -610,5 +610,26 @@ TEST_F(DS3231M_Test,ReadTime_TWI_not_Connected){
 // DS3231M_read_temperature() TESTS 
 //#########################################################
 TEST_F(DS3231M_Test,Temperature_mid){
-    
+    DS_state.temp[0] = 20;
+    DS_state.temp[1] = 128; //1000 0000 --> 0.5
+
+    DS3231M_read_temperature();
+    EXPECT_FALSE(CHECK_ERROR(I2C_BUS_ERROR));
+    EXPECT_FALSE(CHECK_ERROR(TIMER_ERROR));
+    EXPECT_TRUE(connected.TWI);
+    EXPECT_TRUE(connected.DS3231M);
+    EXPECT_EQ(DS3231M_Temperature,20.5+273);
+
+}
+TEST_F(DS3231M_Test,Temperature_lower){
+    DS_state.temp[0] = 0;
+    DS_state.temp[1] = 0; 
+
+    DS3231M_read_temperature();
+    EXPECT_FALSE(CHECK_ERROR(I2C_BUS_ERROR));
+    EXPECT_FALSE(CHECK_ERROR(TIMER_ERROR));
+    EXPECT_TRUE(connected.TWI);
+    EXPECT_TRUE(connected.DS3231M);
+    EXPECT_EQ(DS3231M_Temperature,0);
+
 }

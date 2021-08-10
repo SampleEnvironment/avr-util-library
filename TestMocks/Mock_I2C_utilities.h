@@ -29,7 +29,7 @@ typedef struct{
   */
   typedef struct{
 	  uint8_t BMP;            /**< @brief BMP Connection */
-	  uint8_t BMP_on_Startup; /** @brief BMP connected on Startup */
+	  uint8_t BMP_on_Startup; /**< @brief BMP connected on Startup */
 	  uint8_t DS3231M;		  /**< @brief DS3231M Connection */
 	  uint8_t TWI;			  /**< @brief  Indication of I2C-Bus connectivity for preventing loops  */
   }connectedType;

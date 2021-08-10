@@ -255,10 +255,10 @@ uint8_t xbee_reconnect(void)
 // Start USART0 transmission to XBee module
 void xbee_send(uint8_t *data)
 {
-	send_str_reader = data;						// point to data
+	USART0.send_str_reader = data;						// point to data
 	
-	USART_IODR = *send_str_reader++;			// Send first data byte (ISR_Tx will do the rest)
-	sending_cmd--;								// 1 byte is sent, so decrease counter
+	USART_IODR = *USART0.send_str_reader++;			// Send first data byte (ISR_Tx will do the rest)
+	USART0.sending_cmd--;								// 1 byte is sent, so decrease counter
 	
 }
 
@@ -267,7 +267,7 @@ void xbee_send_msg(uint8_t *buffer, uint8_t length)
 {
 	if (!length) return;
 	
-	sending_cmd = length;		//bytes number to send
+	USART0.sending_cmd = length;		//bytes number to send
 	xbee_send(buffer);			//send first
 	
 	_delay_ms(100);
