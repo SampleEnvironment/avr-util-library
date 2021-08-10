@@ -55,6 +55,15 @@ void version_INIT(uint16_t Fw_version,uint8_t Branch_id,uint16_t FW_eeprom_chang
 #endif  
 
 
+#ifdef ILM_MODULE
+#define SDA PINC1
+#define SCL PINC0
+
+#define OPCODE_INDEX 14
+#define STATUS_BYTE  0
+#define DATA_INDEX   15
+#endif
+
 
 
 
