@@ -49,6 +49,11 @@
   #define SCL 0
 #endif
 
+#ifdef GASCOUNTER_MODULE
+  #define SDA 1
+  #define SCL 0
+#endif
+
 
 
 #define SDA_PORT        PORTC       // SDA Port C

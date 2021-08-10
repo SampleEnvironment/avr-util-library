@@ -54,6 +54,26 @@
 #define XBEE_PING_OK            "PingOK"
 #endif
 
+#ifdef  ILM_MODULE
+#define XBEE_AI_MESSAGE    "" // API command "AI" => Reads possible errors with the last association request, result 0: everything is o.k.
+#define XBEE_REASSOCIATE_   ""
+#define XBEE_REASSOCIATE__  ""
+#define XBEE_REASSOCIATE___ ""
+#define XBEE_DEVICE_ASSOCIATED ""
+#define XBEE_PRINT_NULL    ""
+#define XBEE_FAILED ""
+#define XBEE_NETWORK_ERROR      ""
+#define XBEE_NETWORK_ERROR_ADDR ""
+#define XBEE_SENDING            ""
+#define XBEE_SENDING_ERROR      ""
+#define XBEE_SENDING_OK         ""
+#define XBEE_CHECK_NETWORK      ""
+#define XBEE_NO_NETWORK		    ""
+#define XBEE_RECONNECTING       ""
+#define XBEE_SENDING_MESSAGE    ""
+#define XBEE_PING				""
+#define XBEE_PING_OK            ""
+#endif
 
 
 #endif /* PRINTINFO_STRINGS_H_ */
