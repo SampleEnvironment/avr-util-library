@@ -49,7 +49,7 @@
   #define SCL 0
 #endif
 
-#ifdef GASCOUNTER_MODULE
+#ifdef ILM_MODULE
   #define SDA 1
   #define SCL 0
 #endif
