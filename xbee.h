@@ -86,12 +86,12 @@ extern VersionType version;
 
 
 #ifdef LEVELMETER
-#define LAST_NON_CMD_MSG		10		// Search no ack commands only (see xbee_hasReply)
+	#define LAST_NON_CMD_MSG		10		// Search no ack commands only (see xbee_hasReply)
 #endif
 
-#ifdef GASCOUNTER_MODULE
-#define LAST_NON_CMD_MSG		95		// Search no ack commands only (see xbee_hasReply)
-#endif
+
+	
+
 
 // Requests without answer sent from the device
 #define UNKNOWN_MSG				11		// Unknown command received from database server
@@ -114,7 +114,7 @@ extern VersionType version;
 #define TRIGGER_REMOTE_PULSE    27		// Trigger a remote Pulse
 #define TRIGGER_REMOTE_U_OVER_I 28		// Trigger a remote U over I Pulse
 
-#define ILM_BROADCAST_MSG       99      // ILM messages are sent in broadcast mode and are ignored by other devices
+
 
 
 
@@ -125,8 +125,8 @@ extern VersionType version;
 #define CMD_send_registration_90				90 /**< @brief Command for Registration with the Server. The server will answer a #CMD_received_set_options_96 message  */
 #define CMD_send_data_91						91 /**< @brief Command for sending Data to the Server. It is unanswered by the server */
 #define CMD_send_Ping_95						95 /**< @brief Command for Ping, the server will send a Pong with #CMD_received_Pong_89  */
+#define CMD_received_Pong_89					89 /**< @brief Command is received as an answer to a #CMD_send_Ping_95 message*/
 
-// Requests with answer (or without answer if ALLOW_COM is false) sent from the device
 
 // Requests without answer sent from the device
 #define CMD_send_funtrace_88					88 /**< @brief Answering the funtrace request from the Server   */
@@ -134,9 +134,13 @@ extern VersionType version;
 #define CMD_send_response_options_set_93		93 /**< @brief Sent to the server after options were received and set (#CMD_received_set_options_96) */
 #define CMD_send_response_send_data_94			94 /**< @brief Same as #CMD_send_data_91, but it is only sent as an answer to a #CMD_received_send_data_97 message   */
 
+#ifdef GASCOUNTER_MODULE
+#define LAST_NON_CMD_MSG		95		// Search no ack commands only (see xbee_hasReply)
+#endif
+
 
 // Requests sent from the database server
-#define CMD_received_Pong_89					89 /**< @brief Command is received as an answer to a #CMD_send_Ping_95 message*/
+
 #define CMD_received_set_options_96				96 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
 #define CMD_received_send_data_97				97 /**< @brief Prompts device to send measurement data to the server */
 #define CMD_received_send_options_98			98 /**< @brief Prompts device to send current #options to the server */
@@ -147,8 +151,30 @@ extern VersionType version;
 
 
 
+//==============================================================
+// Database server commands ILM_MODULE
+//==============================================================
+// Requests with answer sent from the device
+#define ILM_SEND_DATA       99      // ILM messages are sent in broadcast mode and are ignored by other devices
+#define ILM_Ping			111     /**< @brief Command for Ping, the server will send a Pong with the same code  */
+#define ILM_login			112		/**< @brief Command for Registration with the Server. The server will answer a 112C ommad containing device options*/
+
+// Requests without answer sent from the device
+#define ILM_send_options					115 /**< @brief Command for sending current #options to the Server as an answer to #ILM_received_send_options  */
+#define ILM_send_response_options_set		116 /**< @brief Sent to the server after options were received and set (#ILM_received_set_options) */
+#define ILM_send_response_send_data			117 /**< @brief Same as #ILM_send_data , but it is only sent as an answer to a #ILM_received_send_data message   */
 
 
+
+
+#ifdef ILM_MODULE
+#define LAST_NON_CMD_MSG		120		// Search no ack commands only (see xbee_hasReply) 
+#endif
+
+
+#define ILM_set_options		      121 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
+#define ILM_send_data			  122 /**< @brief Prompts device to send measurement data to the server */
+#define ILM_received_send_options 123 /**< @brief Prompts device to send current #options to the server */
 
 //==============================================================
 // XBee commands
