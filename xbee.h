@@ -172,10 +172,10 @@ extern VersionType version;
 #endif
 
 
-#define ILM_set_options		      121 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
-#define ILM_send_data			  122 /**< @brief Prompts device to send measurement data to the server */
-#define ILM_received_send_options 123 /**< @brief Prompts device to send current #options to the server */
-
+#define ILM_received_set_options		  121 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
+#define ILM_received_send_data			  122 /**< @brief Prompts device to send measurement data to the server */
+#define ILM_received_send_options		  123 /**< @brief Prompts device to send current #options to the server */
+  
 //==============================================================
 // XBee commands
 //==============================================================
