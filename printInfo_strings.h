@@ -31,6 +31,7 @@
 #define XBEE_SENDING_MESSAGE    "sending message..."
 #define XBEE_PING				"Ping.."
 #define XBEE_PING_OK            "PingOK"
+#define XBEE_NO_SERV			"...no Server"
 #endif
 
 #ifdef  GASCOUNTER_MODULE
@@ -52,6 +53,7 @@
 #define XBEE_SENDING_MESSAGE    "SendMs"
 #define XBEE_PING				"Ping.."
 #define XBEE_PING_OK            "PingOK"
+#define XBEE_NO_SERV			"no Serv"
 #endif
 
 #ifdef  ILM_MODULE
@@ -73,6 +75,7 @@
 #define XBEE_SENDING_MESSAGE    ""
 #define XBEE_PING				""
 #define XBEE_PING_OK            ""
+#define XBEE_NO_SERV			""
 #endif
 
 

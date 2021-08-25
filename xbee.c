@@ -415,6 +415,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		recon_already_tried = 1;
 		
 		if (xbee_reconnect()){
+			print_info_xbee(XBEE_N)
 			return reply_Id;
 		}
 	}
