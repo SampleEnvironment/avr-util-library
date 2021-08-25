@@ -14,6 +14,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 
 #include "DS3231M.h"
@@ -174,7 +175,7 @@ void DS3231M_set_time(struct tm *newtime)
 	Time_copy.tm_mday = newtime->tm_mday;
 	Time_copy.tm_mon = newtime->tm_mon - 1 ;
 	Time_copy.tm_year = newtime->tm_year +100;
-	Time.tm_isdst =0;
+	Time.tm_isdst =-1;
 	
 	
 	
@@ -237,25 +238,24 @@ void DS3231M_read_time(void)
 		return;
 	}
 
-	uint8_t sec = decodeDS3231M(data[0]);
-	uint8_t min = decodeDS3231M(data[1]);
-	uint8_t hour = decodeDS3231M(data[2]);
-	uint8_t mday = decodeDS3231M(data[4]);
-	uint8_t mon = decodeDS3231M(data[5]);
-	uint8_t year = decodeDS3231M(data[6]);
+	struct tm ds_Time;
+
+	ds_Time.tm_sec  = decodeDS3231M(data[0]);
+	ds_Time.tm_min  = decodeDS3231M(data[1]);
+	ds_Time.tm_hour = decodeDS3231M(data[2]);
+	ds_Time.tm_mday = decodeDS3231M(data[4]);
+	ds_Time.tm_mon  = decodeDS3231M(data[5]);
+	ds_Time.tm_year = decodeDS3231M(data[6]);
 	
-	if (
-		INRANGE(sec,0,59) && 
-		INRANGE(min,0,59) && 
-		INRANGE(hour,0,23) &&
-		INRANGE(mday,1,31) &&
-		INRANGE(mon,1,12) &&
-		INRANGE(year,21,99))
+	if (DS3231M_concurrency_check(&ds_Time))
 	{
 		connected.DS3231M = 1;
 		connected.TWI =1;
 		
 		CLEAR_ERROR(TIMER_ERROR);
+
+
+		memcpy(&Time,&ds_Time,sizeof(struct tm));
 
 
 		}else{
@@ -267,23 +267,9 @@ void DS3231M_read_time(void)
 
 	}
 	
-	//  Bits 7-4 are for the tens digits and bits 0-3 are for unit digits
-	
-	//			   | 3210 |		 | 7654|
-	Time.tm_sec  = sec ;
-	
-	Time.tm_min  = min ;
 
-	Time.tm_hour = hour;
 
-	Time.tm_mday = mday ;
 
-	Time.tm_mon  = mon;
-
-	Time.tm_year = year;
-	
-
-	return;
 }
 
 void DS3231M_read_temperature(void)
@@ -327,6 +313,7 @@ uint8_t encodeDS3231M(uint8_t element){
 
 void DS3231M_estimate_sys_Time(void){
 
+
 			 
 
 	time_t curr_time = last_Valid_Time + (count_t_elapsed - syst_at_last_Valid_Time);
@@ -339,4 +326,49 @@ void DS3231M_estimate_sys_Time(void){
 	Time.tm_mday = curr_t_est->tm_mday;
 	Time.tm_mon  = curr_t_est->tm_mon  + 1;   // tm_mon (0...11) but in ds3231m --> 1..12
 	Time.tm_year = curr_t_est->tm_year - 100; // tm_year (1900...) but in ds3231m --> 2000...
+}
+
+uint8_t DS3231M_concurrency_check(  struct tm *ds_Time){
+		if (
+		!(INRANGE(ds_Time->tm_sec,0,59) && 
+		  INRANGE(ds_Time->tm_min,0,59) && 
+		  INRANGE(ds_Time->tm_hour,0,23) &&
+		  INRANGE(ds_Time->tm_mday,1,31) &&
+		  INRANGE(ds_Time->tm_mon,1,12) &&
+		  INRANGE(ds_Time->tm_year,21,99))
+		)
+		{
+			return 0;
+		}
+
+		// ds3231m to time.h represenatation
+		ds_Time->tm_year += 100;
+		ds_Time->tm_mon  -= 1;
+
+		time_t curr_time_estimate = last_Valid_Time + (count_t_elapsed - syst_at_last_Valid_Time);
+		//printf("est:%i\n",curr_time_estimate);
+
+		ds_Time->tm_isdst =-1;
+
+		time_t curr_time_DS3231M  =  mktime( ds_Time); 	
+		//printf("ds3:%i\n",curr_time_DS3231M);
+
+		uint32_t time_drift = abs(curr_time_estimate-curr_time_DS3231M);
+		//printf("drif:%i\n",time_drift);
+
+		if(time_drift > MAX_t_DRIFT){
+			//back to ds3231m represenatation
+			ds_Time->tm_year -= 100;
+			ds_Time->tm_mon  += 1;
+			return 0;
+		}
+		
+		//back to ds3231m represenatation
+		ds_Time->tm_year -= 100;
+		ds_Time->tm_mon  += 1;
+
+		return 1;
+
+
+
 }

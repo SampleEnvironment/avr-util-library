@@ -42,7 +42,7 @@ int set_env(const char *name, const char *value)
 #endif
 }
 
-    void setServer(uint8_t sec, uint8_t min, uint8_t hour,uint8_t mday, uint8_t mon,uint8_t year){
+void setServer(uint8_t sec, uint8_t min, uint8_t hour,uint8_t mday, uint8_t mon,uint8_t year){
         ServerTime.tm_sec = sec;
         ServerTime.tm_min = min;
         ServerTime.tm_hour = hour;
@@ -56,7 +56,7 @@ int set_env(const char *name, const char *value)
 
 
 
-    virtual void SetUp() override{
+virtual void SetUp() override{
         
         const char *Germany = "GST+1GDT";
 
@@ -75,7 +75,7 @@ int set_env(const char *name, const char *value)
         DS3231M_read_time();
     }
 
-    virtual void TearDown() override{
+virtual void TearDown() override{
         //reset all 
     	CLEAR_ERROR(I2C_BUS_ERROR);
 		CLEAR_ERROR(TIMER_ERROR);
@@ -86,6 +86,7 @@ int set_env(const char *name, const char *value)
         count_t_elapsed = 0;
         temp_LSB = 0;
         temp_MSB = 0;
+        count_t_elapsed = 0;
         
     }
 };
@@ -605,6 +606,112 @@ TEST_F(DS3231M_Test,ReadTime_TWI_not_Connected){
     
 }
 
+//#########################################################
+// DS3231M_read_time() && concurrency_check  TESTS 
+//#########################################################
+TEST_F(DS3231M_Test,concurrency_check_mid){
+    //time drift of 10 s is allowed
+    count_t_elapsed = 5;
+
+    DS3231M_read_time();
+   
+    EXPECT_FALSE(CHECK_ERROR(TIMER_ERROR));
+    EXPECT_FALSE(CHECK_ERROR(I2C_BUS_ERROR));
+    EXPECT_EQ(
+        ServerTime.tm_sec,
+       Time.tm_sec
+    );
+    EXPECT_EQ(
+        ServerTime.tm_min,
+        Time.tm_min
+    );
+    EXPECT_EQ(
+        ServerTime.tm_hour,
+        Time.tm_hour
+    );
+    EXPECT_EQ(
+        ServerTime.tm_mday,
+        Time.tm_mday
+    );
+    EXPECT_EQ(
+        ServerTime.tm_mon,
+        Time.tm_mon
+    );
+    EXPECT_EQ(
+        ServerTime.tm_year,
+        Time.tm_year
+    );
+}
+
+TEST_F(DS3231M_Test,concurrency_check_upper){
+    //time drift of 5min 1s --> DS3231m is 5min 1s in the past 
+    // 
+    count_t_elapsed = (5*60);
+
+    DS3231M_read_time();
+   
+    EXPECT_FALSE(CHECK_ERROR(TIMER_ERROR));
+    EXPECT_FALSE(CHECK_ERROR(I2C_BUS_ERROR));
+   EXPECT_EQ(
+        ServerTime.tm_sec,
+       Time.tm_sec
+    );
+    EXPECT_EQ(
+        ServerTime.tm_min,
+        Time.tm_min
+    );
+    EXPECT_EQ(
+        ServerTime.tm_hour,
+        Time.tm_hour
+    );
+    EXPECT_EQ(
+        ServerTime.tm_mday,
+        Time.tm_mday
+    );
+    EXPECT_EQ(
+        ServerTime.tm_mon,
+        Time.tm_mon
+    );
+    EXPECT_EQ(
+        ServerTime.tm_year,
+        Time.tm_year
+    );
+}
+
+TEST_F(DS3231M_Test,concurrency_check_out){
+    //time drift of 5min 1s --> DS3231m is 5min 1s in the past 
+    // 
+    count_t_elapsed = (5*60)+1;
+
+    DS3231M_read_time();
+   
+    EXPECT_TRUE(CHECK_ERROR(TIMER_ERROR));
+    EXPECT_FALSE(CHECK_ERROR(I2C_BUS_ERROR));
+   EXPECT_EQ(
+        ServerTime.tm_sec+1,
+       Time.tm_sec
+    );
+    EXPECT_EQ(
+        ServerTime.tm_min+5,
+        Time.tm_min
+    );
+    EXPECT_EQ(
+        ServerTime.tm_hour,
+        Time.tm_hour
+    );
+    EXPECT_EQ(
+        ServerTime.tm_mday,
+        Time.tm_mday
+    );
+    EXPECT_EQ(
+        ServerTime.tm_mon,
+        Time.tm_mon
+    );
+    EXPECT_EQ(
+        ServerTime.tm_year,
+        Time.tm_year
+    );
+}
 
 //#########################################################
 // DS3231M_read_temperature() TESTS 
@@ -622,7 +729,7 @@ TEST_F(DS3231M_Test,Temperature_mid){
 
 }
 TEST_F(DS3231M_Test,Temperature_lower){
-    DS_state.temp[0] = 0;
+    DS_state.temp[0] = -128;
     DS_state.temp[1] = 0; 
 
     DS3231M_read_temperature();
@@ -630,6 +737,18 @@ TEST_F(DS3231M_Test,Temperature_lower){
     EXPECT_FALSE(CHECK_ERROR(TIMER_ERROR));
     EXPECT_TRUE(connected.TWI);
     EXPECT_TRUE(connected.DS3231M);
-    EXPECT_EQ(DS3231M_Temperature,0);
+    EXPECT_EQ(DS3231M_Temperature,-128+273);
+
+}
+TEST_F(DS3231M_Test,Temperature_upper){
+    DS_state.temp[0] = 127;
+    DS_state.temp[1] = 0; 
+
+    DS3231M_read_temperature();
+    EXPECT_FALSE(CHECK_ERROR(I2C_BUS_ERROR));
+    EXPECT_FALSE(CHECK_ERROR(TIMER_ERROR));
+    EXPECT_TRUE(connected.TWI);
+    EXPECT_TRUE(connected.DS3231M);
+    EXPECT_EQ(DS3231M_Temperature,127+273);
 
 }

@@ -58,6 +58,8 @@
 
 #define INRANGE(INPUT,MIN,MAX)  ((INPUT < MIN || INPUT > MAX) ? (0) : (1))
 
+#define MAX_t_DRIFT  (5*60) // maximum allowed time drift between ds3231m and internal time deduced by cpu timers
+
 extern struct tm Time;
 extern time_t last_Valid_Time;
 extern double DS3231M_Temperature;
@@ -72,5 +74,5 @@ void DS3231M_read_temperature(void);
 uint8_t encodeDS3231M(uint8_t element);
 uint8_t decodeDS3231M(uint8_t element);
 void DS3231M_estimate_sys_Time(void);
-
+uint8_t DS3231M_concurrency_check(struct tm *ds_Time);
 #endif 

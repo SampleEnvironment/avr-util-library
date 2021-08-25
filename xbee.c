@@ -456,6 +456,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		if (network_up)
 		{
 			print_info_xbee(XBEE_NO_SERV,0);
+			
 		}else{
 			print_info_xbee(XBEE_NO_NETWORK, 0);
 		}
@@ -480,7 +481,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 			break;
 		}
 	}
-
+	_delay_ms(2000);
 	return reply_Id;
 }
 
