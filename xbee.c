@@ -416,7 +416,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		recon_already_tried = 1;
 		
 		if (xbee_reconnect()){
-			print_info_xbee(XBEE_NO_NETWORK);
+			print_info_xbee(XBEE_NO_NETWORK,0);
 			return reply_Id;
 		}
 	}
