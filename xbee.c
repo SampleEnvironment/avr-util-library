@@ -398,6 +398,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 {
 	
+	uint8_t network_up = 0;
 	
 	// =================================================================
 	// ========= TRY TO RESOLVE EXISTING NETWORK ERRORS ================
@@ -415,7 +416,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		recon_already_tried = 1;
 		
 		if (xbee_reconnect()){
-			print_info_xbee(XBEE_N)
+			print_info_xbee(XBEE_NO_NETWORK);
 			return reply_Id;
 		}
 	}
@@ -436,6 +437,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		if (!recon_already_tried){ // Try reconnect then send again
 			if (!xbee_reconnect())
 			{	// reconn successful
+				network_up = 1;
 				reply_Id = xbee_send_request_only( db_cmd_type,buffer,  length);
 			}
 			
@@ -451,7 +453,13 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	if (reply_Id == 0xFF)
 	{
 		// Network error occurred
-		print_info_xbee(XBEE_NO_NETWORK, 0);
+		if (network_up)
+		{
+			print_info_xbee(XBEE_NO_SERV,0);
+		}else{
+			print_info_xbee(XBEE_NO_NETWORK, 0);
+		}
+		
 		_delay_ms(1000);
 		switch(db_cmd_type)
 		{
