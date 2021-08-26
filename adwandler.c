@@ -84,24 +84,13 @@ double map_to_pres(double adcVal, double zero, double span)
 }
 
 double read_Vcc(){
-	ADMUX = 0x0e;
-	ADMUX |= (0x01 << REFS0)    /* AVCC with external capacitor at AREF pin */
-	| (0 << ADLAR) ;       /* Left Adjust Result: disabled
+	double Vcc_value ;
 
-	float Vcc_value = 0 /* measured Vcc value */;
-	
-	
-	ADCSRA |= (1<<ADSC);  
-	
-	while ( ADCSRA & (1<<ADSC) );	
+	Vcc_value = readChannel(0x0e,40);
 
 
-			double Vcc_value = ( 0x400 * 1.1 ) / ((float)ADCW)    /* calculate
-			the Vcc value */;
+	return Vcc_value	= ( 0x400 * 1.1 ) / (Vcc_value)   ;
 
-	
-	
-	return (double) Vcc_value;
  	
 }
 
