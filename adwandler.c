@@ -98,9 +98,8 @@ double read_Vcc(){
 	
 	while ( ADCSRA & (1<<ADSC) );	
 
-			ADC_RES_L = ADCL;
-			ADC_RES_H = ADCH;
-			Vcc_value = ( 0x400 * 1.1 ) / (ADC_RES_L + ADC_RES_H * 0x100)    /* calculate
+
+			Vcc_value = ( 0x400 * 1.1 ) / ((float)ADCW)    /* calculate
 			the Vcc value */;
 
 	
