@@ -96,15 +96,14 @@ double read_Vcc(){
 	
 	ADCSRA |= (1<<ADSC);  
 	
-	while(1) {
-		if (ADCSRA & (0x01 << ADIF))    /* check if ADC conversion complete */
-		{
+	while ( ADCSRA & (1<<ADSC) );	
+
 			ADC_RES_L = ADCL;
 			ADC_RES_H = ADCH;
 			Vcc_value = ( 0x400 * 1.1 ) / (ADC_RES_L + ADC_RES_H * 0x100)    /* calculate
 			the Vcc value */;
-		}
-	}
+
+	
 	
 	return (double) Vcc_value;
  	
