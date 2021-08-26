@@ -481,7 +481,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 			break;
 		}
 	}
-	_delay_ms(2000);
+	_delay_ms(1000);
 	return reply_Id;
 }
 

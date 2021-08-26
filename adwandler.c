@@ -13,7 +13,7 @@
 // Initialize analog to digital converter on selected channel
 void adc_init(uint8_t channel)
 {
-//	uint16_t result;
+	//	uint16_t result;
 
 	// ADCSRA means ADC Control and Status Register A
 	// Set ADEN to true enables the ADC
@@ -28,7 +28,7 @@ void adc_init(uint8_t channel)
 	
 	while (ADCSRA & (1<<ADSC));
 
-//	result = ADCW;
+	//	result = ADCW;
 }
 
 ///rounds double number
@@ -51,13 +51,13 @@ double round_double(double number, int digits)
 
 double map_to_current(double adcVal)   //???
 {
-//	return ((adcVal)/((1023.0*10.0)/(100.0*11.0)));
+	//	return ((adcVal)/((1023.0*10.0)/(100.0*11.0)));
 	return adcVal * MAP_TO_CURRENT_FACTOR + MAP_TO_CURRENT_OFFSET;
 }
 
 double map_to_volt(double adcVal)   //???
 {
-//	return ((adcVal)/((1023.0*10.0)/(35.0*11.0)));
+	//	return ((adcVal)/((1023.0*10.0)/(35.0*11.0)));
 	return (adcVal * MAP_TO_VOLTAGE_FACTOR) + MAP_TO_VOLTAGE_OFFSET;
 }
 
@@ -73,14 +73,41 @@ double map_to_test(double adcVal)
 
 double map_to_batt(double adcVal)
 {
-//	return ((adcVal)/((1023.0*10.0)/(15.0*11.0))*1.05);
+	//	return ((adcVal)/((1023.0*10.0)/(15.0*11.0))*1.05);
 	return adcVal * MAP_TO_BATT_FACTOR + MAP_TO_BATT_OFFSET;
 }
 
 double map_to_pres(double adcVal, double zero, double span)
 {
-//	return (((adcVal)/((1023.0)/10.0))*span) - zero;
+	//	return (((adcVal)/((1023.0)/10.0))*span) - zero;
 	return adcVal * MAP_TO_PRESS_FACTOR * span + zero;
+}
+
+double read_Vcc(){
+	ADMUX = 0;
+	ADMUX = (0x01 << REFS0)    /* AVCC with external capacitor at AREF pin */
+	| (0 << ADLAR)        /* Left Adjust Result: disabled
+	*/
+	| (0x0e << MUX0)    /* Internal Reference (VBG) */;
+	
+	float Vcc_value = 0 /* measured Vcc value */;
+	uint16_t ADC_RES_L = 0;
+	uint16_t ADC_RES_H = 0;
+	
+	ADCSRA |= (1<<ADSC);  
+	
+	while(1) {
+		if (ADCSRA & (0x01 << ADIF))    /* check if ADC conversion complete */
+		{
+			ADC_RES_L = ADCL;
+			ADC_RES_H = ADCH;
+			Vcc_value = ( 0x400 * 1.1 ) / (ADC_RES_L + ADC_RES_H * 0x100)    /* calculate
+			the Vcc value */;
+		}
+	}
+	
+	return (double) Vcc_value;
+ 	
 }
 
 
@@ -98,7 +125,7 @@ double calc_he_level(double res_x, double res_min, double res_max)
 		return 100;			// Return 100 %
 	}
 	
-	// The measured resistance is higher than the maximum value, the dewar is empty	
+	// The measured resistance is higher than the maximum value, the dewar is empty
 	if(res_x > res_max)
 	{
 		return 0;			// Return 0 %
