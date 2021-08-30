@@ -148,6 +148,7 @@ extern VersionType version;
 #define CMD_received_simulate_xBee_100			   100
 #define CMD_received_Funtrace_toggle_101           101 /**< @brief Command for enabling or disabling the Functiontrace saving in eeprom */
 #define CMD_received_send_Funtrace_102			   102 /**< @brief Command prompting the device to send the function Trace that was saved in its eeprom*/
+#define CMD_received_set_ping_Intervall_103		   103 /**< @brief Command prompting the device to set the Ping Intervall*/
 
 
 
@@ -175,6 +176,7 @@ extern VersionType version;
 #define ILM_received_set_options		  121 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
 #define ILM_received_send_data			  122 /**< @brief Prompts device to send measurement data to the server */
 #define ILM_received_send_options		  123 /**< @brief Prompts device to send current #options to the server */
+#define ILM_received_set_ping_Intervall_103		   124 /**< @brief Command prompting the device to set the Ping Intervall*/
   
 //==============================================================
 // XBee commands
