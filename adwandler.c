@@ -18,7 +18,7 @@ void adc_init(uint8_t channel)
 	// ADCSRA means ADC Control and Status Register A
 	// Set ADEN to true enables the ADC
 	// Set the division factor to 128 between the XTAL frequency and the input clock to the ADC
-	ADCSRA = (1<<ADEN) | (1<<ADPS2) | (1<<ADPS1) | (0<<ADPS0);
+	ADCSRA = (1<<ADEN) | (1<<ADPS2) | (0<<ADPS1) | (1<<ADPS0);
 
 	ADMUX = channel;					// Select channel
 	ADMUX |= (0<<REFS1) | (1<<REFS0); 	// Intern reference on AVCC with external capacitor at AREF pin
