@@ -9,7 +9,9 @@
 
 #define BUFFER_LENGTH	10        		    // maximum frames
 #define DATA_LENGTH		256-16				// maximum data in frame   ATTENTION if changed then change SINGLE_FRAME_LENGTH in xbee.h as well
-
+#define OPCODE_INDEX 14
+#define STATUS_BYTE  buffer[15]
+#define DATA_INDEX   16
 
 extern XbeeType xbee;
 
