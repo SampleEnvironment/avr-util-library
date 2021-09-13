@@ -159,10 +159,10 @@ extern VersionType version;
 
 
 //Dummy codes
-#define FILLING_BEGIN_MSG   0
-#define FILLING_END_MSG     0
-#define OPTIONS_CHANGED_MSG 0
-#define LONG_INTERVAL_MSG   0
+#define FILLING_BEGIN_MSG   5
+#define FILLING_END_MSG     7
+#define OPTIONS_CHANGED_MSG 4
+#define LONG_INTERVAL_MSG   3
 
 #endif
 
@@ -189,10 +189,10 @@ extern VersionType version;
 #define SET_PING_INTERVALL_CMD 124 /**< @brief Command prompting the device to set the Ping Intervall*/
 
 //Dummy codes
-#define FILLING_BEGIN_MSG   0
-#define FILLING_END_MSG     0
-#define OPTIONS_CHANGED_MSG 0
-#define LONG_INTERVAL_MSG   0
+#define FILLING_BEGIN_MSG   5
+#define FILLING_END_MSG     7
+#define OPTIONS_CHANGED_MSG 4
+#define LONG_INTERVAL_MSG   3
 
 #endif
   
