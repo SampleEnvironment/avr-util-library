@@ -278,27 +278,13 @@ uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_
 {
 	uint8_t reply_Id = 0xFF;
 	
-	//------------------------
-	// Answer db_commands are not the same as the requests --> remapping is done here
-	uint8_t answer_db_cmd_type;
-	switch(db_cmd_type){
-		case CMD_send_Ping_95:
-		answer_db_cmd_type = CMD_received_Pong_89;
-		break;
-		//case CMD_send_registration_90:
-		//answer_db_cmd_type = CMD_received_set_options_96;
-		//break;
-		default:
-		answer_db_cmd_type = db_cmd_type;
-		break;
-	}
-	
+
 
 	// if length not 0 get and delete all old replies of this db_cmd_type
 	if (length)
 	do
 	{
-		reply_Id = xbee_hasReply(answer_db_cmd_type, EQUAL);	//check for reply
+		reply_Id = xbee_hasReply(db_cmd_type, EQUAL);	//check for reply
 		if (reply_Id != 0xFF)							//reply available
 		buffer_removeData(reply_Id);				//mark as read
 	}
@@ -322,7 +308,7 @@ uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_
 
 		
 		// Check for reply
-		reply_Id = xbee_hasReply(answer_db_cmd_type, EQUAL);
+		reply_Id = xbee_hasReply(db_cmd_type, EQUAL);
 		_delay_ms(10);
 		
 		if (reply_Id == 0xFF)
@@ -347,7 +333,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 	uint8_t reply_Id = 0xFF;
 	
 
-	if(db_cmd_type == CMD_send_Ping_95){
+	if(db_cmd_type == PING_MSG){
 		// Any network error
 		print_info_xbee(XBEE_PING, 0);
 		}else{
@@ -372,7 +358,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 	else {
 		memcpy(buffer, (uint8_t*)frameBuffer[reply_Id].data, frameBuffer[reply_Id].data_len);
 		
-		if(db_cmd_type == CMD_send_Ping_95){
+		if(db_cmd_type == PING_MSG){
 			print_info_xbee(XBEE_PING_OK, 0);
 			_delay_ms(300);
 			}else{

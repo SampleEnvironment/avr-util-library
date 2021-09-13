@@ -69,6 +69,8 @@ extern VersionType version;
 // Database server commands
 //==============================================================
 // Requests with answer sent from the device
+#ifdef LEVELMETER
+#define PING_MSG			    0 
 #define LOGIN_MSG				1		// Request for login
 #define FORCE_LOGIN_MSG			2		// Force login ???
 //#define LETTERS_REQUEST         23		// Request for the positions list (compare to command SET_LETTERS_CMD)  NOT USED AT THE MOMENT
@@ -85,9 +87,8 @@ extern VersionType version;
 
 
 
-#ifdef LEVELMETER
+
 	#define LAST_NON_CMD_MSG		10		// Search no ack commands only (see xbee_hasReply)
-#endif
 
 
 	
@@ -113,70 +114,67 @@ extern VersionType version;
 #define TRIGGER_MEAS_MSG	    24      // Triggers a measurement of the Helium level
 #define TRIGGER_REMOTE_PULSE    27		// Trigger a remote Pulse
 #define TRIGGER_REMOTE_U_OVER_I 28		// Trigger a remote U over I Pulse
+#endif
 
 
 
 
-
+#ifdef GASCOUNTER_MODULE
 //==============================================================
 // Database server commands GASCOUNTER_MODULE
 //==============================================================
 // Requests with answer sent from the device
-#define CMD_send_registration_90				90 /**< @brief Command for Registration with the Server. The server will answer a #CMD_received_set_options_96 message  */
-#define CMD_send_data_91						91 /**< @brief Command for sending Data to the Server. It is unanswered by the server */
-#define CMD_send_Ping_95						95 /**< @brief Command for Ping, the server will send a Pong with #CMD_received_Pong_89  */
-#define CMD_received_Pong_89					89 /**< @brief Command is received as an answer to a #CMD_send_Ping_95 message*/
+#define LOGIN_MSG				90 /**< @brief Command for Registration with the Server. The server will answer a #CMD_received_set_options_96 message  */
+#define MEAS_MSG						91 /**< @brief Command for sending Data to the Server. It is unanswered by the server */
+#define PING_MSG						95 /**< @brief Command for Ping, the server will send a Pong with #CMD_received_Pong_89  */
+//#define CMD_received_Pong_89					89 /**< @brief Command is received as an answer to a #CMD_send_Ping_95 message*/
 
 
 // Requests without answer sent from the device
 #define CMD_send_funtrace_88					88 /**< @brief Answering the funtrace request from the Server   */
-#define CMD_send_options_92						92 /**< @brief Command for sending current #options to the Server as an answer to #CMD_received_send_options_98  */
-#define CMD_send_response_options_set_93		93 /**< @brief Sent to the server after options were received and set (#CMD_received_set_options_96) */
-#define CMD_send_response_send_data_94			94 /**< @brief Same as #CMD_send_data_91, but it is only sent as an answer to a #CMD_received_send_data_97 message   */
+//#define CMD_send_options_92						92 /**< @brief Command for sending current #options to the Server as an answer to #CMD_received_send_options_98  */
+#define OPTIONS_SET_ACK		93 /**< @brief Sent to the server after options were received and set (#CMD_received_set_options_96) */
+//#define CMD_send_response_send_data_94			94 /**< @brief Same as #CMD_send_data_91, but it is only sent as an answer to a #CMD_received_send_data_97 message   */
 
-#ifdef GASCOUNTER_MODULE
+
 #define LAST_NON_CMD_MSG		95		// Search no ack commands only (see xbee_hasReply)
-#endif
+
 
 
 // Requests sent from the database server
 
-#define CMD_received_set_options_96				96 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
-#define CMD_received_send_data_97				97 /**< @brief Prompts device to send measurement data to the server */
-#define CMD_received_send_options_98			98 /**< @brief Prompts device to send current #options to the server */
-#define CMD_received_ILM_Ignore_99				99 /**< @brief broadcasted ILM message, ignored by Gascounter module */
-#define CMD_received_simulate_xBee_100			   100
-#define CMD_received_Funtrace_toggle_101           101 /**< @brief Command for enabling or disabling the Functiontrace saving in eeprom */
-#define CMD_received_send_Funtrace_102			   102 /**< @brief Command prompting the device to send the function Trace that was saved in its eeprom*/
-#define CMD_received_set_ping_Intervall_103		   103 /**< @brief Command prompting the device to set the Ping Intervall*/
+#define SET_OPTIONS_CMD				    96 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
+#define TRIGGER_MEAS_CMD				97 /**< @brief Prompts device to send measurement data to the server */
+#define GET_OPTIONS_CMD			        98 /**< @brief Prompts device to send current #options to the server */
+#define CMD_received_ILM_Ignore_99	    99 /**< @brief broadcasted ILM message, ignored by Gascounter module */
+#define SIMULATE_XBEE_CMD			   100
+#define SET_FUNTRACE_CMD               101 /**< @brief Command for enabling or disabling the Functiontrace saving in eeprom */
+#define GET_FUNTRACE_CMD			   102 /**< @brief Command prompting the device to send the function Trace that was saved in its eeprom*/
+#define SET_PING_INTERVALL_CMD		   103 /**< @brief Command prompting the device to set the Ping Intervall*/
+#endif
 
 
-
+#ifdef ILM_MODULE
 //==============================================================
 // Database server commands ILM_MODULE
 //==============================================================
 // Requests with answer sent from the device
-#define ILM_SEND_DATA       99      // ILM messages are sent in broadcast mode and are ignored by other devices
-#define ILM_Ping			111     /**< @brief Command for Ping, the server will send a Pong with the same code  */
-#define ILM_login			112		/**< @brief Command for Registration with the Server. The server will answer a 112C ommad containing device options*/
+//#define ILM_SEND_DATA       99      // ILM messages are sent in broadcast mode and are ignored by other devices
+#define PING_MSG			111     /**< @brief Command for Ping, the server will send a Pong with the same code  */
+#define LOGIN_MSG			112		/**< @brief Command for Registration with the Server. The server will answer a 112C ommad containing device options*/
+#define MEAS_MSG            113     /**< @brief ILM Measurement Message*/
+
 
 // Requests without answer sent from the device
-#define ILM_send_options					115 /**< @brief Command for sending current #options to the Server as an answer to #ILM_received_send_options  */
-#define ILM_send_response_options_set		116 /**< @brief Sent to the server after options were received and set (#ILM_received_set_options) */
-#define ILM_send_response_send_data			117 /**< @brief Same as #ILM_send_data , but it is only sent as an answer to a #ILM_received_send_data message   */
+#define OPTIONS_SET_ACK		116 /**< @brief Sent to the server after options were received and set (#ILM_received_set_options) */
 
-
-
-
-#ifdef ILM_MODULE
 #define LAST_NON_CMD_MSG		120		// Search no ack commands only (see xbee_hasReply) 
+
+#define SET_OPTIONS_CMD		   121 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
+#define TRIGGER_MEAS_CMD	   122 /**< @brief Prompts device to send measurement data to the server */
+#define GET_OPTIONS_CMD		   123 /**< @brief Prompts device to send current #options to the server */
+#define SET_PING_INTERVALL_CMD 124 /**< @brief Command prompting the device to set the Ping Intervall*/
 #endif
-
-
-#define ILM_received_set_options		  121 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
-#define ILM_received_send_data			  122 /**< @brief Prompts device to send measurement data to the server */
-#define ILM_received_send_options		  123 /**< @brief Prompts device to send current #options to the server */
-#define ILM_received_set_ping_Intervall		   124 /**< @brief Command prompting the device to set the Ping Intervall*/
   
 //==============================================================
 // XBee commands
