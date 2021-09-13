@@ -70,7 +70,7 @@ extern VersionType version;
 //==============================================================
 // Requests with answer sent from the device
 #ifdef LEVELMETER
-#define PING_MSG			    0 
+
 #define LOGIN_MSG				1		// Request for login
 #define FORCE_LOGIN_MSG			2		// Force login ???
 //#define LETTERS_REQUEST         23		// Request for the positions list (compare to command SET_LETTERS_CMD)  NOT USED AT THE MOMENT
@@ -111,9 +111,14 @@ extern VersionType version;
 #define SET_XBEE_SLEEP_TIME_CMD	19		// Set XBee sleeping period received from the database server
 #define DISPLAY_MSG_CMD	        20		// Displays a message on the display
 #define SET_XBEE_AWAKE_TIME_CMD	22		// Set XBee awake period received from the database server
-#define TRIGGER_MEAS_MSG	    24      // Triggers a measurement of the Helium level
+#define TRIGGER_MEAS_CMD	    24      // Triggers a measurement of the Helium level
 #define TRIGGER_REMOTE_PULSE    27		// Trigger a remote Pulse
 #define TRIGGER_REMOTE_U_OVER_I 28		// Trigger a remote U over I Pulse
+
+
+//dummy Codes
+#define PING_MSG			    0 
+
 #endif
 
 
@@ -151,6 +156,14 @@ extern VersionType version;
 #define SET_FUNTRACE_CMD               101 /**< @brief Command for enabling or disabling the Functiontrace saving in eeprom */
 #define GET_FUNTRACE_CMD			   102 /**< @brief Command prompting the device to send the function Trace that was saved in its eeprom*/
 #define SET_PING_INTERVALL_CMD		   103 /**< @brief Command prompting the device to set the Ping Intervall*/
+
+
+//Dummy codes
+#define FILLING_BEGIN_MSG   0
+#define FILLING_END_MSG     0
+#define OPTIONS_CHANGED_MSG 0
+#define LONG_INTERVAL_MSG   0
+
 #endif
 
 
@@ -174,6 +187,13 @@ extern VersionType version;
 #define TRIGGER_MEAS_CMD	   122 /**< @brief Prompts device to send measurement data to the server */
 #define GET_OPTIONS_CMD		   123 /**< @brief Prompts device to send current #options to the server */
 #define SET_PING_INTERVALL_CMD 124 /**< @brief Command prompting the device to set the Ping Intervall*/
+
+//Dummy codes
+#define FILLING_BEGIN_MSG   0
+#define FILLING_END_MSG     0
+#define OPTIONS_CHANGED_MSG 0
+#define LONG_INTERVAL_MSG   0
+
 #endif
   
 //==============================================================
