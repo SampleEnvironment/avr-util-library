@@ -68,6 +68,8 @@ extern VersionType version;
 //==============================================================
 // Database server commands
 //==============================================================
+#define  DEPRECATED_ILM_BROADCAST 99
+
 // Requests with answer sent from the device
 #ifdef LEVELMETER
 
@@ -151,7 +153,7 @@ extern VersionType version;
 #define SET_OPTIONS_CMD				    96 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
 #define TRIGGER_MEAS_CMD				97 /**< @brief Prompts device to send measurement data to the server */
 #define GET_OPTIONS_CMD			        98 /**< @brief Prompts device to send current #options to the server */
-#define CMD_received_ILM_Ignore_99	    99 /**< @brief broadcasted ILM message, ignored by Gascounter module */
+
 #define SIMULATE_XBEE_CMD			   100
 #define SET_FUNTRACE_CMD               101 /**< @brief Command for enabling or disabling the Functiontrace saving in eeprom */
 #define GET_FUNTRACE_CMD			   102 /**< @brief Command prompting the device to send the function Trace that was saved in its eeprom*/
@@ -172,7 +174,7 @@ extern VersionType version;
 // Database server commands ILM_MODULE
 //==============================================================
 // Requests with answer sent from the device
-//#define ILM_SEND_DATA       99      // ILM messages are sent in broadcast mode and are ignored by other devices
+
 #define PING_MSG			111     /**< @brief Command for Ping, the server will send a Pong with the same code  */
 #define LOGIN_MSG			112		/**< @brief Command for Registration with the Server. The server will answer a 112C ommad containing device options*/
 #define MEAS_MSG            113     /**< @brief ILM Measurement Message*/
