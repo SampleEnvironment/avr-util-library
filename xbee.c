@@ -127,6 +127,46 @@ uint8_t xbee_is_connected(void)
 
 }
 
+uint32_t xbee_SL_address(void){
+	uint32_t 	SL_Address = 0;
+	#ifdef USE_XBEE
+
+	uint8_t buffer[SINGLE_FRAME_LENGTH];
+	
+	buffer[0] = (uint8_t)'S';
+	buffer[1] = (uint8_t)'L';
+	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
+	
+	
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, SL_MSG_TYPE, 1000);
+
+	if(reply_Id == 0xFF) return 0;
+	
+	SL_Address = (frameBuffer[reply_Id].data[0] << 24) ++(frameBuffer[reply_Id].data[1] << 16) + (frameBuffer[reply_Id].data[2] << 8) + frameBuffer[reply_Id].data[3] ;
+	
+	char print_sl[10];
+	
+	
+	for (uint8_t i =0;i <4;i++)
+	{
+	
+	sprintf(print_sl,"%i",frameBuffer[reply_Id].data[i]);
+	print_info_xbee(print_sl;);
+	_delay_ms(5000);
+	}
+
+	
+	
+
+	#endif // USE_XBEE
+	#ifdef USE_LAN
+
+	#endif
+	
+	return SL_Address;
+}
+
+
 
 uint8_t xbee_hardware_version(void){
 	#ifdef USE_XBEE

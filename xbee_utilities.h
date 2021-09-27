@@ -67,7 +67,9 @@ enum  reply_type{
 #define DL_MSG_TYPE 			20		// Destination address low API command
 #define STATUS_MSG_TYPE 		21		//
 #define AI_MSG_TYPE				22      // Association Indication Reads errors with the last association request.
-#define HV_MSG_TYPE				23      // Association Indication Reads errors with the last association request.
+#define HV_MSG_TYPE				23      // Hardvare version of xbee module
+#define SL_MSG_TYPE				29		// xbeeaddress of module
+
 
 //==============================================================
 // XBee utilities commands

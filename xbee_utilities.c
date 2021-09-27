@@ -107,6 +107,7 @@ inline uint8_t get_at_frame_type(char *id, uint8_t len)
 	if((id[0] == 'D') && (id[1] == 'H')) return DH_MSG_TYPE;
 	if((id[0] == 'A') && (id[1] == 'I')) return AI_MSG_TYPE;
 	if((id[0] == 'H') && (id[1] == 'V')) return HV_MSG_TYPE;
+	if((id[0] == 'S') && (id[1] == 'L')) return SL_MSG_TYPE;
 	
 	return 0;
 }
@@ -137,7 +138,7 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 		newFrame.data[data_counter++] = buffer[i];
 		newFrame.data_len = --data_counter;
 		
-		if (newFrame.type == (CMD_received_set_options_96||CMD_send_registration_90))
+		if (newFrame.type == (SET_OPTIONS_CMD||LOGIN_MSG))
 		{
 			
 			IP_1_octet = buffer[5];
@@ -152,7 +153,7 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 		
 		if (buffer[4] && (buffer[5] == (uint8_t) 'C') && (buffer[6] == (uint8_t) 'E'))
 		{
-			newFrame.type = CMD_received_simulate_xBee_100;
+			newFrame.type = SIMULATE_XBEE_CMD;
 			newFrame.status = 0;
 		}
 		else

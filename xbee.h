@@ -224,6 +224,7 @@ uint8_t xbee_is_connected(void);           // checks if xbee is connected to coo
 _Bool xbee_reset_connection(void);		// Reset connection with the xbee coordinator and initiate a new one
 // Returns true if reconnection is successfull, false otherwise
 uint8_t xbee_hardware_version(void);
+uint32_t xbee_SL_address(void);
 uint8_t xbee_reconnect(void);			// Try a new connection with the server
 void xbee_send(uint8_t *data);			// Start USART0 transmission to XBee module
 void xbee_send_msg(uint8_t *buffer, uint8_t length);	// Send message via XBee module
