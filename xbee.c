@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <avr/io.h>
+#include <stdio.h>
 
 
 
@@ -151,7 +152,7 @@ uint32_t xbee_SL_address(void){
 	{
 	
 	sprintf(print_sl,"%i",frameBuffer[reply_Id].data[i]);
-	print_info_xbee(print_sl;);
+	print_info_xbee(print_sl,1);
 	_delay_ms(5000);
 	}
 
