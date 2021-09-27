@@ -143,7 +143,7 @@ uint32_t xbee_SL_address(void){
 
 	if(reply_Id == 0xFF) return 0;
 	
-	SL_Address = (frameBuffer[reply_Id].data[0] << 24) ++(frameBuffer[reply_Id].data[1] << 16) + (frameBuffer[reply_Id].data[2] << 8) + frameBuffer[reply_Id].data[3] ;
+	SL_Address = ((uint32_t)frameBuffer[reply_Id].data[0] << 24) +((uint32_t)frameBuffer[reply_Id].data[1] << 16) + ((uint32_t)frameBuffer[reply_Id].data[2] << 8) + (uint32_t)frameBuffer[reply_Id].data[3] ;
 	
 	char print_sl[10];
 	
