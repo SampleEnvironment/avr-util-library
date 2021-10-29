@@ -60,6 +60,6 @@ double readChannel(uint8_t mux, uint16_t avg);
 double readChannel_calib(uint8_t channel, uint8_t nb_readings, double adc_zero);
 uint8_t get_batt_level(double batt_min, double batt_max);
 double read_Vcc();
-uint16_t readChannel_ILM(uint8_t channel, uint8_t avg);
+uint32_t readChannel_ILM(uint8_t channel, uint16_t avg);
 
 #endif //adwandler.h
