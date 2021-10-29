@@ -121,7 +121,7 @@ double calc_he_level(double res_x, double res_min, double res_max)
 
 
 ///reads the given channel and returns converted ADc-value (average of "avr" measurements)
-inline uint16_t readChannel_ILM(uint8_t channel, uint8_t avg)
+uint16_t readChannel_ILM(uint8_t channel, uint8_t avg)
 {
 	uint16_t result = 0;
 	
