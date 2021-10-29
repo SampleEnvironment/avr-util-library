@@ -118,6 +118,34 @@ double calc_he_level(double res_x, double res_min, double res_max)
 	return ((res_max - res_x)/(res_max - res_min))*100;
 }
 
+
+
+///reads the given channel and returns converted ADc-value (average of "avr" measurements)
+inline uint16_t readChannel_ILM(uint8_t channel, uint8_t avg)
+{
+	uint16_t result = 0;
+	
+	ADMUX = channel;						// Kanal waehlen
+	ADMUX |= (1<<REFS1) | (1<<REFS0); 	// 2,56
+	
+	//ADCSRA = (1<<ADEN) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0); //strom an
+	
+	//Messung - Mittelwert aus "avg" aufeinanderfolgenden Wandlungen
+	for( uint8_t i=0; i<avg; i++ )
+	{
+		ADCSRA |= (1<<ADSC);            	// eine Wandlung "single conversion"
+		while ( ADCSRA & (1<<ADSC) );		// auf Abschluss der Konvertierung warten
+		
+		result += ADCW;		    			// Wandlungsergebnisse aufaddieren
+	}
+	
+	//ADCSRA &= ~(1<<ADEN); // ADC deaktivieren
+
+	return result/avg;
+}
+
+
+
 ///reads the given channel and returns converted ADc-value (average of "avr" measurements)
 double readChannel(uint8_t mux, uint16_t avg)
 {
