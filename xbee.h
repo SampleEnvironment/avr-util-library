@@ -189,6 +189,8 @@ extern VersionType version;
 #define TRIGGER_MEAS_CMD	   122 /**< @brief Prompts device to send measurement data to the server */
 #define GET_OPTIONS_CMD		   123 /**< @brief Prompts device to send current #options to the server */
 #define SET_PING_INTERVALL_CMD 124 /**< @brief Command prompting the device to set the Ping Intervall*/
+#define GET_RAW_DATA		   125 /**< @brief Command prompting the device to send raw ADC Values for all three channels */ 
+
 
 //Dummy codes
 #define FILLING_BEGIN_MSG   5
