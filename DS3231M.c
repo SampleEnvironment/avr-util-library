@@ -42,7 +42,7 @@
 struct tm Time;
 
 
-time_t last_Valid_Time;
+time_t last_Valid_Time = 0;
 
 int8_t temp_MSB;
 uint8_t temp_LSB;
@@ -53,9 +53,9 @@ uint32_t syst_at_last_Valid_Time;
 
 
 /**
-* @brief Holds Function to print Infoline 
+* @brief Holds Function to print Infoline
 *
-* Paints an info message on the LCD 
+* Paints an info message on the LCD
 */
 void (*print_info_DS3231M)(char * ,bool ) = NULL;
 
@@ -82,7 +82,7 @@ uint8_t init_DS3231M(void (*printInfoFun)(char *,bool))
 	Time.tm_year = 0;
 	Time.tm_isdst =0;
 	
-		
+	
 	uint8_t data[2];
 	
 	if (I2C_read_from(DS3231M_address,DS3231M_address_temp_MSB,data,2))
@@ -110,12 +110,12 @@ uint8_t init_DS3231M(void (*printInfoFun)(char *,bool))
 
 uint8_t check_valid_ranges(struct tm * newtime){
 	if (
-		INRANGE(newtime->tm_sec,0,59) &&
-		INRANGE(newtime->tm_min,0,59) &&
-		INRANGE(newtime->tm_hour,0,23) &&
-		INRANGE(newtime->tm_mday,1,31) &&
-		INRANGE(newtime->tm_mon,1,12) &&
-		INRANGE(newtime->tm_year,0,99))
+	INRANGE(newtime->tm_sec,0,59) &&
+	INRANGE(newtime->tm_min,0,59) &&
+	INRANGE(newtime->tm_hour,0,23) &&
+	INRANGE(newtime->tm_mday,1,31) &&
+	INRANGE(newtime->tm_mon,1,12) &&
+	INRANGE(newtime->tm_year,0,99))
 	{
 		return 1;
 	}
@@ -283,7 +283,7 @@ void DS3231M_read_temperature(void)
 		connected.TWI = 0;
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TIMER_ERROR);
-	    _delay_ms(2000);
+		_delay_ms(2000);
 		return;
 	}
 	if(i2c_ret_code == DEVICE_NOT_CONNECTED){
@@ -304,21 +304,21 @@ void DS3231M_read_temperature(void)
 
 
 uint8_t encodeDS3231M(uint8_t element){
-       return ((element / 10) << 4)  | (element % 10);
+	return ((element / 10) << 4)  | (element % 10);
 }
 
- uint8_t decodeDS3231M(uint8_t element){
-       return (element & 0x0F) + (element >> 4)*10;
+uint8_t decodeDS3231M(uint8_t element){
+	return (element & 0x0F) + (element >> 4)*10;
 }
 
 void DS3231M_estimate_sys_Time(void){
 
 
-			 
+	
 
 	time_t curr_time = last_Valid_Time + (count_t_elapsed - syst_at_last_Valid_Time);
 
-	struct tm * curr_t_est  = gmtime(&curr_time);	
+	struct tm * curr_t_est  = gmtime(&curr_time);
 
 	Time.tm_sec  = curr_t_est->tm_sec;
 	Time.tm_min  = curr_t_est->tm_min;
@@ -329,45 +329,51 @@ void DS3231M_estimate_sys_Time(void){
 }
 
 uint8_t DS3231M_concurrency_check(  struct tm *ds_Time){
-		if (
-		!(INRANGE(ds_Time->tm_sec,0,59) && 
-		  INRANGE(ds_Time->tm_min,0,59) && 
-		  INRANGE(ds_Time->tm_hour,0,23) &&
-		  INRANGE(ds_Time->tm_mday,1,31) &&
-		  INRANGE(ds_Time->tm_mon,1,12) &&
-		  INRANGE(ds_Time->tm_year,21,99))
-		)
-		{
-			return 0;
-		}
+	if (
+	!(INRANGE(ds_Time->tm_sec,0,59) &&
+	INRANGE(ds_Time->tm_min,0,59) &&
+	INRANGE(ds_Time->tm_hour,0,23) &&
+	INRANGE(ds_Time->tm_mday,1,31) &&
+	INRANGE(ds_Time->tm_mon,1,12) &&
+	INRANGE(ds_Time->tm_year,21,99))
+	)
+	{
+		return 0;
+	}
+	
+	// if there last valid time is not initialized yet, the the concurrencycheck defaults to pass
+	if (last_Valid_Time == 0)
+	{
+		return 1;
+	}
 
-		// ds3231m to time.h represenatation
-		ds_Time->tm_year += 100;
-		ds_Time->tm_mon  -= 1;
+	// ds3231m to time.h represenatation
+	ds_Time->tm_year += 100;
+	ds_Time->tm_mon  -= 1;
 
-		time_t curr_time_estimate = last_Valid_Time + (count_t_elapsed - syst_at_last_Valid_Time);
-		//printf("est:%i\n",curr_time_estimate);
+	time_t curr_time_estimate = last_Valid_Time + (count_t_elapsed - syst_at_last_Valid_Time);
+	//printf("est:%i\n",curr_time_estimate);
 
-		ds_Time->tm_isdst =-1;
+	ds_Time->tm_isdst =-1;
 
-		time_t curr_time_DS3231M  =  mktime( ds_Time); 	
-		//printf("ds3:%i\n",curr_time_DS3231M);
+	time_t curr_time_DS3231M  =  mktime( ds_Time);
+	//printf("ds3:%i\n",curr_time_DS3231M);
 
-		uint32_t time_drift = abs(curr_time_estimate-curr_time_DS3231M);
-		//printf("drif:%i\n",time_drift);
+	uint32_t time_drift = abs(curr_time_estimate-curr_time_DS3231M);
+	//printf("drif:%i\n",time_drift);
 
-		if(time_drift > MAX_t_DRIFT){
-			//back to ds3231m represenatation
-			ds_Time->tm_year -= 100;
-			ds_Time->tm_mon  += 1;
-			return 0;
-		}
-		
+	if(time_drift > MAX_t_DRIFT){
 		//back to ds3231m represenatation
 		ds_Time->tm_year -= 100;
 		ds_Time->tm_mon  += 1;
+		return 0;
+	}
+	
+	//back to ds3231m represenatation
+	ds_Time->tm_year -= 100;
+	ds_Time->tm_mon  += 1;
 
-		return 1;
+	return 1;
 
 
 
