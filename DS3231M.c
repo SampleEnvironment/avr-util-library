@@ -226,7 +226,7 @@ void DS3231M_read_time(void)
 		SET_ERROR(TIMER_ERROR);
 		_delay_ms(2000);
 
-		DS3231M_estimate_sys_Time();
+		//DS3231M_estimate_sys_Time();
 		return;
 	}
 	if(i2c_ret_code == DEVICE_NOT_CONNECTED){
@@ -234,7 +234,7 @@ void DS3231M_read_time(void)
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TIMER_ERROR);
 
-		DS3231M_estimate_sys_Time();
+		//DS3231M_estimate_sys_Time();
 		return;
 	}
 
@@ -261,7 +261,7 @@ void DS3231M_read_time(void)
 		}else{
 		SET_ERROR(TIMER_ERROR);
 		
-		DS3231M_estimate_sys_Time();
+		//DS3231M_estimate_sys_Time();
 
 		return;
 
@@ -340,7 +340,7 @@ uint8_t DS3231M_concurrency_check(  struct tm *ds_Time){
 	{
 		return 0;
 	}
-	
+	/*
 	// if there last valid time is not initialized yet, the the concurrencycheck defaults to pass
 	if (last_Valid_Time == 0)
 	{
@@ -372,7 +372,7 @@ uint8_t DS3231M_concurrency_check(  struct tm *ds_Time){
 	//back to ds3231m represenatation
 	ds_Time->tm_year -= 100;
 	ds_Time->tm_mon  += 1;
-
+	*/
 	return 1;
 
 
