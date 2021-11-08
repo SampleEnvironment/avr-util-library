@@ -448,6 +448,7 @@ uint32_t xbee_get_address_block(uint8_t cmd_type)
 */
 void xbee_pseudo_send_AT_response( char CMD_NAME_FC, char CMD_NAME_SC, uint8_t status, uint8_t *values, uint8_t value_length)
 {
+	_delay_ms(300);
 
 	uint8_t temp_buffer[50];
 	uint16_t i;
