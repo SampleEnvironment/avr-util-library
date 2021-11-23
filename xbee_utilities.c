@@ -25,10 +25,10 @@ volatile uint8_t bufferSize;
 /************************************************************************/
 // Put Gascounter IP here:
 #ifdef USE_LAN
-volatile uint8_t IP_1_octet = 192;		/**< @brief  1.octet of IPv4 Address */
-volatile uint8_t IP_2_octet = 168;		/**< @brief  2.octet of IPv4 Address */
-volatile uint8_t IP_3_octet = 178;		/**< @brief  3.octet of IPv4 Address */
-volatile uint8_t IP_4_octet = 38;		/**< @brief  4.octet of IPv4 Address */
+extern volatile uint8_t IP_1_octet;		/**< @brief  1.octet of IPv4 Address */
+extern volatile uint8_t IP_2_octet;		/**< @brief  2.octet of IPv4 Address */
+extern volatile uint8_t IP_3_octet;		/**< @brief  3.octet of IPv4 Address */
+extern volatile uint8_t IP_4_octet;		/**< @brief  4.octet of IPv4 Address */
 #endif
 //************************************************************************/
 
