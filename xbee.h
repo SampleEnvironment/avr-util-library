@@ -27,6 +27,14 @@ typedef struct
 	
 }XbeeType;
 
+
+typedef struct {
+	uint8_t IP_oct_1;
+	uint8_t IP_oct_2;
+	uint8_t IP_oct_3;
+	uint8_t IP_oct_4;
+}IP_v4Type;
+
 //==============================================================
 // Device status
 //==============================================================
