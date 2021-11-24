@@ -20,17 +20,6 @@ volatile uint8_t bufferSize;
 
 
 
-/************************************************************************/
-/*  LAN-Gascounter IPv4 Address                                         */
-/************************************************************************/
-// Put Gascounter IP here:
-#ifdef USE_LAN
-extern volatile uint8_t IP_1_octet;		/**< @brief  1.octet of IPv4 Address */
-extern volatile uint8_t IP_2_octet;		/**< @brief  2.octet of IPv4 Address */
-extern volatile uint8_t IP_3_octet;		/**< @brief  3.octet of IPv4 Address */
-extern volatile uint8_t IP_4_octet;		/**< @brief  4.octet of IPv4 Address */
-#endif
-//************************************************************************/
 
 
 
@@ -141,10 +130,10 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 		if (newFrame.type == (SET_OPTIONS_CMD||LOGIN_MSG))
 		{
 			
-			IP_1_octet = buffer[5];
-			IP_2_octet = buffer[7];
-			IP_3_octet = buffer[9];
-			IP_4_octet = buffer[11];
+			GCM_IP.IP_oct_1 = buffer[5];
+			GCM_IP.IP_oct_2= buffer[7];
+			GCM_IP.IP_oct_3 = buffer[9];
+			GCM_IP.IP_oct_4 = buffer[11];
 		}
 		
 		break;
@@ -307,14 +296,14 @@ uint8_t xbee_pack_tx64_frame(uint8_t db_cmd_type, uint8_t *params, uint8_t param
 	//len
 	temp_buffer[3] = 0x80;   	//API ID 64 bit RX // must be together 0x80 to be compatible with the xBee frame structure for the server
 	
-	temp_buffer[4] = IP_1_octet;
+	temp_buffer[4] = GCM_IP.IP_oct_1;
 	temp_buffer[5] = 46;
-	temp_buffer[6] = IP_2_octet;
+	temp_buffer[6] = GCM_IP.IP_oct_2;
 	temp_buffer[7] = 46;
 	
-	temp_buffer[8] = IP_3_octet;
+	temp_buffer[8] = GCM_IP.IP_oct_3;
 	temp_buffer[9] = 46;
-	temp_buffer[10] = IP_4_octet;
+	temp_buffer[10] = GCM_IP.IP_oct_4;
 	temp_buffer[11] = 0;
 	
 	temp_buffer[12] = 0x00;
