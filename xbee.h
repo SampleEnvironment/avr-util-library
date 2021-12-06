@@ -124,6 +124,7 @@ extern VersionType version;
 #define TRIGGER_MEAS_CMD	    24      // Triggers a measurement of the Helium level
 #define TRIGGER_REMOTE_PULSE    27		// Trigger a remote Pulse
 #define TRIGGER_REMOTE_U_OVER_I 28		// Trigger a remote U over I Pulse
+#define TRIGGER_REMOTE_PULSE_CUSTOM_PARAMS_CMD 29 // Trigger a remote Pulse with custom Parameters 
 
 
 //dummy Codes
