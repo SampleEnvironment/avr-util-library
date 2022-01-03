@@ -125,6 +125,7 @@ extern VersionType version;
 #define TRIGGER_REMOTE_PULSE    27		// Trigger a remote Pulse
 #define TRIGGER_REMOTE_U_OVER_I 28		// Trigger a remote U over I Pulse
 #define TRIGGER_REMOTE_PULSE_CUSTOM_PARAMS_CMD 29 // Trigger a remote Pulse with custom Parameters 
+#define TRIGGER_REMOTE_PULSE_CONSTANT_I 30 // Trigger a remote Pulse with constant current I
 
 
 //dummy Codes
