@@ -120,10 +120,10 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 	{
 		case API_TX_64: //0x00
 		newFrame.type = buffer[14];
-		newFrame.status = 0;// buffer[15];
+		newFrame.status = STATUS_BYTE;// buffer[15];
 		
-		if (length < (15+1)) return;
-		for (uint8_t i = 15; i < length; ++i)
+		if (length < (DATA_INDEX+1)) return;
+		for (uint8_t i = DATA_INDEX; i < length; ++i)
 		newFrame.data[data_counter++] = buffer[i];
 		newFrame.data_len = --data_counter;
 		
