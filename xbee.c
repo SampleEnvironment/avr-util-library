@@ -203,7 +203,7 @@ uint8_t xbee_Active_Scan(void){
 		if (reply_Id != 0xFF)							//reply available
 		buffer_removeData(reply_Id);				    //mark as read
 	}
-	
+	//test
 	return 1;
 }
 
