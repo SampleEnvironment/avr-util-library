@@ -150,10 +150,10 @@ uint32_t xbee_SL_address(void){
 	
 	for (uint8_t i =0;i <4;i++)
 	{
-	
-	sprintf(print_sl,"%i",frameBuffer[reply_Id].data[i]);
-	print_info_xbee(print_sl,1);
-	_delay_ms(5000);
+		
+		sprintf(print_sl,"%i",frameBuffer[reply_Id].data[i]);
+		print_info_xbee(print_sl,1);
+		_delay_ms(5000);
 	}
 
 	
@@ -167,6 +167,45 @@ uint32_t xbee_SL_address(void){
 	return SL_Address;
 }
 
+
+uint8_t xbee_Active_Scan(void){
+	uint8_t buffer[SINGLE_FRAME_LENGTH];
+	
+	buffer[0] = (uint8_t)'A';
+	buffer[1] = (uint8_t)'S';
+	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
+	
+	
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AS_MSG_TYPE, 1000);
+	
+
+	if(reply_Id == 0xFF) return 0;
+	
+	//PanDescriptor_S2CType PanArr[10];
+	
+	for (uint8_t i = 0; i < 10; i++ )
+	{
+		reply_Id = xbee_hasReply(AS_MSG_TYPE, EQUAL);	//check for reply
+		
+		char print_pan_len[10];
+		
+		sprintf(print_pan_len,"%i",frameBuffer[reply_Id].data_len);
+		print_info_xbee(print_pan_len,1);
+		
+		_delay_ms(5000);
+		
+		sprintf(print_pan_len,"%i",sizeof(PanDescriptor_S2CType));
+		print_info_xbee(print_pan_len,1);
+				
+		_delay_ms(5000);
+		
+		
+		if (reply_Id != 0xFF)							//reply available
+		buffer_removeData(reply_Id);				    //mark as read
+	}
+	
+	return 1;
+}
 
 
 uint8_t xbee_hardware_version(void){
@@ -484,7 +523,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		{
 			print_info_xbee(XBEE_NO_SERV,0);
 			
-		}else{
+			}else{
 			print_info_xbee(XBEE_NO_NETWORK, 0);
 		}
 		

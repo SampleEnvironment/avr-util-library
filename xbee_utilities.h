@@ -76,6 +76,7 @@ extern volatile IP_v4Type GCM_IP;
 #define AI_MSG_TYPE				22      // Association Indication Reads errors with the last association request.
 #define HV_MSG_TYPE				23      // Hardvare version of xbee module
 #define SL_MSG_TYPE				29		// xbeeaddress of module
+#define AS_MSG_TYPE				30      // Module performs an sctive Scan and retrns PAN descriptors of all Coordinators within range
 
 
 //==============================================================

@@ -97,6 +97,8 @@ inline uint8_t get_at_frame_type(char *id, uint8_t len)
 	if((id[0] == 'A') && (id[1] == 'I')) return AI_MSG_TYPE;
 	if((id[0] == 'H') && (id[1] == 'V')) return HV_MSG_TYPE;
 	if((id[0] == 'S') && (id[1] == 'L')) return SL_MSG_TYPE;
+	if((id[0] == 'A') && (id[1] == 'S')) return AI_MSG_TYPE;
+	
 	
 	return 0;
 }

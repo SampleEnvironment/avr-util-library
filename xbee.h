@@ -28,6 +28,37 @@ typedef struct
 }XbeeType;
 
 
+typedef struct
+{
+	uint32_t DH;				 //coordinator address high
+	uint32_t DL;				 //coordinator address low
+	uint8_t  CoordPanID;		 // ID Parameter
+	uint8_t  CoordAddrMode;		 // 0x03 --> 64bit address
+	uint8_t  Channel;		   	 // CH Parameter
+	uint8_t  SecurityUse;		 // not used
+	uint8_t  ACLEntry;			 // not used
+	uint8_t  SecurityFailure;	 // not used
+	uint16_t SuperFrameSpec;	 
+	uint8_t  GtsPermit;
+	uint8_t  RSSI;				 // signal strength in -dBm
+	uint8_t  MsbTimestamp;
+	uint16_t LsbTimestamp;
+	
+}PanDescriptorType;
+
+typedef struct  
+{
+	uint8_t  AS_type;  //  should be ==2 for zigbee modules 
+	uint8_t  CHannel_ID;
+	uint16_t PAN;
+	uint64_t ExtendedPAN;
+	uint8_t  AllowJoin;
+	uint8_t  StackProfile;
+	uint8_t  LinkQualityIndicator;
+	int8_t   RSSI;
+
+}PanDescriptor_S2CType;
+
 typedef struct {
 	uint8_t IP_oct_1;
 	uint8_t IP_oct_2;
@@ -98,10 +129,10 @@ extern VersionType version;
 
 
 
-	#define LAST_NON_CMD_MSG		10		// Search no ack commands only (see xbee_hasReply)
+#define LAST_NON_CMD_MSG		10		// Search no ack commands only (see xbee_hasReply)
 
 
-	
+
 
 
 // Requests without answer sent from the device
@@ -111,8 +142,8 @@ extern VersionType version;
 #define GET_PASSWORD_CMD		16		// Send options password to the database server. This password is required to access to the settings pages.
 #define GET_XBEE_SLEEP_TIME_CMD	18		// Send XBee sleeping period to the database server
 #define GET_XBEE_AWAKE_TIME_CMD	21		// Send XBee awake period to the database server
-#define GET_PULSE_I				25		// Send I Values of Pluse
-#define GET_PULSE_U				26		// Send U Values of Pluse
+#define GET_PULSE_I				25		// Send I Values of Pulse
+#define GET_PULSE_U				26		// Send U Values of Pulse
 
 // Requests sent from the database server
 #define SET_OPTIONS_CMD			13		// Set device settings received from the database server
@@ -124,12 +155,12 @@ extern VersionType version;
 #define TRIGGER_MEAS_CMD	    24      // Triggers a measurement of the Helium level
 #define TRIGGER_REMOTE_PULSE    27		// Trigger a remote Pulse
 #define TRIGGER_REMOTE_U_OVER_I 28		// Trigger a remote U over I Pulse
-#define TRIGGER_REMOTE_PULSE_CUSTOM_PARAMS_CMD 29 // Trigger a remote Pulse with custom Parameters 
+#define TRIGGER_REMOTE_PULSE_CUSTOM_PARAMS_CMD 29 // Trigger a remote Pulse with custom Parameters
 #define TRIGGER_REMOTE_PULSE_CONSTANT_I 30 // Trigger a remote Pulse with constant current I
 
 
 //dummy Codes
-#define PING_MSG			    0 
+#define PING_MSG			    0
 
 #endif
 
@@ -193,13 +224,13 @@ extern VersionType version;
 // Requests without answer sent from the device
 #define OPTIONS_SET_ACK		116 /**< @brief Sent to the server after options were received and set (#ILM_received_set_options) */
 
-#define LAST_NON_CMD_MSG		120		// Search no ack commands only (see xbee_hasReply) 
+#define LAST_NON_CMD_MSG		120		// Search no ack commands only (see xbee_hasReply)
 
 #define SET_OPTIONS_CMD		   121 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
 #define TRIGGER_MEAS_CMD	   122 /**< @brief Prompts device to send measurement data to the server */
 #define GET_OPTIONS_CMD		   123 /**< @brief Prompts device to send current #options to the server */
 #define SET_PING_INTERVALL_CMD 124 /**< @brief Command prompting the device to set the Ping Intervall*/
-#define GET_RAW_DATA_CMD	   125 /**< @brief Command prompting the device to send raw ADC Values for all three channels */ 
+#define GET_RAW_DATA_CMD	   125 /**< @brief Command prompting the device to send raw ADC Values for all three channels */
 
 
 //Dummy codes
@@ -209,7 +240,7 @@ extern VersionType version;
 #define LONG_INTERVAL_MSG   3
 
 #endif
-  
+
 //==============================================================
 // XBee commands
 //==============================================================
@@ -237,6 +268,8 @@ _Bool xbee_reset_connection(void);		// Reset connection with the xbee coordinato
 // Returns true if reconnection is successfull, false otherwise
 uint8_t xbee_hardware_version(void);
 uint32_t xbee_SL_address(void);
+uint8_t xbee_Active_Scan(void);
+
 uint8_t xbee_reconnect(void);			// Try a new connection with the server
 void xbee_send(uint8_t *data);			// Start USART0 transmission to XBee module
 void xbee_send_msg(uint8_t *buffer, uint8_t length);	// Send message via XBee module
