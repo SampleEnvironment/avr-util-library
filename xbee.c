@@ -106,7 +106,7 @@ uint8_t xbee_is_connected(void)
 	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "AI" command
 	
 	// Send packed command to the coordinator in order to check the connection
-	reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AI_MSG_TYPE, 1000);
+	reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AI_MSG_TYPE, COM_TIMEOUT_TIME);
 
 	#ifdef ALLOW_DEBUG
 	print_info_xbee(XBEE_AI_MESSAGE, 0);
@@ -139,7 +139,7 @@ uint32_t xbee_SL_address(void){
 	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
 	
 	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, SL_MSG_TYPE, 1000);
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, SL_MSG_TYPE, COM_TIMEOUT_TIME);
 
 	if(reply_Id == 0xFF) return 0;
 	
@@ -169,42 +169,83 @@ uint32_t xbee_SL_address(void){
 
 
 uint8_t xbee_Active_Scan(void){
+	
+	char print_pan_len[10];
+	
+	
+	
 	uint8_t buffer[SINGLE_FRAME_LENGTH];
 	
 	buffer[0] = (uint8_t)'A';
 	buffer[1] = (uint8_t)'S';
+
 	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
 	
 	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AS_MSG_TYPE, 1000);
 	
+	
+	
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AS_MSG_TYPE, 20);
 
-	if(reply_Id == 0xFF) return 0;
+
 	
 	//PanDescriptor_S2CType PanArr[10];
-	
+
 	for (uint8_t i = 0; i < 10; i++ )
 	{
 		reply_Id = xbee_hasReply(AS_MSG_TYPE, EQUAL);	//check for reply
 		
-		char print_pan_len[10];
+		_delay_ms(2000);
 		
-		sprintf(print_pan_len,"%i",frameBuffer[reply_Id].data_len);
-		print_info_xbee(print_pan_len,1);
+		if (reply_Id == 255)
+		{
+			continue;
+		}
 		
-		_delay_ms(5000);
+
+		sprintf(print_pan_len,"stat:%i",frameBuffer[reply_Id].status);
+		print_info_xbee(print_pan_len,0);
 		
-		sprintf(print_pan_len,"%i",sizeof(PanDescriptor_S2CType));
-		print_info_xbee(print_pan_len,1);
-				
-		_delay_ms(5000);
+		_delay_ms(2000);
+		
+		
+		sprintf(print_pan_len,"len:%i#%i",frameBuffer[reply_Id].data_len,frameBuffer[reply_Id].length);
+		print_info_xbee(print_pan_len,0);
+		
+		
+		_delay_ms(2000);
+		
+
 		
 		
 		if (reply_Id != 0xFF)							//reply available
 		buffer_removeData(reply_Id);				    //mark as read
 	}
 	//test
+	
+	print_info_xbee("",0);
 	return 1;
+}
+
+uint16_t xbee_Scan_Channels(void){
+	uint8_t buffer[SINGLE_FRAME_LENGTH];
+	
+	buffer[0] = (uint8_t)'S';
+	buffer[1] = (uint8_t)'C';
+
+	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
+	
+	
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, SC_MSG_TYPE, COM_TIMEOUT_TIME);
+	
+	if(reply_Id == 0xFF) return 0;
+	
+	
+	uint16_t ScanChannels = (frameBuffer[reply_Id].data[0] << 8) + frameBuffer[reply_Id].data[1] ;
+	
+	
+	return ScanChannels;
+	
 }
 
 
@@ -218,7 +259,7 @@ uint8_t xbee_hardware_version(void){
 	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
 	
 	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, HV_MSG_TYPE, 1000);
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, HV_MSG_TYPE, COM_TIMEOUT_TIME);
 
 	if(reply_Id == 0xFF) return 0;
 	
@@ -235,6 +276,27 @@ uint8_t xbee_hardware_version(void){
 	return version.hw_version_xbee;
 }
 
+
+uint8_t xbee_Join_Verification(void){
+	uint8_t buffer[SINGLE_FRAME_LENGTH];
+	
+	buffer[0] = (uint8_t)'J';
+	buffer[1] = (uint8_t)'V';
+
+	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
+	
+	
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, JV_MSG_TYPE, COM_TIMEOUT_TIME);
+	
+	if(reply_Id == 0xFF) return 0;
+	
+	
+	uint8_t JoinVerification = frameBuffer[reply_Id].data[0] ;
+	
+	
+	return JoinVerification;
+	
+}
 
 // Reset connection with the xbee coordinator and initiate a new one
 // Returns true if reconnection is successful, false otherwise
@@ -253,7 +315,7 @@ _Bool xbee_reset_connection(void)
 	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "DA" command
 	
 	// Send packed command to the Xbee-Module in order to Force Reassociation
-	if (xbee_send_and_get_reply(buffer, temp_bytes_number, DA_MSG_TYPE, 1000) == 0xFF)
+	if (xbee_send_and_get_reply(buffer, temp_bytes_number, DA_MSG_TYPE, COM_TIMEOUT_TIME) == 0xFF)
 	return 0;											// couldn't disassociate (= no reply from xbee on my request)
 	//dont need any data from DA so nothing else happens
 
@@ -354,7 +416,7 @@ void xbee_send_msg(uint8_t *buffer, uint8_t length)
 }
 
 // Send message and look for reply from database and copy data to the buffer
-uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_type, uint16_t delay)
+uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_type, uint16_t comTimeOut)
 {
 	uint8_t reply_Id = 0xFF;
 	
@@ -427,7 +489,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 
 	uint8_t temp_bytes_number = xbee_pack_tx64_frame(db_cmd_type, sendbuffer, length, xbee.dest_high, xbee.dest_low);
 	
-	reply_Id = xbee_send_and_get_reply(sendbuffer, temp_bytes_number, db_cmd_type, 2000);
+	reply_Id = xbee_send_and_get_reply(sendbuffer, temp_bytes_number, db_cmd_type, COM_TIMEOUT_TIME);
 	
 	if(reply_Id == 0xFF)	//request failed!
 	{

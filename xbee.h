@@ -269,11 +269,13 @@ _Bool xbee_reset_connection(void);		// Reset connection with the xbee coordinato
 uint8_t xbee_hardware_version(void);
 uint32_t xbee_SL_address(void);
 uint8_t xbee_Active_Scan(void);
+uint16_t xbee_Scan_Channels(void);
+uint8_t xbee_Join_Verification(void);
 
 uint8_t xbee_reconnect(void);			// Try a new connection with the server
 void xbee_send(uint8_t *data);			// Start USART0 transmission to XBee module
 void xbee_send_msg(uint8_t *buffer, uint8_t length);	// Send message via XBee module
-uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_type, uint16_t delay);	// Send message (if length not 0) and look for reply from database and copy data to the buffer
+uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_type, uint16_t comTimeOut);	// Send message (if length not 0) and look for reply from database and copy data to the buffer
 uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length);
 uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length);	// Checks network connection and send request and receive answer
 uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length);      // Checks network connection and sends message

@@ -97,7 +97,9 @@ inline uint8_t get_at_frame_type(char *id, uint8_t len)
 	if((id[0] == 'A') && (id[1] == 'I')) return AI_MSG_TYPE;
 	if((id[0] == 'H') && (id[1] == 'V')) return HV_MSG_TYPE;
 	if((id[0] == 'S') && (id[1] == 'L')) return SL_MSG_TYPE;
-	if((id[0] == 'A') && (id[1] == 'S')) return AI_MSG_TYPE;
+	if((id[0] == 'A') && (id[1] == 'S')) return AS_MSG_TYPE;
+	if((id[0] == 'S') && (id[1] == 'C')) return SC_MSG_TYPE;
+	if((id[0] == 'J') && (id[1] == 'V')) return JV_MSG_TYPE;
 	
 	
 	return 0;
@@ -416,7 +418,7 @@ uint32_t xbee_get_address_block(uint8_t cmd_type)
 	// Pack frame according to type
 	uint8_t temp_bytes_number = xbee_pack_tx_frame(send_buffer, 2);  // Add DL or DH
 	
-	if (xbee_send_and_get_reply(send_buffer, temp_bytes_number, cmd_type, 500) != 0xFF)
+	if (xbee_send_and_get_reply(send_buffer, temp_bytes_number, cmd_type, COM_TIMEOUT_TIME) != 0xFF)
 	{
 		dest_addr = (unsigned long int)send_buffer[0]<<24;
 		dest_addr += (unsigned long int)send_buffer[1]<<16;
