@@ -10,6 +10,7 @@
 
 #include "xbee.h"
 #include "xbee_utilities.h"
+#include "xbee_AT_comm.h"
 #include "module_globals.h"
 
 // Global Variables
@@ -396,39 +397,7 @@ uint8_t xbee_get_packet_len(uint8_t *buffer)
 	return (buffer[1]<<8) + buffer[2];
 }
 
-// Get high and low bytes of basis station
-// Used only with "DL" and "DH" command type
-uint32_t xbee_get_address_block(uint8_t cmd_type)
-{
-	_delay_ms(300);
-	
-	uint32_t dest_addr;
-	uint8_t send_buffer[SINGLE_FRAME_LENGTH];
-	
-	if(cmd_type == DL_MSG_TYPE)
-	{
-		send_buffer[0] = (uint8_t)'D';
-		send_buffer[1] = (uint8_t)'L';
-	}
-	else {
-		send_buffer[0] = (uint8_t)'D';
-		send_buffer[1] = (uint8_t)'H';
-	}
-	
-	// Pack frame according to type
-	uint8_t temp_bytes_number = xbee_pack_tx_frame(send_buffer, 2);  // Add DL or DH
-	
-	if (xbee_send_and_get_reply(send_buffer, temp_bytes_number, cmd_type, COM_TIMEOUT_TIME) != 0xFF)
-	{
-		dest_addr = (unsigned long int)send_buffer[0]<<24;
-		dest_addr += (unsigned long int)send_buffer[1]<<16;
-		dest_addr += (unsigned long int)send_buffer[2]<<8;
-		dest_addr += (unsigned long int)send_buffer[3];
-		
-		return dest_addr;
-	}
-	else return 0;		// Couldn't read addr_high or addr_low
-}
+
 
 /**
 * @brief Used for the LAN-Variant of the Gascounters. Necessary for Xbee simulation.

@@ -46,18 +46,7 @@ typedef struct
 	
 }PanDescriptorType;
 
-typedef struct  
-{
-	uint8_t  AS_type;  //  should be ==2 for zigbee modules 
-	uint8_t  CHannel_ID;
-	uint16_t PAN;
-	uint64_t ExtendedPAN;
-	uint8_t  AllowJoin;
-	uint8_t  StackProfile;
-	uint8_t  LinkQualityIndicator;
-	int8_t   RSSI;
 
-}PanDescriptor_S2CType;
 
 typedef struct {
 	uint8_t IP_oct_1;
@@ -199,6 +188,7 @@ extern VersionType version;
 #define SET_FUNTRACE_CMD               101 /**< @brief Command for enabling or disabling the Functiontrace saving in eeprom */
 #define GET_FUNTRACE_CMD			   102 /**< @brief Command prompting the device to send the function Trace that was saved in its eeprom*/
 #define SET_PING_INTERVALL_CMD		   103 /**< @brief Command prompting the device to set the Ping Intervall*/
+#define SET_IP_LAN_GASCOUNTER_CMD      104 /**< @brief Command prompting the device to set ist IP address. The ip addres acts as identifier for the GCM */
 
 
 //Dummy codes
@@ -241,6 +231,8 @@ extern VersionType version;
 
 #endif
 
+extern void (*print_info_AT)(char *, _Bool );
+
 //==============================================================
 // XBee commands
 //==============================================================
@@ -263,14 +255,10 @@ void xbee_wake_up(void);			// Wake up XBee module
 void xbee_wake_up_plus(void);
 void xbee_sleep_plus(void);
 
-uint8_t xbee_is_connected(void);           // checks if xbee is connected to coordinator
+
 _Bool xbee_reset_connection(void);		// Reset connection with the xbee coordinator and initiate a new one
 // Returns true if reconnection is successfull, false otherwise
-uint8_t xbee_hardware_version(void);
-uint32_t xbee_SL_address(void);
-uint8_t xbee_Active_Scan(void);
-uint16_t xbee_Scan_Channels(void);
-uint8_t xbee_Join_Verification(void);
+
 
 uint8_t xbee_reconnect(void);			// Try a new connection with the server
 void xbee_send(uint8_t *data);			// Start USART0 transmission to XBee module

@@ -16,9 +16,11 @@
 #include "usart.h"
 #include "xbee_utilities.h"
 #include "xbee.h"
+#include "xbee_AT_comm.h"
 #include "module_globals.h"
 #include "printInfo_strings.h"
 #include "status.h"
+
 
 
 
@@ -46,6 +48,7 @@ XbeeType xbee = {
 
 void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len){
 	print_info_xbee = printInfoFun;
+	print_info_AT   = printInfoFun;
 	xbee.dev_id_str = dev_ID_str;
 	xbee.dev_id_str_len = max_devid_str_len;
 }
@@ -94,209 +97,6 @@ inline void xbee_wake_up(void)
 }
 
 
-uint8_t xbee_is_connected(void)
-{
-	uint8_t buffer[SINGLE_FRAME_LENGTH];
-	uint8_t reply_Id = 0;
-
-	
-	// API command "AI" => Reads possible errors with the last association request, result 0: everything is o.k.
-	buffer[0] = (uint8_t)'A';
-	buffer[1] = (uint8_t)'I';
-	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "AI" command
-	
-	// Send packed command to the coordinator in order to check the connection
-	reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AI_MSG_TYPE, COM_TIMEOUT_TIME);
-
-	#ifdef ALLOW_DEBUG
-	print_info_xbee(XBEE_AI_MESSAGE, 0);
-	_delay_ms(1000);
-	#endif
-	
-	if (reply_Id== 0xFF)  	// NO Answer from xbee --> not associated
-	{
-		return 1;
-	}
-	if (frameBuffer[reply_Id].data[0] != 0)
-	{
-		// not associated with Coordinator
-		return frameBuffer[reply_Id].data[0];
-	}
-
-	//Xbee is associated to a Coordinator
-	return 0;
-
-}
-
-uint32_t xbee_SL_address(void){
-	uint32_t 	SL_Address = 0;
-	#ifdef USE_XBEE
-
-	uint8_t buffer[SINGLE_FRAME_LENGTH];
-	
-	buffer[0] = (uint8_t)'S';
-	buffer[1] = (uint8_t)'L';
-	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
-	
-	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, SL_MSG_TYPE, COM_TIMEOUT_TIME);
-
-	if(reply_Id == 0xFF) return 0;
-	
-	SL_Address = ((uint32_t)frameBuffer[reply_Id].data[0] << 24) +((uint32_t)frameBuffer[reply_Id].data[1] << 16) + ((uint32_t)frameBuffer[reply_Id].data[2] << 8) + (uint32_t)frameBuffer[reply_Id].data[3] ;
-	
-	char print_sl[10];
-	
-	
-	for (uint8_t i =0;i <4;i++)
-	{
-		
-		sprintf(print_sl,"%i",frameBuffer[reply_Id].data[i]);
-		print_info_xbee(print_sl,1);
-		_delay_ms(5000);
-	}
-
-	
-	
-
-	#endif // USE_XBEE
-	#ifdef USE_LAN
-
-	#endif
-	
-	return SL_Address;
-}
-
-
-uint8_t xbee_Active_Scan(void){
-	
-	char print_pan_len[10];
-	
-	
-	
-	uint8_t buffer[SINGLE_FRAME_LENGTH];
-	
-	buffer[0] = (uint8_t)'A';
-	buffer[1] = (uint8_t)'S';
-
-	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
-	
-	
-	
-	
-	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, AS_MSG_TYPE, 20);
-
-
-	
-	//PanDescriptor_S2CType PanArr[10];
-
-	for (uint8_t i = 0; i < 10; i++ )
-	{
-		reply_Id = xbee_hasReply(AS_MSG_TYPE, EQUAL);	//check for reply
-		
-		_delay_ms(2000);
-		
-		if (reply_Id == 255)
-		{
-			continue;
-		}
-		
-
-		sprintf(print_pan_len,"stat:%i",frameBuffer[reply_Id].status);
-		print_info_xbee(print_pan_len,0);
-		
-		_delay_ms(2000);
-		
-		
-		sprintf(print_pan_len,"len:%i#%i",frameBuffer[reply_Id].data_len,frameBuffer[reply_Id].length);
-		print_info_xbee(print_pan_len,0);
-		
-		
-		_delay_ms(2000);
-		
-
-		
-		
-		if (reply_Id != 0xFF)							//reply available
-		buffer_removeData(reply_Id);				    //mark as read
-	}
-	//test
-	
-	print_info_xbee("",0);
-	return 1;
-}
-
-uint16_t xbee_Scan_Channels(void){
-	uint8_t buffer[SINGLE_FRAME_LENGTH];
-	
-	buffer[0] = (uint8_t)'S';
-	buffer[1] = (uint8_t)'C';
-
-	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
-	
-	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, SC_MSG_TYPE, COM_TIMEOUT_TIME);
-	
-	if(reply_Id == 0xFF) return 0;
-	
-	
-	uint16_t ScanChannels = (frameBuffer[reply_Id].data[0] << 8) + frameBuffer[reply_Id].data[1] ;
-	
-	
-	return ScanChannels;
-	
-}
-
-
-uint8_t xbee_hardware_version(void){
-	#ifdef USE_XBEE
-
-	uint8_t buffer[SINGLE_FRAME_LENGTH];
-	
-	buffer[0] = (uint8_t)'H';
-	buffer[1] = (uint8_t)'V';
-	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
-	
-	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, HV_MSG_TYPE, COM_TIMEOUT_TIME);
-
-	if(reply_Id == 0xFF) return 0;
-	
-	
-	uint16_t hw_version_16 = (frameBuffer[reply_Id].data[0] << 8) + frameBuffer[reply_Id].data[1] ;
-	
-	
-	version.hw_version_xbee = (hw_version_16 > 0x2000)? XBEE_V_SC2 : XBEE_V_S1;
-	#endif // USE_XBEE
-	#ifdef USE_LAN
-	version.hw_version_xbee = XPORT;
-	#endif
-	
-	return version.hw_version_xbee;
-}
-
-
-uint8_t xbee_Join_Verification(void){
-	uint8_t buffer[SINGLE_FRAME_LENGTH];
-	
-	buffer[0] = (uint8_t)'J';
-	buffer[1] = (uint8_t)'V';
-
-	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "HV" command
-	
-	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number, JV_MSG_TYPE, COM_TIMEOUT_TIME);
-	
-	if(reply_Id == 0xFF) return 0;
-	
-	
-	uint8_t JoinVerification = frameBuffer[reply_Id].data[0] ;
-	
-	
-	return JoinVerification;
-	
-}
 
 // Reset connection with the xbee coordinator and initiate a new one
 // Returns true if reconnection is successful, false otherwise
@@ -306,24 +106,9 @@ _Bool xbee_reset_connection(void)
 	// Clear frame_buffer if there is still some information in the queue
 	buffer_init();
 
-	uint8_t buffer[SINGLE_FRAME_LENGTH];  		// put DA here then send
-	
-	// API command "DA" => Force Disassociation.
-	// End Device will immediately disassociate from a Coordinator (if associated) and reattempt to associate.
-	buffer[0] = (uint8_t)'D';
-	buffer[1] = (uint8_t)'A';
-	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, 2);  	// Pack API "DA" command
-	
-	// Send packed command to the Xbee-Module in order to Force Reassociation
-	if (xbee_send_and_get_reply(buffer, temp_bytes_number, DA_MSG_TYPE, COM_TIMEOUT_TIME) == 0xFF)
-	return 0;											// couldn't disassociate (= no reply from xbee on my request)
-	//dont need any data from DA so nothing else happens
-
-
+	if(!xbee_DA_initiate_reassociation()) return 0;
 	
 	uint8_t timeout_count = 0;
-
-
 
 	while(1){
 		

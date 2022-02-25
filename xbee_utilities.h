@@ -69,16 +69,7 @@ extern volatile IP_v4Type GCM_IP;
 #define RX_ID					0x80	// RX Packet: 64-bit Address / When the module receives an RF packet, it is sent out the UART using this message type.
 #define STA_ID					0x8A	// RF module status messages are sent from the module in response to specific conditions.
 
-#define DA_MSG_TYPE 			18		// Force dissociation API command
-#define DH_MSG_TYPE 			19		// Destination address high API command
-#define DL_MSG_TYPE 			20		// Destination address low API command
-#define STATUS_MSG_TYPE 		21		//
-#define AI_MSG_TYPE				22      // Association Indication Reads errors with the last association request.
-#define HV_MSG_TYPE				23      // Hardvare version of xbee module
-#define SL_MSG_TYPE				29		// xbeeaddress of module
-#define AS_MSG_TYPE				30      // Module performs an sctive Scan and retrns PAN descriptors of all Coordinators within range
-#define SC_MSG_TYPE             31      // Scan channels reads the list of channels to scan
-#define JV_MSG_TYPE				32      // Coordinator join verification
+
 
 //==============================================================
 // XBee utilities commands
