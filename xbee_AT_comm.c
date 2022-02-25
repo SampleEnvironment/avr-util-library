@@ -13,6 +13,7 @@
 #include "xbee_AT_comm.h"
 #include "xbee.h"
 #include "xbee_utilities.h"
+#include "heap.h"
 
 
 void (*print_info_AT)(char *, _Bool )  = NULL;
@@ -239,7 +240,26 @@ uint8_t xbee_hardware_version(void){
 uint16_t xbee_Scan_Channels(void){
 	AT_commandType AT_command;
 	
-	initAt_read(&AT_command,HV_MSG_TYPE);
+	initAt_read(&AT_command,SC_MSG_TYPE);
+	send_AT(&AT_command);
+
+	
+	if(AT_command.AnswerReceived == false) return 0;
+	
+	
+	uint16_t ScanChannels = AT_command.dataword ;
+	
+	
+	return ScanChannels;
+	
+}
+
+uint16_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
+	AT_commandType AT_command;
+	
+	uint8_t buffer[2] = {(SC_Bitfield >> 8) ,(uint8_t) SC_Bitfield };
+	
+	initAt_set(&AT_command,SC_MSG_TYPE,buffer,2);
 	send_AT(&AT_command);
 
 	
@@ -279,7 +299,7 @@ uint8_t xbee_Active_Scan(void){
 
 	
 	
-	for (uint8_t i = 0; i < 10; i++ )
+	for (uint8_t i = 0; i < PAN_POOL_SIZE; i++ )
 	{
 		sprintf(print_pan_len,"time: %i",10-i);
 		print_info_AT(print_pan_len,1);

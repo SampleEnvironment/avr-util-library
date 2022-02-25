@@ -9,6 +9,8 @@
 #ifndef XBEE_AT_COMM_H_
 #define XBEE_AT_COMM_H_
 
+#include "heap.h"
+
 
 typedef struct
 {
@@ -22,6 +24,15 @@ typedef struct
 	int8_t   RSSI;
 
 }PanDescriptor_S2CType;
+
+#define PAN_POOL_SIZE 10
+
+typedef struct  
+{
+	PanDescriptor_S2CType Pool[PAN_POOL_SIZE];
+	uint8_t AlreadyTried[PAN_POOL_SIZE];
+	HeapType Heap;
+}PanPoolType;
 
 typedef struct  
 {
@@ -43,6 +54,8 @@ typedef struct
 	
 	
 }AT_commandType;
+
+
 
 #define  AT_START 18
 
