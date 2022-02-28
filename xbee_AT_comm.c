@@ -41,7 +41,7 @@ AT_commandType* initAt_set(AT_commandType * Atcommand,AT_MESSAGE AT_Code,uint8_t
 	Atcommand->MSG_TYPE = AT_Code;
 	
 	Atcommand->MSC_AT_CODE = AT_Lut[(uint8_t)(AT_Code-AT_START)][0];
-	Atcommand->MSC_AT_CODE = AT_Lut[(uint8_t)(AT_Code-AT_START)][1];
+	Atcommand->LSC_AT_CODE = AT_Lut[(uint8_t)(AT_Code-AT_START)][1];
 	
 	
 	if (data != NULL)
@@ -62,7 +62,7 @@ AT_commandType* initAt_read(AT_commandType * Atcommand,AT_MESSAGE AT_Code){
 	Atcommand->MSG_TYPE = AT_Code;
 	
 	Atcommand->MSC_AT_CODE = AT_Lut[(uint8_t)(AT_Code-AT_START)][0];
-	Atcommand->MSC_AT_CODE = AT_Lut[(uint8_t)(AT_Code-AT_START)][1];
+	Atcommand->LSC_AT_CODE = AT_Lut[(uint8_t)(AT_Code-AT_START)][1];
 	
 	Atcommand->data_len = 0;
 	
