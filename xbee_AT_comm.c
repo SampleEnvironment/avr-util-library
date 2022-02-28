@@ -18,6 +18,10 @@
 
 void (*print_info_AT)(char *, _Bool )  = NULL;
 
+
+PanPoolType Pans;
+
+
 char AT_Lut[10] [2] = {
 	{'D','A'},
 	{'D','H'},
@@ -31,7 +35,6 @@ char AT_Lut[10] [2] = {
 	{'J','V'}
 };
 
-PanDescriptor_S2CType PanArr[10];
 
 AT_commandType* initAt_set(AT_commandType * Atcommand,AT_MESSAGE AT_Code,uint8_t * data,uint8_t data_len){
 	
@@ -282,6 +285,8 @@ uint8_t xbee_Active_Scan(void){
 	
 	AT_commandType AT_command;
 	
+	resetHeap(&Pans.Heap);
+	
 	initAt_read(&AT_command,AS_MSG_TYPE);
 	send_AT(&AT_command);
 
@@ -292,7 +297,7 @@ uint8_t xbee_Active_Scan(void){
 	if (AT_command.data_len > 1)
 	{
 		
-		memcpy(&PanArr[panArr_index],&AT_command.pandesc,sizeof(PanDescriptor_S2CType));
+		memcpy(&Pans.Pool[panArr_index],&AT_command.pandesc,sizeof(PanDescriptor_S2CType));
 		
 		panArr_index++;
 	}
@@ -311,7 +316,10 @@ uint8_t xbee_Active_Scan(void){
 			if (frameBuffer[reply_ID].data_len > 1)
 			{
 					
-				memcpy(&PanArr[panArr_index],(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S2CType));
+				memcpy(&Pans.Pool[panArr_index],(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S2CType));
+				
+				push(&Pans.Heap,Pans.Pool[panArr_index].LinkQualityIndicator,&Pans.Pool[panArr_index]);
+				
 					
 				panArr_index++;
 			}
@@ -335,3 +343,4 @@ uint8_t xbee_Active_Scan(void){
 	print_info_AT("",0);
 	return 1;
 }
+
