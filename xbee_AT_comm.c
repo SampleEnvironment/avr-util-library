@@ -87,6 +87,7 @@ uint8_t send_AT(AT_commandType *AT_Command){
 	
 	if (reply_Id != 0xFF)
 	{
+	
 		memcpy(AT_Command->data,(uint8_t *)frameBuffer[reply_Id].data,frameBuffer[reply_Id].data_len);
 		
 		AT_Command->data_len = frameBuffer[reply_Id].data_len;
@@ -170,6 +171,8 @@ uint32_t xbee_SL_address(void){
 // Used only with "DL" and "DH" command type
 uint32_t xbee_get_address_block(uint8_t cmd_type)
 {
+	
+
 	_delay_ms(100);
 	AT_commandType AT_command;
 
@@ -184,11 +187,16 @@ uint32_t xbee_get_address_block(uint8_t cmd_type)
 	initAt_read(&AT_command,cmd_type);
 	send_AT(&AT_command);
 	
-
 	
 	if (AT_command.AnswerReceived == true)
 	{
-		return AT_command.Address;
+			uint32_t dest_addr;
+				dest_addr = (unsigned long int)AT_command.data[0]<<24;
+				dest_addr += (unsigned long int)AT_command.data[1]<<16;
+				dest_addr += (unsigned long int)AT_command.data[2]<<8;
+				dest_addr += (unsigned long int)AT_command.data[3];
+				
+		return dest_addr;
 	}
 	else return 0;		// Couldn't read addr_high or addr_low
 }
