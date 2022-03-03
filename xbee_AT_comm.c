@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "xbee_AT_comm.h"
 #include "xbee.h"
@@ -87,8 +88,38 @@ uint8_t send_AT(AT_commandType *AT_Command){
 	
 	if (reply_Id != 0xFF)
 	{
-	
-		memcpy(AT_Command->data,(uint8_t *)frameBuffer[reply_Id].data,frameBuffer[reply_Id].data_len);
+		switch(frameBuffer[reply_Id].data_len){
+			case 1: // One Byte
+			AT_Command->byte = frameBuffer[reply_Id].data[0];
+			break;
+			
+			case 2: // Data Word
+			memcpy(&AT_Command->dataword,(uint8_t *)frameBuffer[reply_Id].data,sizeof(uint16_t));
+			break;
+			
+			case 4: // Data Word
+			memcpy(&AT_Command->Address,(uint8_t *)frameBuffer[reply_Id].data,sizeof(uint32_t));
+			break;
+			
+			case 16: // Pan Descriptor
+			memcpy(&AT_Command->pandesc_S2C,(uint8_t *)frameBuffer[reply_Id].data,sizeof(PanDescriptor_S2CType));
+			if (frameBuffer[reply_Id].type == AS_MSG_TYPE)
+			{
+				break;
+			}
+			case 21: // Pan Descriptor
+			memcpy(&AT_Command->pandesc_S1C,(uint8_t *)frameBuffer[reply_Id].data,sizeof(PanDescriptor_S1CType));
+			if (frameBuffer[reply_Id].type == AS_MSG_TYPE)
+			{
+				break;
+			}
+			default:
+			memcpy(AT_Command->data,(uint8_t *)frameBuffer[reply_Id].data,frameBuffer[reply_Id].data_len);
+			break;
+			
+		}
+		
+		
 		
 		AT_Command->data_len = frameBuffer[reply_Id].data_len;
 		AT_Command->AnswerReceived = true;
@@ -190,13 +221,8 @@ uint32_t xbee_get_address_block(uint8_t cmd_type)
 	
 	if (AT_command.AnswerReceived == true)
 	{
-			uint32_t dest_addr;
-				dest_addr = (unsigned long int)AT_command.data[0]<<24;
-				dest_addr += (unsigned long int)AT_command.data[1]<<16;
-				dest_addr += (unsigned long int)AT_command.data[2]<<8;
-				dest_addr += (unsigned long int)AT_command.data[3];
-				
-		return dest_addr;
+		
+		return AT_command.Address;
 	}
 	else return 0;		// Couldn't read addr_high or addr_low
 }
@@ -302,35 +328,20 @@ uint8_t xbee_Active_Scan(void){
 		return 0;
 	}
 	
-	if (AT_command.data_len > 1)
-	{
-		
-		memcpy(&Pans.Pool[panArr_index],&AT_command.pandesc,sizeof(PanDescriptor_S2CType));
-		
-		panArr_index++;
-	}
+	panArr_index = addFrameToPanPool(reply_ID,panArr_index);
 
 	
 	
 	for (uint8_t i = 0; i < PAN_POOL_SIZE; i++ )
 	{
-		sprintf(print_pan_len,"time: %i",10-i);
+		sprintf(print_pan_len,"time: %2i",10-i);
 		print_info_AT(print_pan_len,1);
-		_delay_ms(4000);
+		_delay_ms(2000);
 		reply_ID = xbee_hasReply(AS_MSG_TYPE, EQUAL);	//check for reply
 		
 		
 		if (reply_ID != 0xFF){							//reply available
-			if (frameBuffer[reply_ID].data_len > 1)
-			{
-					
-				memcpy(&Pans.Pool[panArr_index],(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S2CType));
-				
-				push(&Pans.Heap,Pans.Pool[panArr_index].LinkQualityIndicator,&Pans.Pool[panArr_index]);
-				
-					
-				panArr_index++;
-			}
+			panArr_index = addFrameToPanPool(reply_ID,panArr_index);
 			
 			buffer_removeData(reply_ID);				    //mark as read
 		}
@@ -344,7 +355,7 @@ uint8_t xbee_Active_Scan(void){
 		
 	}
 
-	sprintf(print_pan_len,"pans#:%i",panArr_index);
+	sprintf(print_pan_len,"pans#:%2i",panArr_index);
 	print_info_AT(print_pan_len,1);
 	_delay_ms(5000);
 	
@@ -352,3 +363,40 @@ uint8_t xbee_Active_Scan(void){
 	return 1;
 }
 
+uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
+	char print_pan_len[10];
+	
+	if (frameBuffer[reply_ID].data_len == 22)
+	{
+		
+		memcpy(&Pans.Pool[panArrIndex].S1C,(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S1CType));
+		Pans.Pool[panArrIndex].HW = XBEE_V_S1;
+		
+		push(&Pans.Heap,(uint8_t) (Pans.Pool[panArrIndex].S1C.RSSI + abs(INT8_MIN)),&Pans.Pool[panArrIndex]);
+		
+		sprintf(print_pan_len,"datalenS1C#:%2i",frameBuffer[reply_ID].data_len);
+		print_info_AT(print_pan_len,1);
+		_delay_ms(4000);
+		print_info_AT("              ",0);
+		
+		panArrIndex++;
+	}
+	
+	if (frameBuffer[reply_ID].data_len == 16)
+	{
+		
+		memcpy(&Pans.Pool[panArrIndex].S2C,(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S2CType));
+		Pans.Pool[panArrIndex].HW = XBEE_V_SC2;
+		
+		push(&Pans.Heap,(uint8_t) (Pans.Pool[panArrIndex].S2C.RSSI + abs(INT8_MIN)),&Pans.Pool[panArrIndex]);
+		
+		sprintf(print_pan_len,"datalen#:%2i",frameBuffer[reply_ID].data_len);
+		print_info_AT(print_pan_len,1);
+		_delay_ms(4000);
+		print_info_AT("              ",0);
+		
+		panArrIndex++;
+	}
+	
+	return panArrIndex;
+}

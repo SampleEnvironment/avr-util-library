@@ -10,6 +10,7 @@
 #define XBEE_AT_COMM_H_
 
 #include "heap.h"
+#include "xbee.h"
 
 
 typedef struct
@@ -25,11 +26,44 @@ typedef struct
 
 }PanDescriptor_S2CType;
 
+typedef struct  
+{
+	uint64_t CoordSerialNumber;
+	uint16_t PanID;
+	uint8_t  CoordAddrMode;
+	uint8_t  ChannelID;
+	uint8_t  SecurityUse;
+	uint8_t  ACLEntry;
+	uint8_t SecurityFailure;
+	uint16_t SuperFrameSpec;
+	uint8_t  GtsPermin;
+	int8_t   RSSI;
+	uint8_t  Timestamp[3];
+}PanDescriptor_S1CType;
+
+
+typedef struct  
+{
+	
+	XBEE_HW_VERSION HW;
+	 
+	union	
+	{
+	PanDescriptor_S1CType S1C;
+	PanDescriptor_S2CType S2C;	
+	
+	};
+	
+	
+	
+}PanDescriptorType;
+
+
 #define PAN_POOL_SIZE 10
 
 typedef struct  
 {
-	PanDescriptor_S2CType Pool[PAN_POOL_SIZE];
+	PanDescriptorType Pool[PAN_POOL_SIZE];
 	uint8_t AlreadyTried[PAN_POOL_SIZE];
 	HeapType Heap;
 }PanPoolType;
@@ -47,7 +81,8 @@ typedef struct
 		uint16_t dataword;
 		uint32_t Address;
 		uint8_t data[25];
-		PanDescriptor_S2CType pandesc;
+		PanDescriptor_S2CType pandesc_S2C;
+		PanDescriptor_S1CType pandesc_S1C;
 	};
 	uint8_t data_len;
 	_Bool AnswerReceived;
@@ -88,6 +123,7 @@ uint8_t xbee_JV_verification(void);
 uint16_t xbee_Scan_Channels(void);
 uint8_t xbee_Active_Scan(void);
 uint8_t xbee_hardware_version(void);
+uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex);
 
 
 

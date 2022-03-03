@@ -28,23 +28,6 @@ typedef struct
 }XbeeType;
 
 
-typedef struct
-{
-	uint32_t DH;				 //coordinator address high
-	uint32_t DL;				 //coordinator address low
-	uint8_t  CoordPanID;		 // ID Parameter
-	uint8_t  CoordAddrMode;		 // 0x03 --> 64bit address
-	uint8_t  Channel;		   	 // CH Parameter
-	uint8_t  SecurityUse;		 // not used
-	uint8_t  ACLEntry;			 // not used
-	uint8_t  SecurityFailure;	 // not used
-	uint16_t SuperFrameSpec;	 
-	uint8_t  GtsPermit;
-	uint8_t  RSSI;				 // signal strength in -dBm
-	uint8_t  MsbTimestamp;
-	uint16_t LsbTimestamp;
-	
-}PanDescriptorType;
 
 
 
@@ -60,14 +43,13 @@ typedef struct {
 //==============================================================
 
 
-
-enum XBEE_HW_VERSION
+typedef enum 
 {
 	XPORT,
 	XBEE_V_S1 ,
 	XBEE_V_SC2
 	
-};
+}XBEE_HW_VERSION;
 
 #define COM_TIMEOUT_TIME 	10 // timeout for xbee connection in seconds
 
