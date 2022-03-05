@@ -315,7 +315,7 @@ uint8_t xbee_Active_Scan(void){
 	char print_pan_len[10];
 	
 	uint8_t panArr_index = 0;
-	uint8_t reply_ID;
+	uint8_t reply_ID = 0;
 	
 	AT_commandType AT_command;
 	
