@@ -42,7 +42,9 @@ XbeeType xbee = {
 	.sleep_period = 1,
 	.awake_period = 120,
 	.sleeping = false,
-	.associated = 0
+	.associated = 0,
+	.scanDurarion = 16.0,
+	.ScanChannels = 0x1FFE
 	
 };
 

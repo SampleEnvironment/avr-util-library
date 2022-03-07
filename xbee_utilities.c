@@ -101,6 +101,7 @@ inline uint8_t get_at_frame_type(char *id, uint8_t len)
 	if((id[0] == 'A') && (id[1] == 'S')) return AS_MSG_TYPE;
 	if((id[0] == 'S') && (id[1] == 'C')) return SC_MSG_TYPE;
 	if((id[0] == 'J') && (id[1] == 'V')) return JV_MSG_TYPE;
+	if((id[0] == 'S') && (id[1] == 'D')) return SD_MSG_TYPE;
 	
 	
 	return 0;

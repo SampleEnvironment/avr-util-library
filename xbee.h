@@ -25,6 +25,9 @@ typedef struct
 	char * dev_id_str;  // pointer to device ID
 	uint8_t dev_id_str_len; // max len of dev_id
 	
+	double   scanDurarion;
+	uint16_t ScanChannels;
+	
 }XbeeType;
 
 

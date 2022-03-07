@@ -66,6 +66,7 @@ typedef struct
 	PanDescriptorType Pool[PAN_POOL_SIZE];
 	uint8_t AlreadyTried[PAN_POOL_SIZE];
 	HeapType Heap;
+	uint8_t nPans;
 }PanPoolType;
 
 typedef struct  
@@ -90,6 +91,7 @@ typedef struct
 	
 }AT_commandType;
 
+extern XbeeType xbee;
 
 
 #define  AT_START 18
@@ -106,6 +108,7 @@ typedef enum
 	AS_MSG_TYPE,				    // Module performs an sctive Scan and retrns PAN descriptors of all Coordinators within range
 	SC_MSG_TYPE,                    // Scan channels reads the list of channels to scan
 	JV_MSG_TYPE,				    // Coordinator join verification
+	SD_MSG_TYPE						// Scan Duration 
 }AT_MESSAGE; 
 
 
@@ -121,10 +124,12 @@ uint32_t xbee_get_address_block(AT_MESSAGE AT_Code);
 uint8_t xbee_DA_initiate_reassociation(void);
 uint8_t xbee_JV_verification(void);
 uint16_t xbee_Scan_Channels(void);
+uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield);
 uint8_t xbee_Active_Scan(void);
 uint8_t xbee_hardware_version(void);
 uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex);
-
+uint32_t countSetBits(uint32_t n);
+PanPoolType * getPanPool(void);
 
 
 

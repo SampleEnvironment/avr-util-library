@@ -23,7 +23,7 @@ void (*print_info_AT)(char *, _Bool )  = NULL;
 PanPoolType Pans;
 
 
-char AT_Lut[10] [2] = {
+char AT_Lut[11] [2] = {
 	{'D','A'},
 	{'D','H'},
 	{'D','L'},
@@ -33,8 +33,10 @@ char AT_Lut[10] [2] = {
 	{'S','L'},
 	{'A','S'},
 	{'S','C'},
-	{'J','V'}
+	{'J','V'},
+	{'S','D'}
 };
+
 
 
 AT_commandType* initAt_set(AT_commandType * Atcommand,AT_MESSAGE AT_Code,uint8_t * data,uint8_t data_len){
@@ -94,10 +96,11 @@ uint8_t send_AT(AT_commandType *AT_Command){
 			break;
 			
 			case 2: // Data Word
-			memcpy(&AT_Command->dataword,(uint8_t *)frameBuffer[reply_Id].data,sizeof(uint16_t));
+			AT_Command->dataword = (frameBuffer[reply_Id].data[0] << 8) + frameBuffer[reply_Id].data[1];
+			
 			break;
 			
-			case 4: // Data Word
+			case 4: // uint32
 			memcpy(&AT_Command->Address,(uint8_t *)frameBuffer[reply_Id].data,sizeof(uint32_t));
 			break;
 			
@@ -107,7 +110,7 @@ uint8_t send_AT(AT_commandType *AT_Command){
 			{
 				break;
 			}
-			case 21: // Pan Descriptor
+			case 22: // Pan Descriptor
 			memcpy(&AT_Command->pandesc_S1C,(uint8_t *)frameBuffer[reply_Id].data,sizeof(PanDescriptor_S1CType));
 			if (frameBuffer[reply_Id].type == AS_MSG_TYPE)
 			{
@@ -127,6 +130,59 @@ uint8_t send_AT(AT_commandType *AT_Command){
 	
 	return reply_Id;
 	
+}
+
+uint16_t xbee_get_Scan_duration(void){
+	
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,SD_MSG_TYPE);
+	
+	send_AT(&AT_command);
+	
+	if (AT_command.AnswerReceived == false)  	// NO Answer from xbee --> not associated
+	{
+		return 0;
+	}
+	if (AT_command.byte != 0)
+	{
+		//
+		double nChannels = countSetBits(xbee.ScanChannels);
+		xbee.scanDurarion = (((nChannels * (2 << AT_command.byte) * 16) + (38 * nChannels) + 20) / 1000)+1;
+		
+		return 1;
+	}
+	
+	return 0;
+	
+	
+}
+uint8_t xbee_set_Scan_Duration(uint8_t dur_exp){
+	
+	AT_commandType AT_command;
+
+	initAt_set(&AT_command,SD_MSG_TYPE,&dur_exp,1);
+	
+	send_AT(&AT_command);
+	
+	if (AT_command.AnswerReceived == false)  	// NO Answer from xbee --> not associated
+	{
+		return 0;
+	}
+	return 1;
+	
+}
+
+
+
+uint32_t countSetBits(uint32_t n)
+{
+	uint32_t count = 0;
+	while (n) {
+		n &= (n - 1);
+		count++;
+	}
+	return count;
 }
 
 
@@ -291,10 +347,13 @@ uint16_t xbee_Scan_Channels(void){
 	
 }
 
-uint16_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
+uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
 	AT_commandType AT_command;
 	
-	uint8_t buffer[2] = {(SC_Bitfield >> 8) ,(uint8_t) SC_Bitfield };
+	uint8_t buffer[2];
+	// xbee uses little endian byte order
+	 buffer[0] = SC_Bitfield >> 8 ;
+	 buffer[1] = SC_Bitfield ;
 	
 	initAt_set(&AT_command,SC_MSG_TYPE,buffer,2);
 	send_AT(&AT_command);
@@ -303,24 +362,30 @@ uint16_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
 	if(AT_command.AnswerReceived == false) return 0;
 	
 	
-	uint16_t ScanChannels = AT_command.dataword ;
-	
-	
-	return ScanChannels;
+	return 1;
 	
 }
 
 uint8_t xbee_Active_Scan(void){
+	print_info_AT("Active Scan    ",1);
+		
 	
-	char print_pan_len[10];
 	
 	uint8_t panArr_index = 0;
-	uint8_t reply_ID;
+	uint8_t reply_ID = 0;
 	
 	AT_commandType AT_command;
 	
-	resetHeap(&Pans.Heap);
+	Pans.nPans = 0;
 	
+	if(!xbee_get_Scan_duration()){
+		print_info_AT("get SD Failed",1);
+		return 0;
+	}
+	
+	
+	resetHeap(&Pans.Heap);
+		
 	initAt_read(&AT_command,AS_MSG_TYPE);
 	send_AT(&AT_command);
 
@@ -329,16 +394,23 @@ uint8_t xbee_Active_Scan(void){
 	}
 	
 	panArr_index = addFrameToPanPool(reply_ID,panArr_index);
+	
+	uint32_t time_first_try = count_t_elapsed;
+	uint8_t delta_t;
+	
 
 	
 	
-	for (uint8_t i = 0; i < PAN_POOL_SIZE; i++ )
+	while(1)
 	{
-		sprintf(print_pan_len,"time: %2i",10-i);
-		print_info_AT(print_pan_len,1);
-		_delay_ms(2000);
+		delta_t = count_t_elapsed - time_first_try;
+		if(delta_t > xbee.scanDurarion)
+		{
+			break;			//stop trying on timeout return bad reply
+		}
+
 		reply_ID = xbee_hasReply(AS_MSG_TYPE, EQUAL);	//check for reply
-		
+		_delay_ms(100);
 		
 		if (reply_ID != 0xFF){							//reply available
 			panArr_index = addFrameToPanPool(reply_ID,panArr_index);
@@ -354,17 +426,13 @@ uint8_t xbee_Active_Scan(void){
 
 		
 	}
-
-	sprintf(print_pan_len,"pans#:%2i",panArr_index);
-	print_info_AT(print_pan_len,1);
-	_delay_ms(5000);
-	
+		
 	print_info_AT("",0);
+	Pans.nPans = panArr_index;
 	return 1;
 }
 
 uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
-	char print_pan_len[10];
 	
 	if (frameBuffer[reply_ID].data_len == 22)
 	{
@@ -374,12 +442,9 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
 		
 		push(&Pans.Heap,(uint8_t) (Pans.Pool[panArrIndex].S1C.RSSI + abs(INT8_MIN)),&Pans.Pool[panArrIndex]);
 		
-		sprintf(print_pan_len,"datalenS1C#:%2i",frameBuffer[reply_ID].data_len);
-		print_info_AT(print_pan_len,1);
-		_delay_ms(4000);
-		print_info_AT("              ",0);
-		
+
 		panArrIndex++;
+
 	}
 	
 	if (frameBuffer[reply_ID].data_len == 16)
@@ -390,13 +455,15 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
 		
 		push(&Pans.Heap,(uint8_t) (Pans.Pool[panArrIndex].S2C.RSSI + abs(INT8_MIN)),&Pans.Pool[panArrIndex]);
 		
-		sprintf(print_pan_len,"datalen#:%2i",frameBuffer[reply_ID].data_len);
-		print_info_AT(print_pan_len,1);
-		_delay_ms(4000);
-		print_info_AT("              ",0);
-		
+
 		panArrIndex++;
+		
 	}
 	
 	return panArrIndex;
 }
+
+PanPoolType * getPanPool(void){
+	return &Pans;
+}
+	
