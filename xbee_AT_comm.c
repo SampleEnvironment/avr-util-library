@@ -101,7 +101,10 @@ uint8_t send_AT(AT_commandType *AT_Command){
 			break;
 			
 			case 4: // uint32
-			memcpy(&AT_Command->Address,(uint8_t *)frameBuffer[reply_Id].data,sizeof(uint32_t));
+					AT_Command->Address = (unsigned long int)frameBuffer[reply_Id].data[0]<<24;
+					AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[1]<<16;
+					AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[2]<<8;
+					AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[3];
 			break;
 			
 			case 16: // Pan Descriptor
