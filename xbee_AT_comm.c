@@ -23,7 +23,7 @@ void (*print_info_AT)(char *, _Bool )  = NULL;
 PanPoolType Pans;
 
 
-char AT_Lut[11] [2] = {
+char AT_Lut[12] [2] = {
 	{'D','A'},
 	{'D','H'},
 	{'D','L'},
@@ -34,7 +34,9 @@ char AT_Lut[11] [2] = {
 	{'A','S'},
 	{'S','C'},
 	{'J','V'},
-	{'S','D'}
+	{'S','D'},
+	{'V','R'}
+		
 };
 
 
@@ -309,7 +311,7 @@ uint8_t xbee_JV_verification(void){
 	
 }
 
-uint8_t xbee_hardware_version(void){
+uint16_t xbee_hardware_version(void){
 	#ifdef USE_XBEE
 
 	AT_commandType AT_command;
@@ -330,7 +332,31 @@ uint8_t xbee_hardware_version(void){
 	version.hw_version_xbee = XPORT;
 	#endif
 	
-	return version.hw_version_xbee;
+	return hw_version_16;
+}
+
+uint16_t xbee_firmware_version(void){
+	#ifdef USE_XBEE
+
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,VR_MSG_TYPE);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0;
+	
+	
+	return AT_command.dataword ;
+
+		
+	#endif // USE_XBEE
+	
+	
+	#ifdef USE_LAN
+	return 0;
+	#endif
+	
+
 }
 
 uint16_t xbee_Scan_Channels(void){
@@ -349,6 +375,7 @@ uint16_t xbee_Scan_Channels(void){
 	return ScanChannels;
 	
 }
+
 
 uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
 	AT_commandType AT_command;

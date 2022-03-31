@@ -108,7 +108,8 @@ typedef enum
 	AS_MSG_TYPE,				    // Module performs an sctive Scan and retrns PAN descriptors of all Coordinators within range
 	SC_MSG_TYPE,                    // Scan channels reads the list of channels to scan
 	JV_MSG_TYPE,				    // Coordinator join verification
-	SD_MSG_TYPE						// Scan Duration 
+	SD_MSG_TYPE,					// Scan Duration 
+	VR_MSG_TYPE						// Reads the xbee Firmware version
 }AT_MESSAGE; 
 
 
@@ -126,7 +127,8 @@ uint8_t xbee_JV_verification(void);
 uint16_t xbee_Scan_Channels(void);
 uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield);
 uint8_t xbee_Active_Scan(void);
-uint8_t xbee_hardware_version(void);
+uint16_t xbee_hardware_version(void);
+uint16_t xbee_firmware_version(void);
 uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex);
 uint32_t countSetBits(uint32_t n);
 PanPoolType * getPanPool(void);
