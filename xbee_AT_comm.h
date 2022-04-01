@@ -120,6 +120,7 @@ typedef enum
 AT_commandType* initAt_set(AT_commandType * Atcommand,AT_MESSAGE AT_Code,uint8_t * data,uint8_t data_len);
 AT_commandType* initAt_read(AT_commandType * Atcommand,AT_MESSAGE AT_Code);
 uint8_t send_AT(AT_commandType *AT_Command);
+uint8_t send_remoteAT(AT_commandType *AT_Command);
 
 uint8_t xbee_is_connected(void);
 uint32_t xbee_SL_address(void);
@@ -136,6 +137,7 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex);
 uint32_t countSetBits(uint32_t n);
 PanPoolType * getPanPool(void);
 uint8_t xbee_pack_remoteAT_frame(AT_commandType *AT_Command, uint8_t * buffer);
+uint8_t xbee_coordIdentifier(void);
 
 
 

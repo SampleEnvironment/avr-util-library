@@ -38,7 +38,7 @@ char AT_Lut[14] [2] = {
 	{'V','R'},
 	{'W','R'},
 	{'N','I'}
-		
+	
 };
 
 
@@ -80,6 +80,25 @@ AT_commandType* initAt_read(AT_commandType * Atcommand,AT_MESSAGE AT_Code){
 }
 
 
+uint8_t send_remoteAT(AT_commandType *AT_Command){
+	uint8_t buffer[SINGLE_FRAME_LENGTH];
+	
+	uint8_t temp_bytes_number = xbee_pack_remoteAT_frame(AT_Command,buffer);
+	
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number,AT_Command->MSG_TYPE, 20);
+	
+	if (reply_Id != 0xFF)
+	{
+
+		memcpy(AT_Command->data,(uint8_t *)frameBuffer[reply_Id].data,frameBuffer[reply_Id].data_len);
+		
+		AT_Command->data_len = frameBuffer[reply_Id].data_len;
+		AT_Command->AnswerReceived = true;
+	}
+	
+	return reply_Id;
+}
+
 uint8_t send_AT(AT_commandType *AT_Command){
 	uint8_t buffer[SINGLE_FRAME_LENGTH];
 	
@@ -105,10 +124,10 @@ uint8_t send_AT(AT_commandType *AT_Command){
 			break;
 			
 			case 4: // uint32
-					AT_Command->Address = (unsigned long int)frameBuffer[reply_Id].data[0]<<24;
-					AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[1]<<16;
-					AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[2]<<8;
-					AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[3];
+			AT_Command->Address = (unsigned long int)frameBuffer[reply_Id].data[0]<<24;
+			AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[1]<<16;
+			AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[2]<<8;
+			AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[3];
 			break;
 			
 			case 16: // Pan Descriptor
@@ -196,7 +215,26 @@ uint8_t xbee_WR(void){
 	
 }
 
-
+uint8_t xbee_coordIdentifier(void){
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,NI_MSG_TYPE);
+	
+	send_remoteAT(&AT_command);
+	
+	if (AT_command.AnswerReceived == false)  	// NO Answer from xbee --> not associated
+	{
+		return 0;
+	}
+	
+	memcpy(xbee.CoordIdentifier,AT_command.data,AT_command.data_len*sizeof(char));
+	xbee.CoordIdentifier[AT_command.data_len] = '\0'; // null terminator anfügen
+	
+	
+	
+	return 1;
+	
+}
 
 uint32_t countSetBits(uint32_t n)
 {
@@ -366,7 +404,7 @@ uint16_t xbee_firmware_version(void){
 	
 	return AT_command.dataword ;
 
-		
+	
 	#endif // USE_XBEE
 	
 	
@@ -400,8 +438,8 @@ uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
 	
 	uint8_t buffer[2];
 	// xbee uses little endian byte order
-	 buffer[0] = SC_Bitfield >> 8 ;
-	 buffer[1] = SC_Bitfield ;
+	buffer[0] = SC_Bitfield >> 8 ;
+	buffer[1] = SC_Bitfield ;
 	
 	initAt_set(&AT_command,SC_MSG_TYPE,buffer,2);
 	send_AT(&AT_command);
@@ -416,7 +454,7 @@ uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
 
 uint8_t xbee_Active_Scan(void){
 	print_info_AT("Active Scan    ",1);
-		
+	
 	
 	
 	uint8_t panArr_index = 0;
@@ -433,7 +471,7 @@ uint8_t xbee_Active_Scan(void){
 	
 	
 	resetHeap(&Pans.Heap);
-		
+	
 	initAt_read(&AT_command,AS_MSG_TYPE);
 	send_AT(&AT_command);
 
@@ -474,7 +512,7 @@ uint8_t xbee_Active_Scan(void){
 
 		
 	}
-		
+	
 	print_info_AT("",0);
 	Pans.nPans = panArr_index;
 	return 1;
@@ -581,4 +619,3 @@ uint8_t xbee_pack_remoteAT_frame(AT_commandType *AT_Command, uint8_t * buffer)
 	return index+1;
 
 }
-	

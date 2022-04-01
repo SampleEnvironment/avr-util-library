@@ -28,6 +28,7 @@ typedef struct
 	double   scanDurarion;
 	uint16_t ScanChannels;
 	
+	char CoordIdentifier[21] ;
 }XbeeType;
 
 
