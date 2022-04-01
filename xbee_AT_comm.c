@@ -23,7 +23,7 @@ void (*print_info_AT)(char *, _Bool )  = NULL;
 PanPoolType Pans;
 
 
-char AT_Lut[12] [2] = {
+char AT_Lut[14] [2] = {
 	{'D','A'},
 	{'D','H'},
 	{'D','L'},
@@ -35,7 +35,9 @@ char AT_Lut[12] [2] = {
 	{'S','C'},
 	{'J','V'},
 	{'S','D'},
-	{'V','R'}
+	{'V','R'},
+	{'W','R'},
+	{'N','I'}
 		
 };
 
@@ -167,6 +169,22 @@ uint8_t xbee_set_Scan_Duration(uint8_t dur_exp){
 	AT_commandType AT_command;
 
 	initAt_set(&AT_command,SD_MSG_TYPE,&dur_exp,1);
+	
+	send_AT(&AT_command);
+	
+	if (AT_command.AnswerReceived == false)  	// NO Answer from xbee --> not associated
+	{
+		return 0;
+	}
+	return 1;
+	
+}
+
+uint8_t xbee_WR(void){
+	
+	AT_commandType AT_command;
+
+	initAt_read(&AT_command,WR_MSG_TYPE);
 	
 	send_AT(&AT_command);
 	
@@ -495,5 +513,72 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
 
 PanPoolType * getPanPool(void){
 	return &Pans;
+}
+
+uint8_t xbee_pack_remoteAT_frame(AT_commandType *AT_Command, uint8_t * buffer)
+{
+	uint8_t temp_buffer[SINGLE_FRAME_LENGTH];
+	uint8_t index = 0;
+	
+	uint8_t *data = AT_Command->data;
+	
+	#ifdef USE_XBEE
+
+	temp_buffer[0] = 0x7E;		// Start delimiter
+	// Let index 1 & 2 free for storing frame length
+	temp_buffer[3] = 0x17;   	// API Identifier Value for 64-bit TX Request message will cause the module to send RF Data as an RF Packet.
+	temp_buffer[4] = 0x00;		// Constant Frame ID arbitrarily selected
+	// Identifies the UART data frame for the host to correlate with a subsequent ACK (acknowledgment).
+	// Setting Frame ID to ‘0' will disable response frame.
+	
+	// 32-bit destination address high
+	temp_buffer[5] = (uint8_t)(xbee.dest_high >> 24);
+	temp_buffer[6] = (uint8_t)(xbee.dest_high >> 16);
+	temp_buffer[7] = (uint8_t)(xbee.dest_high >> 8);
+	temp_buffer[8] = (uint8_t) xbee.dest_high;
+	
+	// 32-bit destination address low
+	temp_buffer[9] = (uint8_t) (xbee.dest_low >> 24);
+	temp_buffer[10] = (uint8_t)(xbee.dest_low >> 16);
+	temp_buffer[11] = (uint8_t)(xbee.dest_low >> 8);
+	temp_buffer[12] = (uint8_t) xbee.dest_low;
+	
+	temp_buffer[13] = 0xFF;				// 16-Bit network Adress
+	temp_buffer[14] = 0xFE;     		// default 0xFFFE
+	
+	temp_buffer[15] = 0;				// Remote command options
+	
+	temp_buffer[16] = AT_Command->MSC_AT_CODE;
+	temp_buffer[17] = AT_Command->LSC_AT_CODE;
+	#endif
+	
+	
+	temp_buffer[15] = MESSAGEFOPRMAT_IDENTIFIER;
+	temp_buffer[16] = version.Branch_id;
+	temp_buffer[17] = (uint8_t)( version.Fw_version>> 8); //MSB
+	temp_buffer[18] = (uint8_t) (version.Fw_version );  //LSB
+
+	index = 19;
+	
+
+	// Parameter
+	while (AT_Command->data_len)
+	{
+		temp_buffer[index] = *data++;
+		index++;
+		AT_Command->data_len--;
+	}
+	
+	// Calculate checksum
+	temp_buffer[index] = xbee_getChecksum(temp_buffer,3,index);
+	
+	// Add frame length - excludes Start delimiter, Length and checksum
+	temp_buffer[1] = ((index-3) >> 8);
+	temp_buffer[2] = (index-3);
+	
+	memcpy(buffer, temp_buffer, index+1);		// Frame is in the params array
+	
+	return index+1;
+
 }
 	

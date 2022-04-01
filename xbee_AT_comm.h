@@ -109,7 +109,9 @@ typedef enum
 	SC_MSG_TYPE,                    // Scan channels reads the list of channels to scan
 	JV_MSG_TYPE,				    // Coordinator join verification
 	SD_MSG_TYPE,					// Scan Duration 
-	VR_MSG_TYPE						// Reads the xbee Firmware version
+	VR_MSG_TYPE,					// Reads the xbee Firmware version
+	WR_MSG_TYPE,					// writes changes to xbee flash	
+	NI_MSG_TYPE						// reads node identifier
 }AT_MESSAGE; 
 
 
@@ -127,11 +129,13 @@ uint8_t xbee_JV_verification(void);
 uint16_t xbee_Scan_Channels(void);
 uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield);
 uint8_t xbee_Active_Scan(void);
+uint8_t xbee_WR(void);
 uint16_t xbee_hardware_version(void);
 uint16_t xbee_firmware_version(void);
 uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex);
 uint32_t countSetBits(uint32_t n);
 PanPoolType * getPanPool(void);
+uint8_t xbee_pack_remoteAT_frame(AT_commandType *AT_Command, uint8_t * buffer);
 
 
 
