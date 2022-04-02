@@ -368,6 +368,7 @@ uint8_t xbee_JV_verification(void){
 }
 
 uint16_t xbee_hardware_version(void){
+	uint16_t hw_version_16 = 0;
 	#ifdef USE_XBEE
 
 	AT_commandType AT_command;
@@ -378,7 +379,7 @@ uint16_t xbee_hardware_version(void){
 	if(AT_command.AnswerReceived == false) return 0;
 	
 	
-	uint16_t hw_version_16 = AT_command.dataword ;
+	 hw_version_16 = AT_command.dataword ;
 	
 	
 	version.hw_version_xbee = (hw_version_16 > 0x2000)? XBEE_V_SC2 : XBEE_V_S1;
