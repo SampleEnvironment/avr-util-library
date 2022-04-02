@@ -79,6 +79,9 @@ uint8_t xbee_get_sleep_period(void){
 	return xbee.sleep_period;
 }
 
+char* xbee_get_coordID(void){
+	return xbee.CoordIdentifier;
+}
 
 
 

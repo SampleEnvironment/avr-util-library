@@ -13,6 +13,8 @@
 #include "xbee_AT_comm.h"
 #include "module_globals.h"
 
+
+
 // Global Variables
 volatile BuffType *setPtr;
 volatile BuffType frameBuffer[BUFFER_LENGTH];
@@ -204,6 +206,18 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 		newFrame.type = STATUS_MSG_TYPE;
 		newFrame.data[0]= buffer[4];
 		newFrame.data_len =1;
+		break;
+		case AT_REMOTE_ID:
+	
+		newFrame.status = buffer[17];
+		newFrame.type = get_at_frame_type((char*) &buffer[15],2);
+		
+		//write data
+		if (length < (19+1)) return;
+		for (uint8_t i = 18; i < length; ++i)
+		newFrame.data[data_counter++] = buffer[i];
+		newFrame.data_len = --data_counter;
+
 		break;
 		default:
 		newFrame.status = 0xFF;

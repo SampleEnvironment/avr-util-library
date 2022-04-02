@@ -233,6 +233,7 @@ void xbee_set_awake_period(uint8_t awake_period);
 uint8_t xbee_get_awake_period(void);
 void xbee_set_sleep_period(uint8_t sleep_period);
 uint8_t xbee_get_sleep_period(void);
+char* xbee_get_coordID(void);
 
 
 
