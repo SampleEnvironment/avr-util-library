@@ -7,6 +7,9 @@
 #include <avr/io.h>
 #include <string.h>
 
+#include "../display_utilities.h"
+#include "../display.h"
+
 
 #include "xbee.h"
 #include "xbee_utilities.h"
@@ -107,7 +110,13 @@ inline uint8_t get_at_frame_type(char *id, uint8_t len)
 	if((id[0] == 'V') && (id[1] == 'R')) return VR_MSG_TYPE;
 	if((id[0] == 'W') && (id[1] == 'R')) return WR_MSG_TYPE;
 	if((id[0] == 'N') && (id[1] == 'I')) return NI_MSG_TYPE;
-	
+	if((id[0] == 'C') && (id[1] == 'E')) return CE_MSG_TYPE;
+	if((id[0] == 'S') && (id[1] == 'M')) return SM_MSG_TYPE;
+	if((id[0] == 'C') && (id[1] == 'H')) return CH_MSG_TYPE;
+	if((id[0] == 'Z') && (id[1] == 'S')) return ZS_MSG_TYPE;
+	if((id[0] == 'N') && (id[1] == 'J')) return NJ_MSG_TYPE;
+	if((id[0] == 'A') && (id[1] == '1')) return A1_MSG_TYPE;
+	if((id[0] == 'A') && (id[1] == '2')) return A2_MSG_TYPE;
 	
 	return 0;
 }
@@ -208,9 +217,13 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 		newFrame.data_len =1;
 		break;
 		case AT_REMOTE_ID:
-	
-		newFrame.status = buffer[17];
-		newFrame.type = get_at_frame_type((char*) &buffer[15],2);
+		
+
+		
+		//newFrame.status = buffer[17];
+		newFrame.status = 0 ;
+		newFrame.type = NI_MSG_TYPE;
+		//newFrame.type = get_at_frame_type((char*) &buffer[15],2);
 		
 		//write data
 		if (length < (19+1)) return;
