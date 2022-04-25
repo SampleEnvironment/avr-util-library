@@ -111,7 +111,14 @@ typedef enum
 	SD_MSG_TYPE,					// Scan Duration 
 	VR_MSG_TYPE,					// Reads the xbee Firmware version
 	WR_MSG_TYPE,					// writes changes to xbee flash	
-	NI_MSG_TYPE						// reads node identifier
+	NI_MSG_TYPE,					// reads node identifier
+	CE_MSG_TYPE,					// coordinator enable bit
+	SM_MSG_TYPE,					// Sleep mode
+	CH_MSG_TYPE,					// operating Channel
+	ZS_MSG_TYPE,					// Stack profile	
+	NJ_MSG_TYPE,					// Node Join Time
+	A1_MSG_TYPE,					// coordinator behavior
+	A2_MSG_TYPE						// end dev behaviour
 }AT_MESSAGE; 
 
 
@@ -122,16 +129,27 @@ AT_commandType* initAt_read(AT_commandType * Atcommand,AT_MESSAGE AT_Code);
 uint8_t send_AT(AT_commandType *AT_Command);
 uint8_t send_remoteAT(AT_commandType *AT_Command);
 
+uint8_t AT_read_Byte( AT_MESSAGE AT_Code);
+uint8_t AT_set_Byte( AT_MESSAGE AT_Code,uint8_t param);
 uint8_t xbee_is_connected(void);
 uint32_t xbee_SL_address(void);
 uint32_t xbee_get_address_block(AT_MESSAGE AT_Code);
 uint8_t xbee_DA_initiate_reassociation(void);
 uint8_t xbee_JV_verification(void);
+uint8_t xbee_Node_Join(void);
+uint8_t xbee_set_Node_Join(uint8_t NJ);
+uint8_t xbee_stack_profile(void);
+uint8_t xbee_sleep_Mode(void);
+uint8_t xbee_set_sleep_Mode(uint8_t SM);
+uint8_t xbee_coordinator_Enable(void);
+uint8_t xbee_set_coordinator_Enable(uint8_t CE);
+uint8_t xbee_Assiciation_indication(void);
 uint16_t xbee_Scan_Channels(void);
 uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield);
 uint8_t xbee_Active_Scan(void);
 uint8_t xbee_WR(void);
 uint16_t xbee_hardware_version(void);
+uint8_t xbee_channel(void);
 uint16_t xbee_firmware_version(void);
 uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex);
 uint32_t countSetBits(uint32_t n);

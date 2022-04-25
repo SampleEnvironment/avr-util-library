@@ -23,7 +23,7 @@ void (*print_info_AT)(char *, _Bool )  = NULL;
 PanPoolType Pans;
 
 
-char AT_Lut[14] [2] = {
+char AT_Lut[21] [2] = {
 	{'D','A'},
 	{'D','H'},
 	{'D','L'},
@@ -37,7 +37,14 @@ char AT_Lut[14] [2] = {
 	{'S','D'},
 	{'V','R'},
 	{'W','R'},
-	{'N','I'}
+	{'N','I'},
+	{'C','E'},
+	{'S','M'},
+	{'C','H'},
+	{'Z','S'},
+	{'N','J'},
+	{'A','1'},
+	{'A','2'}
 	
 };
 
@@ -247,6 +254,31 @@ uint32_t countSetBits(uint32_t n)
 }
 
 
+uint8_t AT_read_Byte( AT_MESSAGE AT_Code){
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,AT_Code);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0;
+	
+	return AT_command.byte;
+}
+
+
+uint8_t AT_set_Byte( AT_MESSAGE AT_Code,uint8_t param){
+	AT_commandType AT_command;
+	
+	initAt_set(&AT_command,AT_Code,&param,1);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0;
+	
+	
+	return 1;
+	
+}
+
 uint8_t xbee_is_connected(void)
 {
 
@@ -294,15 +326,6 @@ uint32_t xbee_SL_address(void){
 	
 	SL_Address = AT_command.Address;
 	
-	char print_sl[10];
-	
-	for (uint8_t i =0;i <4;i++)
-	{
-		
-		sprintf(print_sl,"%i",AT_command.data[i]);
-		//print_info_xbee(print_sl,1);
-		_delay_ms(5000);
-	}
 
 	
 	
@@ -367,6 +390,58 @@ uint8_t xbee_JV_verification(void){
 	
 }
 
+uint8_t xbee_Node_Join(void){
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,NJ_MSG_TYPE);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0;
+	
+	return AT_command.byte;
+	
+}
+
+uint8_t xbee_set_Node_Join(uint8_t NJ){
+	AT_commandType AT_command;
+	
+	initAt_set(&AT_command,CE_MSG_TYPE,&NJ,1);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0;
+	
+	
+	return 1;
+	
+}
+
+
+
+
+
+uint8_t xbee_stack_profile(void){
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,ZS_MSG_TYPE);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0;
+	
+	return AT_command.byte;
+}
+
+uint8_t xbee_channel(void){
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,CH_MSG_TYPE);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0xff;
+	
+	return AT_command.byte;
+}
+
+
 uint16_t xbee_hardware_version(void){
 	uint16_t hw_version_16 = 0;
 	#ifdef USE_XBEE
@@ -416,6 +491,80 @@ uint16_t xbee_firmware_version(void){
 
 }
 
+uint8_t xbee_coordinator_Enable(void){
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,CE_MSG_TYPE);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0xFF;
+	
+	uint8_t CE = AT_command.byte ;
+	
+	
+	return CE;
+	
+}
+
+uint8_t xbee_set_coordinator_Enable(uint8_t CE){
+	AT_commandType AT_command;
+	
+	initAt_set(&AT_command,CE_MSG_TYPE,&CE,1);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0;
+	
+	
+	return 1;
+	
+}
+
+
+uint8_t xbee_sleep_Mode(void){
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,SM_MSG_TYPE);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0xFF;
+	
+	uint8_t SM = AT_command.byte ;
+	
+	
+	return SM;
+	
+}
+
+uint8_t xbee_set_sleep_Mode(uint8_t SM){
+	AT_commandType AT_command;
+	
+	initAt_set(&AT_command,SM_MSG_TYPE,&SM,1);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0;
+	
+	
+	return 1;
+	
+}
+
+
+uint8_t xbee_Assiciation_indication(void){
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,AI_MSG_TYPE);
+	send_AT(&AT_command);
+	
+	if(AT_command.AnswerReceived == false) return 0xFF;
+	
+	uint8_t AI = AT_command.byte ;
+	
+	
+	return AI;
+	
+}
+
+
 uint16_t xbee_Scan_Channels(void){
 	AT_commandType AT_command;
 	
@@ -455,8 +604,6 @@ uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
 
 uint8_t xbee_Active_Scan(void){
 	print_info_AT("Active Scan    ",1);
-	
-	
 	
 	uint8_t panArr_index = 0;
 	uint8_t reply_ID = 0;
@@ -523,7 +670,7 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
 	
 	if (frameBuffer[reply_ID].data_len == 22)
 	{
-		
+				
 		memcpy(&Pans.Pool[panArrIndex].S1C,(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S1CType));
 		Pans.Pool[panArrIndex].HW = XBEE_V_S1;
 		
@@ -536,6 +683,7 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
 	
 	if (frameBuffer[reply_ID].data_len == 16)
 	{
+
 		
 		memcpy(&Pans.Pool[panArrIndex].S2C,(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S2CType));
 		Pans.Pool[panArrIndex].HW = XBEE_V_SC2;
@@ -554,6 +702,10 @@ PanPoolType * getPanPool(void){
 	return &Pans;
 }
 
+
+
+
+
 uint8_t xbee_pack_remoteAT_frame(AT_commandType *AT_Command, uint8_t * buffer)
 {
 	uint8_t temp_buffer[SINGLE_FRAME_LENGTH];
@@ -566,7 +718,7 @@ uint8_t xbee_pack_remoteAT_frame(AT_commandType *AT_Command, uint8_t * buffer)
 	temp_buffer[0] = 0x7E;		// Start delimiter
 	// Let index 1 & 2 free for storing frame length
 	temp_buffer[3] = 0x17;   	// API Identifier Value for 64-bit TX Request message will cause the module to send RF Data as an RF Packet.
-	temp_buffer[4] = 0x00;		// Constant Frame ID arbitrarily selected
+	temp_buffer[4] = 0x50;		// Constant Frame ID arbitrarily selected
 	// Identifies the UART data frame for the host to correlate with a subsequent ACK (acknowledgment).
 	// Setting Frame ID to ‘0' will disable response frame.
 	
@@ -591,13 +743,8 @@ uint8_t xbee_pack_remoteAT_frame(AT_commandType *AT_Command, uint8_t * buffer)
 	temp_buffer[17] = AT_Command->LSC_AT_CODE;
 	#endif
 	
-	
-	temp_buffer[15] = MESSAGEFOPRMAT_IDENTIFIER;
-	temp_buffer[16] = version.Branch_id;
-	temp_buffer[17] = (uint8_t)( version.Fw_version>> 8); //MSB
-	temp_buffer[18] = (uint8_t) (version.Fw_version );  //LSB
 
-	index = 19;
+	index = 18;
 	
 
 	// Parameter
