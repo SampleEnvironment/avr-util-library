@@ -217,21 +217,20 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 		newFrame.data_len =1;
 		break;
 		case AT_REMOTE_ID:
-		
+
 
 		
-		//newFrame.status = buffer[17];
-		newFrame.status = 0 ;
-		newFrame.type = NI_MSG_TYPE;
-		//newFrame.type = get_at_frame_type((char*) &buffer[15],2);
+		newFrame.status = buffer[17];
+		newFrame.type = get_at_frame_type((char*) &buffer[15],2);
 		
 		//write data
-		if (length < (19+1)) return;
+		if (length < (18+1)) return;
 		for (uint8_t i = 18; i < length; ++i)
 		newFrame.data[data_counter++] = buffer[i];
 		newFrame.data_len = --data_counter;
 
 		break;
+		
 		default:
 		newFrame.status = 0xFF;
 	}

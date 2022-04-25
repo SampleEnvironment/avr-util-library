@@ -231,7 +231,6 @@ uint8_t xbee_coordIdentifier(void){
 	
 	if (AT_command.AnswerReceived == false)  	// NO Answer from xbee --> not associated
 	{
-		print_info_AT("no answer",1);
 		return 0;
 	}
 	
@@ -670,7 +669,7 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
 	
 	if (frameBuffer[reply_ID].data_len == 22)
 	{
-		
+				
 		memcpy(&Pans.Pool[panArrIndex].S1C,(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S1CType));
 		Pans.Pool[panArrIndex].HW = XBEE_V_S1;
 		
@@ -683,6 +682,7 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
 	
 	if (frameBuffer[reply_ID].data_len == 16)
 	{
+
 		
 		memcpy(&Pans.Pool[panArrIndex].S2C,(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S2CType));
 		Pans.Pool[panArrIndex].HW = XBEE_V_SC2;
