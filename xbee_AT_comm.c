@@ -92,7 +92,7 @@ uint8_t send_remoteAT(AT_commandType *AT_Command){
 	
 	uint8_t temp_bytes_number = xbee_pack_remoteAT_frame(AT_Command,buffer);
 	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number,AT_Command->MSG_TYPE, 20);
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number,AT_Command->MSG_TYPE, 1);
 	
 	if (reply_Id != 0xFF)
 	{
@@ -116,7 +116,7 @@ uint8_t send_AT(AT_commandType *AT_Command){
 
 	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, AT_Command->data_len+2);
 	
-	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number,AT_Command->MSG_TYPE, 20);
+	uint8_t reply_Id = xbee_send_and_get_reply(buffer, temp_bytes_number,AT_Command->MSG_TYPE, 4);
 	
 	if (reply_Id != 0xFF)
 	{
@@ -231,7 +231,10 @@ uint8_t xbee_coordIdentifier(void){
 	
 	if (AT_command.AnswerReceived == false)  	// NO Answer from xbee --> not associated
 	{
+		char temp[21] = "NO NETWORK";
+		strncpy(xbee.CoordIdentifier,temp,sizeof(char)* 11);
 		return 0;
+
 	}
 	
 	memcpy(xbee.CoordIdentifier,AT_command.data,AT_command.data_len*sizeof(char));
@@ -454,7 +457,7 @@ uint16_t xbee_hardware_version(void){
 	if(AT_command.AnswerReceived == false) return 0;
 	
 	
-	 hw_version_16 = AT_command.dataword ;
+	hw_version_16 = AT_command.dataword ;
 	
 	
 	version.hw_version_xbee = (hw_version_16 > 0x2000)? XBEE_V_SC2 : XBEE_V_S1;
@@ -670,7 +673,7 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
 	
 	if (frameBuffer[reply_ID].data_len == 22)
 	{
-				
+		
 		memcpy(&Pans.Pool[panArrIndex].S1C,(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S1CType));
 		Pans.Pool[panArrIndex].HW = XBEE_V_S1;
 		

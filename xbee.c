@@ -44,7 +44,8 @@ XbeeType xbee = {
 	.sleeping = false,
 	.associated = 0,
 	.scanDurarion = 16.0,
-	.ScanChannels = 0x1FFE
+	.ScanChannels = 0x1FFE,
+	.CoordIdentifier = ""
 	
 };
 
@@ -111,7 +112,11 @@ _Bool xbee_reset_connection(void)
 	// Clear frame_buffer if there is still some information in the queue
 	buffer_init();
 
-	if(!xbee_DA_initiate_reassociation()) return 0;
+	if (!xbee_coordIdentifier())
+	{
+		if(!xbee_DA_initiate_reassociation()) return 0;
+	}
+
 	
 	uint8_t timeout_count = 0;
 
@@ -134,6 +139,7 @@ _Bool xbee_reset_connection(void)
 
 		if(version.hw_version_xbee == XBEE_V_SC2 && xbee_is_connected() == 0){
 			print_info_xbee(XBEE_DEVICE_ASSOCIATED,1);
+			
 			return 1;
 		}
 		
@@ -176,7 +182,7 @@ uint8_t xbee_reconnect(void)
 		return 1;
 	}
 	CLEAR_ERROR(NETWORK_ERROR);		// Successfully reconnected, clear network error
-	
+
 	
 	_delay_ms(1000);
 	return 0;
@@ -233,7 +239,7 @@ uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_
 	while(1)
 	{
 		delta_t = count_t_elapsed - time_first_try;
-		if(delta_t > COM_TIMEOUT_TIME)
+		if(delta_t > comTimeOut)
 		{
 			break;			//stop trying on timeout return bad reply
 		}
