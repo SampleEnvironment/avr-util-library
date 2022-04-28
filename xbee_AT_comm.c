@@ -106,6 +106,22 @@ uint8_t send_remoteAT(AT_commandType *AT_Command){
 	return reply_Id;
 }
 
+
+void send_AT_noRep(AT_commandType *AT_Command){
+	uint8_t buffer[SINGLE_FRAME_LENGTH];
+	
+	buffer[0] = (uint8_t) AT_Command->MSC_AT_CODE;
+	buffer[1] = (uint8_t) AT_Command->LSC_AT_CODE;
+	
+	memcpy(&buffer[2],AT_Command->data,sizeof(uint8_t)*AT_Command->data_len);
+
+	uint8_t temp_bytes_number = xbee_pack_tx_frame(buffer, AT_Command->data_len+2);
+	
+	// send message (only if length not 0) and wait
+	xbee_send_msg(buffer, temp_bytes_number);
+}
+
+
 uint8_t send_AT(AT_commandType *AT_Command){
 	uint8_t buffer[SINGLE_FRAME_LENGTH];
 	
@@ -137,14 +153,9 @@ uint8_t send_AT(AT_commandType *AT_Command){
 			AT_Command->Address += (unsigned long int)frameBuffer[reply_Id].data[3];
 			break;
 			
-			case 16: // Pan Descriptor
-			memcpy(&AT_Command->pandesc_S2C,(uint8_t *)frameBuffer[reply_Id].data,sizeof(PanDescriptor_S2CType));
-			if (frameBuffer[reply_Id].type == AS_MSG_TYPE)
-			{
-				break;
-			}
+
 			case 22: // Pan Descriptor
-			memcpy(&AT_Command->pandesc_S1C,(uint8_t *)frameBuffer[reply_Id].data,sizeof(PanDescriptor_S1CType));
+			memcpy(&AT_Command->pandesc,(uint8_t *)frameBuffer[reply_Id].data,sizeof(PanDescriptor_15_4));
 			if (frameBuffer[reply_Id].type == AS_MSG_TYPE)
 			{
 				break;
@@ -615,6 +626,8 @@ uint8_t xbee_Active_Scan(void){
 	
 	Pans.nPans = 0;
 	
+	xbee_set_Scan_Duration(4);
+	
 	if(!xbee_get_Scan_duration()){
 		print_info_AT("get SD Failed",1);
 		return 0;
@@ -624,18 +637,11 @@ uint8_t xbee_Active_Scan(void){
 	resetHeap(&Pans.Heap);
 	
 	initAt_read(&AT_command,AS_MSG_TYPE);
-	send_AT(&AT_command);
+	send_AT_noRep(&AT_command);
 
-	if(AT_command.AnswerReceived == false){
-		return 0;
-	}
-	
-	panArr_index = addFrameToPanPool(reply_ID,panArr_index);
 	
 	uint32_t time_first_try = count_t_elapsed;
 	uint8_t delta_t;
-	
-
 	
 	
 	while(1)
@@ -674,29 +680,38 @@ uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){
 	if (frameBuffer[reply_ID].data_len == 22)
 	{
 		
-		memcpy(&Pans.Pool[panArrIndex].S1C,(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S1CType));
-		Pans.Pool[panArrIndex].HW = XBEE_V_S1;
+		//memcpy(&Pans.Pool[panArrIndex],(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_15_4));
+
 		
-		push(&Pans.Heap,(uint8_t) (Pans.Pool[panArrIndex].S1C.RSSI + abs(INT8_MIN)),&Pans.Pool[panArrIndex]);
+		Pans.Pool[panArrIndex].CoordSerialNumber =   (
+		((uint64_t) frameBuffer[reply_ID].data[0] << 56) |
+		((uint64_t) frameBuffer[reply_ID].data[1] << 48) |
+		((uint64_t) frameBuffer[reply_ID].data[2] << 40) |
+		((uint64_t) frameBuffer[reply_ID].data[3] << 32) |
+		((uint64_t) frameBuffer[reply_ID].data[4] << 24) |
+		((uint64_t) frameBuffer[reply_ID].data[5] << 16) |
+		((uint64_t) frameBuffer[reply_ID].data[6] << 8) |
+		((uint64_t) frameBuffer[reply_ID].data[7]  ));
+		
+		Pans.Pool[panArrIndex].PanID= (
+		((uint16_t) frameBuffer[reply_ID].data[8] << 8) |
+		((uint16_t) frameBuffer[reply_ID].data[9] ));
+		
+		Pans.Pool[panArrIndex].ChannelID = frameBuffer[reply_ID].data[11];
+		
+		Pans.Pool[panArrIndex].RSSI = frameBuffer[reply_ID].data[18];
+		
+
+
+		
+		push(&Pans.Heap,(uint8_t) (Pans.Pool[panArrIndex].RSSI + abs(INT8_MIN)),&Pans.Pool[panArrIndex]);
 		
 
 		panArrIndex++;
 
 	}
 	
-	if (frameBuffer[reply_ID].data_len == 16)
-	{
 
-		
-		memcpy(&Pans.Pool[panArrIndex].S2C,(uint8_t *)frameBuffer[reply_ID].data,sizeof(PanDescriptor_S2CType));
-		Pans.Pool[panArrIndex].HW = XBEE_V_SC2;
-		
-		push(&Pans.Heap,(uint8_t) (Pans.Pool[panArrIndex].S2C.RSSI + abs(INT8_MIN)),&Pans.Pool[panArrIndex]);
-		
-
-		panArrIndex++;
-		
-	}
 	
 	return panArrIndex;
 }
