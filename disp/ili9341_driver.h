@@ -7,36 +7,19 @@
 #define ILI9341_DRIVER_H
 
 
+#ifdef ili9341
+
+
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 
 
-// Default Pin assignments if not defined anywhere else
 
-#ifndef LCD_CLK
-#define LCD_CLK 		PINB3//7		// Clock
-#endif
 
-#ifndef LCD_RESET
-#define LCD_RESET 		PINB6		// Reset Display
-#endif
 
-#ifndef LCD_SELECT
-#define LCD_SELECT 		PINB7//2		// Cable Select
-#endif
 
-#ifndef LCD_DC
-#define LCD_DC 			PINB5//4		// Data/Command
-#endif
-
-#ifndef LCD_MOSI
-#define LCD_MOSI 		PINB4//5		// Send Data
-#endif
-
-#ifndef LCD_PORT 
-#define LCD_PORT PORTB
-#endif
 
 
 
@@ -114,5 +97,6 @@ void LCD_SPI_Int(unsigned int Value);
 void LCD_End_drawing(void);
 
 
+#endif // ili9341
 
 #endif  // display_driver.h0

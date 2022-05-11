@@ -10,6 +10,8 @@
 #define DISP_3000_DRIVER_H_
 
 
+#ifdef DISP_3000
+
 
 
 
@@ -94,5 +96,6 @@ void LCD_Wait(void);
 #define FILL    1
 #define NOFILL  0
 
+#endif // DISP_3000
 
 #endif /* DISP_3000_DRIVER_H_ */

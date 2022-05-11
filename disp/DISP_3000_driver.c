@@ -31,6 +31,10 @@
 //
 // Dieses Beispiel hier läuft auf dem Board D071, D072, D073 von Display 3000
 
+
+#ifdef DISP_3000
+
+
 #include <stdio.h>
 #include <avr/io.h>
 //#include <avr/wdt.h>
@@ -205,4 +209,4 @@ void LCD_End_drawing(void){
 	SET(LCD_SELECT);	// disable Chipselect
 }
 
-
+#endif // DISP_3000

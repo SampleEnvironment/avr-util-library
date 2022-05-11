@@ -1,9 +1,11 @@
 
 
+
+
+
+#ifdef ili9341
+#include "PinAllocation.h"
 #include "ili9341_driver.h"
-
-
-
 
 /*
 * ----------------------------------------------------------------------------
@@ -69,7 +71,7 @@ void glcd_led_off() {
 	*/
 
 
-	PORTD &= ~_BV(PIND6);
+	LCD_LED_PORT &= ~_BV(LCD_LED);
 }
 void glcd_led_on() {
 	/*
@@ -77,7 +79,7 @@ void glcd_led_on() {
 	PORTD |=  0b10000000;
 	*/
 
-	PORTD |= _BV(PIND6);
+	LCD_LED_PORT |= _BV(LCD_LED);
 
 }
 void glcd_rst_off() {
@@ -165,7 +167,7 @@ void glcd_setY(unsigned int y0,unsigned int y1)
 // Initialize the display
 //-------------------------------------------------------------------------------
 void LCD_Init(void){
-	DDRB = 248; //all Ports to output
+	DDRB = LCD_DDRB;  //all Ports to output
 	SPI_MasterInit();
 
 	glcd_cs_high();
@@ -358,3 +360,4 @@ void LCD_End_drawing(void){
 	glcd_cs_high(); //Disable chipselect
 }
 
+#endif // ili9341
