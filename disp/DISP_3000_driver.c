@@ -41,6 +41,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "DISP_3000_driver.h"
 
 
 const unsigned int LCD_Width  = MAX_X;

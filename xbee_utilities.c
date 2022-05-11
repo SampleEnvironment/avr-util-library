@@ -7,8 +7,7 @@
 #include <avr/io.h>
 #include <string.h>
 
-#include "../display_utilities.h"
-#include "../display.h"
+
 
 
 #include "xbee.h"
