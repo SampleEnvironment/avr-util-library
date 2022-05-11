@@ -68,7 +68,7 @@ extern volatile IP_v4Type GCM_IP;
 #define AT_ID					0x88	// In response to an AT Command message, the module will send an AT Command Response message.
 #define RX_ID					0x80	// RX Packet: 64-bit Address / When the module receives an RF packet, it is sent out the UART using this message type.
 #define STA_ID					0x8A	// RF module status messages are sent from the module in response to specific conditions.
-
+#define AT_REMOTE_ID			0x97    // response to remote AT Command
 
 
 //==============================================================

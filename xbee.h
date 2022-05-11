@@ -25,6 +25,10 @@ typedef struct
 	char * dev_id_str;  // pointer to device ID
 	uint8_t dev_id_str_len; // max len of dev_id
 	
+	double   scanDurarion;
+	uint16_t ScanChannels;
+	
+	char CoordIdentifier[21] ;
 }XbeeType;
 
 
@@ -229,6 +233,7 @@ void xbee_set_awake_period(uint8_t awake_period);
 uint8_t xbee_get_awake_period(void);
 void xbee_set_sleep_period(uint8_t sleep_period);
 uint8_t xbee_get_sleep_period(void);
+char* xbee_get_coordID(void);
 
 
 
