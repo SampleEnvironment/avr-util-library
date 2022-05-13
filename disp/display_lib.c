@@ -85,12 +85,21 @@ struct Logo
 
 
 
+#ifdef LOGO_SMALL
+
+struct Logo HZB_logo = {.w = 160,.h = 56, .data_len = 1120,.bytes_per_line = 20,.h_Blue = 37};
+extern const uint8_t HZB_LOGO_DISP_3000[] PROGMEM;
+#endif
+
+#ifdef LOGO_BIG
+struct Logo HZB_logo = {.w = 290,.h = 102, .data_len = 3774,.bytes_per_line = 37,.h_Blue = 65};
+extern const uint8_t HZB_LOGO_ili9341[] PROGMEM;
+#endif
+
 
 #ifdef ili9341
 
-struct Logo HZB_logo = {.w = 290,.h = 102, .data_len = 3774,.bytes_per_line = 37,.h_Blue = 65};
 
-extern const uint8_t HZB_LOGO_ili9341[] PROGMEM;
 
 
 
@@ -107,9 +116,7 @@ TFontInfo FontInfo[3] =
 
 #ifdef DISP_3000
 
-struct Logo HZB_logo = {.w = 160,.h = 56, .data_len = 1120,.bytes_per_line = 20,.h_Blue = 37};
 
-extern const uint8_t HZB_LOGO_DISP_3000[] PROGMEM;
 
 
 extern const uint8_t Font1[], Font2[] PROGMEM;	// Shared font arrays stored in Program-Memory
@@ -163,33 +170,25 @@ unsigned char XScale, unsigned char YScale, unsigned int ForeColor, unsigned int
 	
 	for (uint16_t LetterIndex = 0;LetterIndex<Len;LetterIndex++){
 		unsigned char Ch = Text[LetterIndex];				// Ch is the position of character data in the font table
-		if (Ch > 122)								// At the end of the font data some german special characters are defined
+		if (Ch > 125)								// At the end of the font data some german special characters are defined
 		{
 			switch (Ch)								// special treatment eliminates the storage of unused data
 			{
-				case 228: Ch = 127; break;			// ä is at Pos. 127 etc.
-				case 246: Ch = 128; break;			// ö
-				case 252: Ch = 129; break;			// ü
-				case 196: Ch = 130; break;			// Ä
-				case 214: Ch = 131; break;			// Ö
-				case 220: Ch = 132; break;			// Ü
-				case 223: Ch = 133; break;			// ß
+				case 228: Ch = 126; break;			// ä is at Pos. 127 etc.
+				case 246: Ch = 127; break;			// ö
+				case 252: Ch = 128; break;			// ü
+				case 196: Ch = 129; break;			// Ä
+				case 214: Ch = 130; break;			// Ö
+				case 220: Ch = 131; break;			// Ü
+				case 223: Ch = 132; break;			// ß
+				case 176: Ch = 133; break;			// °
+				case 179: Ch = 134; break;			// ³
 				default: Ch = '?'; break;				// not allowed: change to ?
 			}
 		}
-		if (Ch != 32 && FontNr == 2 ){
-			if (Ch < 64)
-			{
-				Ch -= 47;
-			}
-			else
-			{
-				Ch -= 54;
-			}
-		}
-		else{
-			Ch -= 32;
-		}
+		
+		Ch -= 32;
+
 		
 		
 		const uint16_t BytePos = Ch * BytePerChar; //determines Line in Font Table
@@ -323,15 +322,16 @@ void LCD_LOGO(uint16_t x, uint16_t y,uint16_t BackColor){
 	for (uint16_t arr_index = 0; arr_index < HZB_logo.data_len; arr_index++)
 	{
 
-		#ifdef ili9341
+		#ifdef LOGO_BIG
 		uint8_t Byte  = pgm_read_byte(&HZB_LOGO_ili9341[arr_index]);
-		#endif
-		
-		#ifdef DISP_3000
+		#endif // LOGO_BIG
+
+		#ifdef LOGO_SMALL
 		uint8_t Byte = pgm_read_byte(&HZB_LOGO_DISP_3000[arr_index]);
-		#endif
+		#endif // LOGO_SMALL
 
 		
+
 
 		for (int BMPbit=7; BMPbit >= 0; --BMPbit)	// check each bit of this  line
 		{

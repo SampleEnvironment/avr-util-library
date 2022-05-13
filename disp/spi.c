@@ -1,6 +1,8 @@
 #include <avr/io.h>
 #include "spi.h"
 
+#include "gcm_old_lcd_driver.h"
+
 
 #define DD_MOSI	PINB3
 #define DD_MISO	PINB4
@@ -27,14 +29,14 @@ SPI2X SPR1 SPR0 SCK_freq
 void SPI_MasterInit(void)
 {
 	
-	SPCR = (1<<SPE)|(1<<MSTR);			// enable SPI, SPI master
-	SPSR = (1<<SPI2X);				// clock rate fsck/2
+	//SPCR = (1<<SPE)|(1<<MSTR);			// enable SPI, SPI master
+	//SPSR = (1<<SPI2X);				// clock rate fsck/2
 }
 
 uint8_t SPI_MasterTransmit(uint8_t cData)
 {
 
-
+	/*
 	SPDR = cData;
 
 	
@@ -43,6 +45,9 @@ uint8_t SPI_MasterTransmit(uint8_t cData)
 	return SPDR;	// Za GLCD
 
 
+	return 0;
+	*/
+	LCD_ShiftOut(LCD_MOSI,LCD_CLK,cData);
 	return 0;
 }
 

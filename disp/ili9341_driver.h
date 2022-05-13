@@ -64,7 +64,6 @@ typedef enum
 #define MADCTL_MH  0x04  ///< LCD refresh right to left
 
 
-extern EWindowOrientation ili_Orientation;
 
 //#define PORTRAIT	0
 //#define LANDSCAPE	1
