@@ -186,9 +186,26 @@ unsigned char XScale, unsigned char YScale, unsigned int ForeColor, unsigned int
 				default: Ch = '?'; break;				// not allowed: change to ?
 			}
 		}
-		
-		Ch -= 32;
-
+		// remapping for Font3 SPACE,1,2,...,9,A,B,...,X,Y,Z
+		if (FontNr == 2)
+		{
+			if(Ch == 32 ){
+				Ch -= 32;
+			}
+			if (Ch > 47 && Ch < 58)
+			{
+				Ch -= 47;
+			}
+			if (Ch > 64 && Ch < 91)
+			{
+				Ch -= 54;
+			}
+			
+		}
+		else
+		{
+			Ch -= 32;
+		}
 		
 		
 		const uint16_t BytePos = Ch * BytePerChar; //determines Line in Font Table

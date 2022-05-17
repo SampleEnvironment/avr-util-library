@@ -44,7 +44,8 @@ XbeeType xbee = {
 	.sleeping = false,
 	.associated = 0,
 	.scanDurarion = 16.0,
-	.ScanChannels = 0x1FFE,
+	.ScanChannels = CHANNEL_MASK,
+	.ScanChannels_current = CHANNEL_MASK,
 	.CoordIdentifier = ""
 	
 };
@@ -54,6 +55,9 @@ void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_
 	print_info_AT   = printInfoFun;
 	xbee.dev_id_str = dev_ID_str;
 	xbee.dev_id_str_len = max_devid_str_len;
+	//xbee_Set_Scan_Channels(CHANNEL_MASK);
+	//xbee_WR();
+
 }
 
 void xbee_set_sleeping(_Bool sleeping){
@@ -106,16 +110,24 @@ inline void xbee_wake_up(void)
 
 // Reset connection with the xbee coordinator and initiate a new one
 // Returns true if reconnection is successful, false otherwise
-_Bool xbee_reset_connection(void)
+_Bool xbee_reset_connection(uint8_t force)
 {
 
 	// Clear frame_buffer if there is still some information in the queue
 	buffer_init();
 
-	if (!xbee_coordIdentifier())
+	if (force)
+	{
+		if(!xbee_DA_initiate_reassociation()) return 0;
+	}else if(!xbee_coordIdentifier())
 	{
 		if(!xbee_DA_initiate_reassociation()) return 0;
 	}
+	
+	
+
+
+
 
 	
 	uint8_t timeout_count = 0;
@@ -163,11 +175,11 @@ _Bool xbee_reset_connection(void)
 }
 
 // Try a new connection with the server
-uint8_t xbee_reconnect(void)
+uint8_t xbee_reconnect(uint8_t force_DA)
 {
 	_delay_ms(300);
 
-	if(!xbee_reset_connection())
+	if(!xbee_reset_connection(force_DA))
 	{
 		SET_ERROR(NETWORK_ERROR);
 		print_info_xbee(XBEE_NETWORK_ERROR, 0);
@@ -339,7 +351,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		
 		recon_already_tried = 1;
 		
-		if (xbee_reconnect()){
+		if (xbee_reconnect(0)){
 			print_info_xbee(XBEE_NO_NETWORK,0);
 			return reply_Id;
 		}
@@ -359,7 +371,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	if (reply_Id == 0xFF) 	// Transmit Failed
 	{
 		if (!recon_already_tried){ // Try reconnect then send again
-			if (!xbee_reconnect())
+			if (!xbee_reconnect(0))
 			{	// reconn successful
 				network_up = 1;
 				reply_Id = xbee_send_request_only( db_cmd_type,buffer,  length);
@@ -380,9 +392,34 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		if (network_up)
 		{
 			print_info_xbee(XBEE_NO_SERV,0);
+			_delay_ms(1000);
+			//TODO --> remove current CH from SC mask reassociate --> send messge again
+			//char print_temp_xbee[20];
+			//sprintf(print_temp_xbee,"before SC:%#04x",xbee_Scan_Channels());
+			//print_info_xbee(print_temp_xbee,0);
+			
+			print_info_xbee(XBEE_SWITCH_CHANNEL,0);
+			xbee_clear_Curr_Channel_from_SC();
+			xbee_WR();
+			//sprintf(print_temp_xbee,"after SC:%#04x",xbee_Scan_Channels());
+			//print_info_xbee(print_temp_xbee,0);
+		
+			//_delay_ms(4000);
+			
+			if (!xbee_reconnect(1))
+			{	// reconn successful
+				reply_Id = xbee_send_request_only( db_cmd_type,buffer,  length);
+			}
+			
+
 			
 			}else{
 			print_info_xbee(XBEE_NO_NETWORK, 0);
+			_delay_ms(500);
+			// reset Scan Mask 
+			print_info_xbee(XBEE_RESET_SC,0);
+			xbee_Set_Scan_Channels(xbee.ScanChannels);
+			_delay_ms(500);
 		}
 		
 		_delay_ms(1000);
@@ -426,7 +463,7 @@ uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		}
 		print_info_xbee(XBEE_RECONNECTING, 0);
 
-		xbee_reconnect();
+		xbee_reconnect(0);
 	}
 	
 	if(!CHECK_ERROR(NETWORK_ERROR))

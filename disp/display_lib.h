@@ -224,7 +224,7 @@
 	#define NOFILL  0
 
 
-	/*
+	
 	#ifdef LEVELMETER
 	
 	#ifdef ili9341
@@ -242,9 +242,9 @@
 	#define LOGO_SMALL
 	#endif // ili9341
 	#endif // GASCOUNTER_MODULE
-*/
+	/*
 	#define LOGO_SMALL
-
+	*/
 
 
 	#endif /* DISPLAY_LIB_H_ */

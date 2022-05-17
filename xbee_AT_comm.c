@@ -579,6 +579,25 @@ uint8_t xbee_Assiciation_indication(void){
 }
 
 
+uint8_t xbee_clear_Curr_Channel_from_SC(void){
+	
+	// get current operating CH
+	uint8_t currCh = xbee_channel();
+	
+	// default channelmask (to avoid successively removing more and more channels)
+	xbee.ScanChannels_current = xbee.ScanChannels;
+	
+	// remove current channel from SC mask
+	xbee.ScanChannels_current &=~(1<<(currCh-0xB));
+	
+	// set new SC Mask
+	return xbee_Set_Scan_Channels(xbee.ScanChannels_current);
+	
+	
+	
+	
+}
+
 uint16_t xbee_Scan_Channels(void){
 	AT_commandType AT_command;
 	

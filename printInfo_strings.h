@@ -32,6 +32,8 @@
 #define XBEE_PING				"Ping.."
 #define XBEE_PING_OK            "PingOK"
 #define XBEE_NO_SERV			"...no Server"
+#define XBEE_SWITCH_CHANNEL     "Switch Channel"
+#define XBEE_RESET_SC			"Reset SC"
 #endif
 
 #ifdef  GASCOUNTER_MODULE
@@ -54,6 +56,8 @@
 #define XBEE_PING				"Ping.."
 #define XBEE_PING_OK            "PingOK"
 #define XBEE_NO_SERV			"no Serv"
+#define XBEE_SWITCH_CHANNEL     "SwChan"
+#define XBEE_RESET_SC			"Res SC"
 #endif
 
 #ifdef  ILM_MODULE
@@ -76,6 +80,8 @@
 #define XBEE_PING				"Ping.."
 #define XBEE_PING_OK            "PingOK"
 #define XBEE_NO_SERV			"no Serv"
+#define XBEE_SWITCH_CHANNEL     "SwChan"
+#define XBEE_RESET_SC			"Res SC"
 #endif
 
 

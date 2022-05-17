@@ -12,7 +12,7 @@
 #include "heap.h"
 #include "xbee.h"
 
-
+#define CHANNEL_MASK 0x1F80
 
 typedef struct
 {
@@ -125,6 +125,7 @@ uint8_t xbee_set_coordinator_Enable(uint8_t CE);
 uint8_t xbee_Assiciation_indication(void);
 uint16_t xbee_Scan_Channels(void);
 uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield);
+uint8_t xbee_clear_Curr_Channel_from_SC(void);
 uint8_t xbee_Active_Scan(void);
 uint8_t xbee_WR(void);
 uint16_t xbee_hardware_version(void);

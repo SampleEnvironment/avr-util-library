@@ -27,6 +27,7 @@ typedef struct
 	
 	double   scanDurarion;
 	uint16_t ScanChannels;
+	uint16_t ScanChannels_current;
 	
 	char CoordIdentifier[21] ;
 }XbeeType;
@@ -55,7 +56,7 @@ typedef enum
 	
 }XBEE_HW_VERSION;
 
-#define COM_TIMEOUT_TIME 	10 // timeout for xbee connection in seconds
+#define COM_TIMEOUT_TIME 	5 // timeout for xbee connection in seconds
 
 
 //TODO RF Data can only be 100 Bytes --> TEST CASE
@@ -243,11 +244,11 @@ void xbee_wake_up_plus(void);
 void xbee_sleep_plus(void);
 
 
-_Bool xbee_reset_connection(void);		// Reset connection with the xbee coordinator and initiate a new one
+_Bool xbee_reset_connection(uint8_t force);		// Reset connection with the xbee coordinator and initiate a new one
 // Returns true if reconnection is successfull, false otherwise
 
 
-uint8_t xbee_reconnect(void);			// Try a new connection with the server
+uint8_t xbee_reconnect(uint8_t force_DA);			// Try a new connection with the server
 void xbee_send(uint8_t *data);			// Start USART0 transmission to XBee module
 void xbee_send_msg(uint8_t *buffer, uint8_t length);	// Send message via XBee module
 uint8_t xbee_send_and_get_reply(uint8_t *buffer, uint8_t length, uint8_t db_cmd_type, uint16_t comTimeOut);	// Send message (if length not 0) and look for reply from database and copy data to the buffer
