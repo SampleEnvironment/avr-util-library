@@ -411,7 +411,11 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 				reply_Id = xbee_send_request_only( db_cmd_type,buffer,  length);
 			}
 			
-
+			if (reply_Id != 0xFF)
+			{
+				xbee_coordIdentifier();
+				return reply_Id;
+			}
 			
 			}else{
 			print_info_xbee(XBEE_NO_NETWORK, 0);
