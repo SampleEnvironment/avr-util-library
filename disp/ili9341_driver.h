@@ -7,7 +7,7 @@
 #define ILI9341_DRIVER_H
 
 
-#ifdef ili9341
+
 
 
 
@@ -96,6 +96,6 @@ void LCD_SPI_Int(unsigned int Value);
 void LCD_End_drawing(void);
 
 
-#endif // ili9341
+
 
 #endif  // display_driver.h0

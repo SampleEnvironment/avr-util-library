@@ -46,7 +46,8 @@ XbeeType xbee = {
 	.scanDurarion = 16.0,
 	.ScanChannels = CHANNEL_MASK,
 	.ScanChannels_current = CHANNEL_MASK,
-	.CoordIdentifier = ""
+	.CoordIdentifier = "",
+	.netstat = ONLINE
 	
 };
 
@@ -183,6 +184,7 @@ uint8_t xbee_reconnect(uint8_t force_DA)
 	{
 		SET_ERROR(NETWORK_ERROR);
 		print_info_xbee(XBEE_NETWORK_ERROR, 0);
+		xbee.netstat = NO_NETWORK;
 		_delay_ms(300);
 		return 1;
 	}
@@ -197,6 +199,7 @@ uint8_t xbee_reconnect(uint8_t force_DA)
 
 	
 	_delay_ms(1000);
+	xbee_coordIdentifier();
 	return 0;
 
 
@@ -392,18 +395,13 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		if (network_up)
 		{
 			print_info_xbee(XBEE_NO_SERV,0);
-			_delay_ms(1000);
-			//TODO --> remove current CH from SC mask reassociate --> send messge again
-			//char print_temp_xbee[20];
-			//sprintf(print_temp_xbee,"before SC:%#04x",xbee_Scan_Channels());
-			//print_info_xbee(print_temp_xbee,0);
 			
+			_delay_ms(1000);
 			print_info_xbee(XBEE_SWITCH_CHANNEL,0);
 			xbee_clear_Curr_Channel_from_SC();
 			xbee_WR();
-			//sprintf(print_temp_xbee,"after SC:%#04x",xbee_Scan_Channels());
-			//print_info_xbee(print_temp_xbee,0);
-		
+
+			
 			//_delay_ms(4000);
 			
 			if (!xbee_reconnect(1))
@@ -416,11 +414,15 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 				xbee_coordIdentifier();
 				return reply_Id;
 			}
+			xbee.netstat = NO_SERVER;
 			
-			}else{
+		}
+		else
+		{
 			print_info_xbee(XBEE_NO_NETWORK, 0);
+			xbee.netstat = NO_NETWORK;
 			_delay_ms(500);
-			// reset Scan Mask 
+			// reset Scan Mask
 			print_info_xbee(XBEE_RESET_SC,0);
 			xbee_Set_Scan_Channels(xbee.ScanChannels);
 			_delay_ms(500);

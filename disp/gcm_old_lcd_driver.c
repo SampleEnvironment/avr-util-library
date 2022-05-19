@@ -13,19 +13,13 @@
 
 
 //TODO move to display file
-/*
 
-InitScreenType InitScreen_old = {
-	.ForeColor = ERR,
-	.BackColor = BGC,
+
+InitScreenType_gcm_disp InitScreen_old = {
 	.MaxNoOfLines = 6,
 	.NextLine = 1,
-	.LineFeed = 0,
-	.FontNr = 1,
-	.XScale = 1,
-	.YScale = 1
+	.LineFeed = 0
 };
-*/
 
 
 
@@ -507,7 +501,7 @@ void LCD_ShiftOut(uint8_t data_pin, uint8_t clock_pin, uint8_t data)
  * @return void
  */
 
-/*
+
 void LCD_InitScreen_AddLine(char* Text, const char FirstLine)
 {
 	if (FirstLine)
@@ -527,7 +521,7 @@ void LCD_InitScreen_AddLine(char* Text, const char FirstLine)
 
 }
 
-*/
+
 
 /**
  * @brief Used to display system info/status in the bottom right corner of the display

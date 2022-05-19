@@ -241,6 +241,10 @@
 	#ifdef ili9341
 	#define LOGO_SMALL
 	#endif // ili9341
+	
+	#ifdef GCM_old_disp
+	#define LOGO_SMALL
+#endif
 	#endif // GASCOUNTER_MODULE
 	/*
 	#define LOGO_SMALL

@@ -17,6 +17,8 @@
 #include "heap.h"
 
 
+
+
 void (*print_info_AT)(char *, _Bool )  = NULL;
 
 
@@ -250,7 +252,6 @@ uint8_t xbee_coordIdentifier(void){
 	
 	memcpy(xbee.CoordIdentifier,AT_command.data,AT_command.data_len*sizeof(char));
 	xbee.CoordIdentifier[AT_command.data_len] = '\0'; // null terminator anfügen
-	
 	
 	
 	return 1;

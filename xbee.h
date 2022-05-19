@@ -8,28 +8,36 @@
 #include "usart.h"
 
 
+typedef enum
+{
+	ONLINE,
+	NO_SERVER,
+	NO_NETWORK
+	
+}NETSTAT_TYPE;
 
 //====================================================================
 //			XBEE
 //====================================================================
 typedef struct
 {
-	uint32_t 	dest_low ;	//0x1234;
-	uint32_t 	dest_high ;	//0x5678;
+	uint32_t 	 dest_low ;	//0x1234;
+	uint32_t 	 dest_high ;	//0x5678;
 
 	// Variables for XBee interface
-	uint8_t		sleep_period;		// in minutes
-	uint8_t		awake_period;     // in seconds
-	_Bool 		sleeping ;
-	volatile uint8_t associated ;
-	char * dev_id_str;  // pointer to device ID
-	uint8_t dev_id_str_len; // max len of dev_id
+	uint8_t		 sleep_period;	// in minutes
+	uint8_t		 awake_period;   // in seconds
+	_Bool 		 sleeping ;
+	volatile     uint8_t associated ;
+	char *       dev_id_str;     // pointer to device ID
+	uint8_t      dev_id_str_len; // max len of dev_id
 	
-	double   scanDurarion;
-	uint16_t ScanChannels;
-	uint16_t ScanChannels_current;
+	double       scanDurarion;
+	uint16_t     ScanChannels;
+	uint16_t     ScanChannels_current;
 	
-	char CoordIdentifier[21] ;
+	char         CoordIdentifier[21] ;
+	NETSTAT_TYPE netstat;
 }XbeeType;
 
 
@@ -48,13 +56,15 @@ typedef struct {
 //==============================================================
 
 
-typedef enum 
+typedef enum
 {
 	XPORT,
 	XBEE_V_S1 ,
 	XBEE_V_SC2
 	
 }XBEE_HW_VERSION;
+
+
 
 #define COM_TIMEOUT_TIME 	5 // timeout for xbee connection in seconds
 

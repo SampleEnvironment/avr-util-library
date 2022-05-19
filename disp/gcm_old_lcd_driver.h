@@ -104,7 +104,7 @@ void LCD_Clear_row_from_column(uint8_t x, uint8_t y);
 void LCD_Clear_row_from_column_to_column(uint8_t from_x, uint8_t to_x, uint8_t y);
 void LCD_String(char *characters, uint8_t x, uint8_t y);
 void LCD_Value(int64_t number, uint8_t dot_point, uint8_t x, uint8_t y, const char *unit);
-
+void LCD_InitScreen_AddLine(char* Text, const char FirstLine);
 
 void LCD_drawLine(void);
 
@@ -114,6 +114,12 @@ void LCD_InitScreen_AddLine(char* Text, const char first_line);
 
 void LCD_paint_info_line(char *line, _Bool update);
 
+
+typedef struct {
+	uint8_t  MaxNoOfLines;
+	uint8_t  NextLine;
+	uint8_t  LineFeed;
+}InitScreenType_gcm_disp;
 
 
 static const uint8_t ASCII[][5] =

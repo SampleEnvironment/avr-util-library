@@ -50,6 +50,10 @@
 #include "DISP_3000_driver.h"
 #endif
 
+#ifdef GCM_old_disp  //TODO --> more elegant solution needed not really needed only for compilation
+#include "ili9341_driver.h"
+#endif
+
 #include "fontConfig.h"
 
 
