@@ -41,11 +41,11 @@
 #ifdef GASCOUNTER_MODULE
 
 #ifdef ili9341
-#define LCD_CLK 		PINB3		// Clock
+#define LCD_CLK 		PINB7		// Clock
 #define LCD_RESET 		PINB6		// Reset Display
-#define LCD_SELECT 		PINB7		// Cable Select
-#define LCD_DC 			PINB5		// Data/Command
-#define LCD_MOSI 		PINB4		// Send Data
+#define LCD_SELECT 		PINB3		// Cable Select
+#define LCD_DC 			PINB4		// Data/Command
+#define LCD_MOSI 		PINB5		// Send Data
 #define LCD_LED         PIND6		// LCD Backlight
 #define LCD_PORT PORTB
 #define LCD_LED_PORT PORTD

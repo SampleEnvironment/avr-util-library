@@ -77,7 +77,7 @@ typedef enum
 
 extern UsartType USART0;
 extern VersionType version;
-
+extern XbeeType xbee;
 
 
 

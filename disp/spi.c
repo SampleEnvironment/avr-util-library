@@ -29,14 +29,14 @@ SPI2X SPR1 SPR0 SCK_freq
 void SPI_MasterInit(void)
 {
 	
-	//SPCR = (1<<SPE)|(1<<MSTR);			// enable SPI, SPI master
-	//SPSR = (1<<SPI2X);				// clock rate fsck/2
+	SPCR = (1<<SPE)|(1<<MSTR);			// enable SPI, SPI master
+	SPSR = (1<<SPI2X);				// clock rate fsck/2
 }
 
 uint8_t SPI_MasterTransmit(uint8_t cData)
 {
 
-	/*
+
 	SPDR = cData;
 
 	
@@ -46,10 +46,10 @@ uint8_t SPI_MasterTransmit(uint8_t cData)
 
 
 	return 0;
-	*/
+	/*
 	LCD_ShiftOut(LCD_MOSI,LCD_CLK,cData);
 	return 0;
-	
+	*/
 }
 
 void SPI_SlaveInit(void)
