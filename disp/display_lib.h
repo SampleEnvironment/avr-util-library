@@ -216,6 +216,7 @@
 	void LCD_vline(unsigned int x0, unsigned int y0, unsigned int length, unsigned int color);
 
 	void LCD_Draw_Cross(uint16_t x0,uint16_t y0,uint16_t x1,uint16_t y1);
+	void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_t color);
 
 	#define THICK   1
 	#define THIN    0

@@ -96,7 +96,8 @@ typedef enum
 	ZS_MSG_TYPE,					// Stack profile
 	NJ_MSG_TYPE,					// Node Join Time
 	A1_MSG_TYPE,					// coordinator behavior
-	A2_MSG_TYPE						// end dev behaviour
+	A2_MSG_TYPE,					// end dev behaviour
+	DB_MSG_TYPE						// RSSI of last received message
 }AT_MESSAGE;
 
 
@@ -124,6 +125,7 @@ uint8_t xbee_coordinator_Enable(void);
 uint8_t xbee_set_coordinator_Enable(uint8_t CE);
 uint8_t xbee_Assiciation_indication(void);
 uint16_t xbee_Scan_Channels(void);
+int8_t xbee_get_DB(void);
 uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield);
 uint8_t xbee_clear_Curr_Channel_from_SC(void);
 uint8_t xbee_Active_Scan(void);

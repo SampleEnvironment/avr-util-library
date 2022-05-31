@@ -38,6 +38,8 @@ typedef struct
 	
 	char         CoordIdentifier[21] ;
 	NETSTAT_TYPE netstat;
+	
+	int8_t  RSSI; // rssi of last received packet
 }XbeeType;
 
 

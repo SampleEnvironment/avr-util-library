@@ -25,7 +25,7 @@ void (*print_info_AT)(char *, _Bool )  = NULL;
 PanPoolType Pans;
 
 
-char AT_Lut[21] [2] = {
+char AT_Lut[22] [2] = {
 	{'D','A'},
 	{'D','H'},
 	{'D','L'},
@@ -46,7 +46,8 @@ char AT_Lut[21] [2] = {
 	{'Z','S'},
 	{'N','J'},
 	{'A','1'},
-	{'A','2'}
+	{'A','2'},
+	{'D','B'}
 	
 };
 
@@ -203,6 +204,33 @@ uint16_t xbee_get_Scan_duration(void){
 	
 	
 }
+
+
+int8_t xbee_get_DB(void){
+		AT_commandType AT_command;
+		
+		initAt_read(&AT_command,DB_MSG_TYPE);
+		
+		send_AT(&AT_command);
+		
+		if (AT_command.AnswerReceived == false)  	// NO Answer from xbee --> not associated
+		{
+			return 0;
+		}
+		if (AT_command.byte != 0)
+		{
+			xbee.RSSI = AT_command.byte;
+			
+			return 1;
+					
+			
+		}
+		
+		return 0;
+		
+}
+
+
 uint8_t xbee_set_Scan_Duration(uint8_t dur_exp){
 	
 	AT_commandType AT_command;

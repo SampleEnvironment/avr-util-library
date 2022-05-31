@@ -116,6 +116,7 @@ inline uint8_t get_at_frame_type(char *id, uint8_t len)
 	if((id[0] == 'N') && (id[1] == 'J')) return NJ_MSG_TYPE;
 	if((id[0] == 'A') && (id[1] == '1')) return A1_MSG_TYPE;
 	if((id[0] == 'A') && (id[1] == '2')) return A2_MSG_TYPE;
+	if((id[0] == 'D') && (id[1] == 'B')) return DB_MSG_TYPE;
 	
 	return 0;
 }

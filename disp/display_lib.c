@@ -547,7 +547,67 @@ void LCD_Draw_Cross(uint16_t x0,uint16_t y0,uint16_t x1,uint16_t y1){
 	LCD_Draw(x0,y1,x1,y0,0,red);
 }
 
+void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_t color){
+		
+	LCD_Box(x,y,x+FONT2_W*2,y+FONT2_H,black);
+	
+	uint16_t colors [5][4]= {
+		{grey, grey, grey, grey},
+		{color,grey, grey, grey},
+		{color,color,grey, grey},
+		{color,color,color,grey},
+		{color,color,color,color}			
+	};
 
+	uint8_t k = 0;
+	
+
+	if(NoNetw){
+		k = 0;
+	}else{
+		if (RSSI <= 40)
+		{
+			k = 4;
+
+		}
+		if (RSSI > 40)
+		{
+			k = 3;
+		}
+		if (RSSI > 50)
+		{
+			k = 2;
+		}
+		if (RSSI > 60)
+		{
+			k = 1;
+		}
+	}
+	 
+	
+	
+	uint16_t x0  = 2;
+	uint16_t y0  = 18;
+	
+	uint16_t bar_w = 2;
+	
+	uint16_t bar_spacing = 2;
+	
+	uint16_t bar_h = 3;
+	uint16_t bar_min_h = 3;
+	
+	for (uint16_t i=0;i <4; i++)
+	{
+		uint16_t offset = (bar_w + bar_spacing) *i;
+		
+		uint16_t yoffs = (bar_h * i);
+		
+		LCD_Box(x+x0+offset,y+y0-(bar_min_h+yoffs),x+x0+bar_w+offset,y+y0,colors[k][i]);
+	}
+	 
+	
+
+}
 
 
 

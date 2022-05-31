@@ -47,7 +47,8 @@ XbeeType xbee = {
 	.ScanChannels = CHANNEL_MASK,
 	.ScanChannels_current = CHANNEL_MASK,
 	.CoordIdentifier = "",
-	.netstat = ONLINE
+	.netstat = ONLINE,
+	.RSSI = 0
 	
 };
 
