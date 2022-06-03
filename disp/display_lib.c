@@ -596,6 +596,8 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 	uint16_t bar_h = 3;
 	uint16_t bar_min_h = 3;
 	
+	uint16_t nonetw_barpos = 11 ;
+	
 	for (uint16_t i=0;i <4; i++)
 	{
 		uint16_t offset = (bar_w + bar_spacing) *i;
@@ -603,6 +605,11 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 		uint16_t yoffs = (bar_h * i);
 		
 		LCD_Box(x+x0+offset,y+y0-(bar_min_h+yoffs),x+x0+bar_w+offset,y+y0,colors[k][i]);
+	}
+	
+	if (NoNetw)
+	{
+		LCD_Box(x,y+nonetw_barpos,x+x0+(4*(bar_w+bar_spacing))+2,y+nonetw_barpos+1,grey);
 	}
 	 
 	
