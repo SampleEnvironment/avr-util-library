@@ -6,7 +6,7 @@
 #include <util/delay.h>
 #include "module_globals.h"
 #include "usart.h"
-
+#include "../config.h"
 
 typedef enum
 {
@@ -65,6 +65,14 @@ typedef enum
 	XBEE_V_SC2
 	
 }XBEE_HW_VERSION;
+
+
+#ifdef HZB
+#define SC_MASK_DEFAULT 0x1F80
+#else 
+#define SC_MASK_DEFAULT 0x1FFE
+#endif
+
 
 
 

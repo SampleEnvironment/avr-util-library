@@ -549,10 +549,10 @@ void LCD_Draw_Cross(uint16_t x0,uint16_t y0,uint16_t x1,uint16_t y1){
 
 void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_t color){
 		
-	LCD_Box(x,y,x+FONT2_W*2,y+FONT2_H,black);
+	LCD_Box(x,y,x+BOX_W_SIGSTRENGTH*2,y+BOX_H_SIGSTRENGTH,black);
 	
 	uint16_t colors [5][4]= {
-		{grey, grey, grey, grey},
+		{white,white, white, white},
 		{color,grey, grey, grey},
 		{color,color,grey, grey},
 		{color,color,color,grey},
@@ -586,17 +586,17 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 	 
 	
 	
-	uint16_t x0  = 2;
-	uint16_t y0  = 18;
+	uint16_t x0  = X0_SiGSTRENTH;
+	uint16_t y0  = Y0_SiGSTRENTH;
 	
-	uint16_t bar_w = 2;
+	uint16_t bar_w = BAR_W_SIGSTRENGTH;
 	
-	uint16_t bar_spacing = 2;
+	uint16_t bar_spacing = BAR_SPACEING_SIGSTRENGTH;
 	
-	uint16_t bar_h = 3;
-	uint16_t bar_min_h = 3;
+	uint16_t bar_h = BAR_H_SIGSTRENGTH;
+	uint16_t bar_min_h = BAR_MIN_H_SIGSTRENGTH;
 	
-	uint16_t nonetw_barpos = 11 ;
+	uint16_t nonetw_barpos = NOW_NETW_BAR_POS_SIGSTENGTH ;
 	
 	for (uint16_t i=0;i <4; i++)
 	{
@@ -609,7 +609,7 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 	
 	if (NoNetw)
 	{
-		LCD_Box(x,y+nonetw_barpos,x+x0+(4*(bar_w+bar_spacing))+2,y+nonetw_barpos+1,grey);
+		LCD_Box(x,y+nonetw_barpos,x+x0+(4*(bar_w+bar_spacing))+2,y+nonetw_barpos+bar_w,color);
 	}
 	 
 	

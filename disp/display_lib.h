@@ -230,10 +230,35 @@
 	
 	#ifdef ili9341
 	#define LOGO_BIG
+	
+	#define BOX_W_SIGSTRENGTH 12
+	#define BOX_H_SIGSTRENGTH 24
+	
+	#define X0_SiGSTRENTH 2
+	#define Y0_SiGSTRENTH 18
+
+	#define BAR_W_SIGSTRENGTH 2
+	#define BAR_SPACEING_SIGSTRENGTH 2
+	#define BAR_H_SIGSTRENGTH 3
+	#define BAR_MIN_H_SIGSTRENGTH 3
+	#define NOW_NETW_BAR_POS_SIGSTENGTH 11
+
+	
 	#endif // ili9341
 	
 	#ifdef DISP_3000
 	#define LOGO_SMALL
+		#define BOX_W_SIGSTRENGTH 6
+		#define BOX_H_SIGSTRENGTH 9
+		
+		#define X0_SiGSTRENTH 4
+		#define Y0_SiGSTRENTH 7
+
+		#define BAR_W_SIGSTRENGTH 0
+		#define BAR_SPACEING_SIGSTRENGTH 2
+		#define BAR_H_SIGSTRENGTH 2
+		#define BAR_MIN_H_SIGSTRENGTH 1
+		#define NOW_NETW_BAR_POS_SIGSTENGTH 4
 	#endif // DISP_3000
 	
 	#endif // LEVELMETER
@@ -241,6 +266,18 @@
 	#ifdef GASCOUNTER_MODULE
 	#ifdef ili9341
 	#define LOGO_SMALL
+	#define BOX_W_SIGSTRENGTH 12
+	#define BOX_H_SIGSTRENGTH 24
+	
+	#define X0_SiGSTRENTH 2
+	#define Y0_SiGSTRENTH 18
+
+	#define BAR_W_SIGSTRENGTH 2
+	#define BAR_SPACEING_SIGSTRENGTH 2
+	#define BAR_H_SIGSTRENGTH 3
+	#define BAR_MIN_H_SIGSTRENGTH 3
+	#define NOW_NETW_BAR_POS_SIGSTENGTH 11
+	
 	#endif // ili9341
 	
 	#ifdef GCM_old_disp

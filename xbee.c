@@ -186,6 +186,7 @@ uint8_t xbee_reconnect(uint8_t force_DA)
 		SET_ERROR(NETWORK_ERROR);
 		print_info_xbee(XBEE_NETWORK_ERROR, 0);
 		xbee.netstat = NO_NETWORK;
+
 		_delay_ms(300);
 		return 1;
 	}
@@ -321,7 +322,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 		}
 		_delay_ms(300);
 		
-
+		xbee.netstat = ONLINE;
 		CLEAR_ALL();  // Clears all newtwork related ERRORS
 	}
 	
@@ -356,7 +357,10 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		recon_already_tried = 1;
 		
 		if (xbee_reconnect(0)){
+			xbee_Set_Scan_Channels(SC_MASK_DEFAULT);
+			xbee_WR();
 			print_info_xbee(XBEE_NO_NETWORK,0);
+			xbee.netstat = NO_NETWORK;
 			return reply_Id;
 		}
 	}
@@ -396,6 +400,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		if (network_up)
 		{
 			print_info_xbee(XBEE_NO_SERV,0);
+			xbee.netstat = NO_SERVER;
 			
 			_delay_ms(1000);
 			print_info_xbee(XBEE_SWITCH_CHANNEL,0);
@@ -408,14 +413,17 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 			if (!xbee_reconnect(1))
 			{	// reconn successful
 				reply_Id = xbee_send_request_only( db_cmd_type,buffer,  length);
+			}else{
+				xbee.netstat = NO_NETWORK;
 			}
 			
 			if (reply_Id != 0xFF)
 			{
+				xbee.netstat = ONLINE;
 				xbee_coordIdentifier();
 				return reply_Id;
 			}
-			xbee.netstat = NO_SERVER;
+
 			
 		}
 		else
@@ -448,8 +456,11 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 			//							SET_ERROR(LETTERS_ERROR);
 			break;
 		}
+	}else{
+			xbee.netstat = ONLINE;
 	}
 	_delay_ms(1000);
+
 	return reply_Id;
 }
 
