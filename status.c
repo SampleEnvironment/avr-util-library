@@ -24,10 +24,12 @@ uint16_t get_status(void){
 
 void SET_ERROR(enum StatusBit Bit){
 	status|=(1<<Bit);
+	status_reset_on_send|=(1<<Bit);
 }
 
 void CLEAR_ERROR(enum StatusBit Bit){
 	status&=~(1<<Bit);
+	status_reset_on_send&=~(1<<Bit);
 }
 
 _Bool CHECK_ERROR(enum StatusBit Bit){

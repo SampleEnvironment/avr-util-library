@@ -15,6 +15,7 @@
 #include <time.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <util/eu_dst.h>
 
 
 #include "DS3231M.h"
@@ -40,16 +41,12 @@
 * Holds current Time (seconds, minutes and hours), and Date (days, months, and year)
 */
 struct tm Time;
+time_t sys_Time;
 
-
-time_t last_Valid_Time = 0;
 
 int8_t temp_MSB;
 uint8_t temp_LSB;
 double DS3231M_Temperature;
-
-
-uint32_t syst_at_last_Valid_Time;
 
 
 /**
@@ -140,8 +137,11 @@ void DS3231M_set_time(struct tm *newtime)
 {
 
 	//Funtrace_enter(12);
+	
 
-	if (!connected.TWI)	{return;}
+	
+
+
 	
 	//FUNCTION_TRACE
 
@@ -167,6 +167,8 @@ void DS3231M_set_time(struct tm *newtime)
 	//newtime->tm_year += 100;
 	
 	
+	
+	
 	struct tm Time_copy;
 	
 	Time_copy.tm_sec = newtime->tm_sec;
@@ -175,15 +177,17 @@ void DS3231M_set_time(struct tm *newtime)
 	Time_copy.tm_mday = newtime->tm_mday;
 	Time_copy.tm_mon = newtime->tm_mon - 1 ;
 	Time_copy.tm_year = newtime->tm_year +100;
-	Time.tm_isdst =-1;
+	Time_copy.tm_isdst = -1;
 	
-	
-	
-	
-	
-	last_Valid_Time = mktime(&Time_copy);
-	syst_at_last_Valid_Time = count_t_elapsed;
 
+
+	
+	set_dst(&eu_dst);
+	set_zone(0);
+
+	set_system_time(mktime(&Time_copy));
+	
+	if (!connected.TWI)	{return;}
 	
 	uint8_t i2c_ret_code = I2C_write_to(DS3231M_address,DS3231M_address_seconds, data, 7);
 	
@@ -214,7 +218,12 @@ void DS3231M_set_time(struct tm *newtime)
 void DS3231M_read_time(void)
 {
 	//Funtrace_enter(13);
-	if (!connected.TWI)	{return;}
+	if (!connected.TWI)	{
+
+		DS3231M_estimate_sys_Time();
+
+		return;
+	}
 	
 	uint8_t data[7];
 	uint8_t i2c_ret_code = I2C_read_from(DS3231M_address,DS3231M_address_seconds,data,7);
@@ -226,7 +235,9 @@ void DS3231M_read_time(void)
 		SET_ERROR(TIMER_ERROR);
 		_delay_ms(2000);
 
-		//DS3231M_estimate_sys_Time();
+
+		DS3231M_estimate_sys_Time();
+
 		return;
 	}
 	if(i2c_ret_code == DEVICE_NOT_CONNECTED){
@@ -234,7 +245,9 @@ void DS3231M_read_time(void)
 		SET_ERROR(I2C_BUS_ERROR);
 		SET_ERROR(TIMER_ERROR);
 
-		//DS3231M_estimate_sys_Time();
+
+		DS3231M_estimate_sys_Time();
+
 		return;
 	}
 
@@ -261,7 +274,9 @@ void DS3231M_read_time(void)
 		}else{
 		SET_ERROR(TIMER_ERROR);
 		
-		//DS3231M_estimate_sys_Time();
+
+		DS3231M_estimate_sys_Time();
+
 
 		return;
 
@@ -312,13 +327,11 @@ uint8_t decodeDS3231M(uint8_t element){
 }
 
 void DS3231M_estimate_sys_Time(void){
-
-
+	
+	time(&sys_Time);
 	
 
-	time_t curr_time = last_Valid_Time + (count_t_elapsed - syst_at_last_Valid_Time);
-
-	struct tm * curr_t_est  = gmtime(&curr_time);
+	struct tm * curr_t_est  = 	localtime(&sys_Time);
 
 	Time.tm_sec  = curr_t_est->tm_sec;
 	Time.tm_min  = curr_t_est->tm_min;
@@ -340,39 +353,7 @@ uint8_t DS3231M_concurrency_check(  struct tm *ds_Time){
 	{
 		return 0;
 	}
-	/*
-	// if there last valid time is not initialized yet, the the concurrencycheck defaults to pass
-	if (last_Valid_Time == 0)
-	{
-		return 1;
-	}
 
-	// ds3231m to time.h represenatation
-	ds_Time->tm_year += 100;
-	ds_Time->tm_mon  -= 1;
-
-	time_t curr_time_estimate = last_Valid_Time + (count_t_elapsed - syst_at_last_Valid_Time);
-	//printf("est:%i\n",curr_time_estimate);
-
-	ds_Time->tm_isdst =-1;
-
-	time_t curr_time_DS3231M  =  mktime( ds_Time);
-	//printf("ds3:%i\n",curr_time_DS3231M);
-
-	uint32_t time_drift = abs(curr_time_estimate-curr_time_DS3231M);
-	//printf("drif:%i\n",time_drift);
-
-	if(time_drift > MAX_t_DRIFT){
-		//back to ds3231m represenatation
-		ds_Time->tm_year -= 100;
-		ds_Time->tm_mon  += 1;
-		return 0;
-	}
-	
-	//back to ds3231m represenatation
-	ds_Time->tm_year -= 100;
-	ds_Time->tm_mon  += 1;
-	*/
 	return 1;
 
 

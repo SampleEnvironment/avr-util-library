@@ -282,6 +282,19 @@
 	
 	#ifdef GCM_old_disp
 	#define LOGO_SMALL
+	
+		#define LOGO_SMALL
+		#define BOX_W_SIGSTRENGTH 12
+		#define BOX_H_SIGSTRENGTH 24
+		
+		#define X0_SiGSTRENTH 2
+		#define Y0_SiGSTRENTH 18
+
+		#define BAR_W_SIGSTRENGTH 2
+		#define BAR_SPACEING_SIGSTRENGTH 2
+		#define BAR_H_SIGSTRENGTH 3
+		#define BAR_MIN_H_SIGSTRENGTH 3
+		#define NOW_NETW_BAR_POS_SIGSTENGTH 11
 #endif
 	#endif // GASCOUNTER_MODULE
 	/*
