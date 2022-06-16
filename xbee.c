@@ -195,12 +195,14 @@ uint8_t xbee_reconnect(uint8_t force_DA)
 		SET_ERROR(NETWORK_ERROR);
 		print_info_xbee(XBEE_NETWORK_ERROR_ADDR , 0);
 		_delay_ms(300);
+		xbee_get_DB();
 		return 1;
 	}
 	CLEAR_ERROR(NETWORK_ERROR);		// Successfully reconnected, clear network error
 
 	
 	_delay_ms(1000);
+	xbee_get_DB();
 	xbee_coordIdentifier();
 	return 0;
 
@@ -328,7 +330,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 	
 	
 
-	
+	xbee_get_DB();
 	return reply_Id; //if you want to get reply data afterwards
 	//note, that data copied to buffer anyway, delete memcpy and use frameBuffer[index].data[] instead
 }
@@ -361,6 +363,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 			xbee_WR();
 			print_info_xbee(XBEE_NO_NETWORK,0);
 			xbee.netstat = NO_NETWORK;
+			xbee_get_DB();
 			return reply_Id;
 		}
 	}
@@ -459,8 +462,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	}else{
 			xbee.netstat = ONLINE;
 	}
-	_delay_ms(1000);
-
+	//_delay_ms(1000);
 	return reply_Id;
 }
 
@@ -495,6 +497,7 @@ uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		uint8_t temp_bytes_number = xbee_pack_tx64_frame(db_cmd_type, buffer, length, xbee.dest_high, xbee.dest_low);
 		
 		xbee_send_msg(buffer, temp_bytes_number);
+		xbee_get_DB();
 		return 1;
 	}
 	else
