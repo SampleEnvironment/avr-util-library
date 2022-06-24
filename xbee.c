@@ -44,8 +44,8 @@ XbeeType xbee = {
 	.sleeping = false,
 	.associated = 0,
 	.scanDurarion = 16.0,
-	.ScanChannels = CHANNEL_MASK,
-	.ScanChannels_current = CHANNEL_MASK,
+	.ScanChannels = SC_MASK_DEFAULT,
+	.ScanChannels_current = SC_MASK_DEFAULT,
 	.CoordIdentifier = "",
 	.netstat = ONLINE,
 	.RSSI = 0
@@ -179,6 +179,16 @@ _Bool xbee_reset_connection(uint8_t force)
 // Try a new connection with the server
 uint8_t xbee_reconnect(uint8_t force_DA)
 {
+	// IF there is no network reset SC MASK
+	if (xbee.ScanChannels != xbee.ScanChannels_current && xbee.netstat == NO_NETWORK)
+	{
+		
+		xbee_Set_Scan_Channels(xbee.ScanChannels);
+		xbee_WR();
+		print_info_xbee(XBEE_RESET_SC,1);
+		_delay_ms(2000);
+	}
+	
 	_delay_ms(300);
 
 	if(!xbee_reset_connection(force_DA))
@@ -341,7 +351,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 {
 	
-	uint8_t network_up = 0;
+
 	
 	// =================================================================
 	// ========= TRY TO RESOLVE EXISTING NETWORK ERRORS ================
@@ -349,9 +359,21 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	uint8_t reply_Id = 0xFF;
 	
 	#ifdef USE_XBEE
+	uint8_t network_up = 0;
 	uint8_t recon_already_tried = 0;
+	
+	// IF there is no network reset SC MASK
+	if (xbee.ScanChannels != xbee.ScanChannels_current && xbee.netstat == NO_NETWORK)
+	{
+		
+		xbee_Set_Scan_Channels(xbee.ScanChannels);
+		xbee_WR();
+		print_info_xbee(XBEE_RESET_SC,1);
+		_delay_ms(2000);
+	}
+	
 
-
+	
 	if (  xbee_is_connected() ||  /*CHECK_ERROR(NO_REPLY_ERROR) ||*/ CHECK_ERROR(NETWORK_ERROR) )
 	{
 		print_info_xbee(XBEE_CHECK_NETWORK, 0);
@@ -359,8 +381,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 		recon_already_tried = 1;
 		
 		if (xbee_reconnect(0)){
-			xbee_Set_Scan_Channels(SC_MASK_DEFAULT);
-			xbee_WR();
+			// No coordinator available --> no network
 			print_info_xbee(XBEE_NO_NETWORK,0);
 			xbee.netstat = NO_NETWORK;
 			xbee_get_DB();
@@ -400,8 +421,13 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	if (reply_Id == 0xFF)
 	{
 		// Network error occurred
+		#ifdef USE_XBEE
+
 		if (network_up)
 		{
+			// ===========================================================
+			// Try a different coordinator (switch xbee operating channel)
+			// ===========================================================
 			print_info_xbee(XBEE_NO_SERV,0);
 			xbee.netstat = NO_SERVER;
 			
@@ -411,13 +437,30 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 			xbee_WR();
 
 			
-			//_delay_ms(4000);
-			
+
+
 			if (!xbee_reconnect(1))
 			{	// reconn successful
+				// new coordinator found
 				reply_Id = xbee_send_request_only( db_cmd_type,buffer,  length);
-			}else{
-				xbee.netstat = NO_NETWORK;
+			}
+			else
+			{
+				// revert back to old Coordinator
+				xbee_Set_Scan_Channels(xbee.ScanChannels);
+				xbee_WR();
+				
+				if (xbee_reconnect(1))
+				{
+					//old Coordinator still available
+					xbee.netstat = NO_SERVER;
+					xbee_get_DB();
+				}else{
+					//old Coordinator not available
+					xbee.netstat = NO_NETWORK;
+				}
+			
+
 			}
 			
 			if (reply_Id != 0xFF)
@@ -437,8 +480,14 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 			// reset Scan Mask
 			print_info_xbee(XBEE_RESET_SC,0);
 			xbee_Set_Scan_Channels(xbee.ScanChannels);
+			xbee_WR();
 			_delay_ms(500);
 		}
+		#endif
+		
+		#ifdef USE_LAN
+		xbee.netstat = NO_NETWORK;
+		#endif
 		
 		_delay_ms(1000);
 		switch(db_cmd_type)
@@ -459,8 +508,8 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 			//							SET_ERROR(LETTERS_ERROR);
 			break;
 		}
-	}else{
-			xbee.netstat = ONLINE;
+		}else{
+		xbee.netstat = ONLINE;
 	}
 	//_delay_ms(1000);
 	return reply_Id;

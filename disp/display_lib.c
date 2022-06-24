@@ -548,7 +548,9 @@ void LCD_Draw_Cross(uint16_t x0,uint16_t y0,uint16_t x1,uint16_t y1){
 }
 
 void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_t color){
-		
+	#ifdef USE_XBEE
+
+	
 	LCD_Box(x,y,x+BOX_W_SIGSTRENGTH*2,y+BOX_H_SIGSTRENGTH,black);
 	
 	uint16_t colors [5][4]= {
@@ -556,7 +558,7 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 		{color,grey, grey, grey},
 		{color,color,grey, grey},
 		{color,color,color,grey},
-		{color,color,color,color}			
+		{color,color,color,color}
 	};
 
 	uint8_t k = 0;
@@ -564,7 +566,7 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 
 	if(NoNetw){
 		k = 0;
-	}else{
+		}else{
 		if (RSSI <= 40)
 		{
 			k = 4;
@@ -583,7 +585,7 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 			k = 1;
 		}
 	}
-	 
+	
 	
 	
 	uint16_t x0  = X0_SiGSTRENTH;
@@ -611,8 +613,44 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 	{
 		LCD_Box(x,y+nonetw_barpos,x+x0+(4*(bar_w+bar_spacing))+2,y+nonetw_barpos+bar_w,color);
 	}
-	 
 	
+	#endif
+	
+	#ifdef USE_LAN
+	
+	
+	
+	const uint16_t centerbar_w = FONT2_W*2 - 4;
+	const uint16_t centerbar_y = 12 + y ;
+	
+	const uint16_t box_w = 6;
+	const uint16_t box_h = 4;
+	
+	const uint16_t x_box_l = x + 3;
+	const uint16_t y_box_l = y + 16;
+	
+	const uint16_t x_box_r = x + 14;
+	const uint16_t y_box_r = y_box_l;
+
+	const uint16_t x_box_m = x + 9;
+	const uint16_t y_box_m = y +4;
+	
+	const uint16_t stublen = 4;
+	const uint16_t boxOffs = 3;
+	
+	LCD_hline(x+2,centerbar_y,centerbar_w,color);
+	
+	LCD_Rect(x_box_l,y_box_l,x_box_l+box_w,y_box_l+box_h,THIN,color);
+	LCD_Rect(x_box_r,y_box_r,x_box_r+box_w,y_box_r+box_h,THIN,color);
+	LCD_Rect(x_box_m,y_box_m,x_box_m+box_w,y_box_m+box_h,THIN,color);
+	
+	
+	LCD_vline(x_box_l  + boxOffs ,centerbar_y,stublen,color);
+	LCD_vline(x_box_r  + boxOffs ,centerbar_y,stublen,color);
+	
+	LCD_vline(x_box_m  + boxOffs ,centerbar_y - stublen ,stublen,color);
+	
+	#endif
 
 }
 

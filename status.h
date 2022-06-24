@@ -25,7 +25,9 @@ enum StatusBit
 	INIT_OFFLINE_ERROR,
 	I2C_BUS_ERROR,
 	VOLUME_TOO_BIG_ERROR,
-	OPTIONS_ERROR
+	OPTIONS_ERROR,
+	OPTIONS_OUT_OF_BOUNDS_ERROR,
+	OPTIONS_LEN_ERROR
 };
 
 
@@ -34,6 +36,9 @@ void SET_ERROR(enum StatusBit Bit);
 void CLEAR_ERROR(enum StatusBit Bit);
 _Bool CHECK_ERROR(enum StatusBit Bit);
 void CLEAR_ALL(void);
+
+
+uint16_t get_status(void);
 
 void set_status_byte(uint16_t status_byte);
 uint8_t get_status_byte(void);

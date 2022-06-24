@@ -181,6 +181,9 @@ uint8_t send_AT(AT_commandType *AT_Command){
 
 uint16_t xbee_get_Scan_duration(void){
 	
+	#ifdef USE_XBEE
+
+	
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,SD_MSG_TYPE);
@@ -194,7 +197,7 @@ uint16_t xbee_get_Scan_duration(void){
 	if (AT_command.byte != 0)
 	{
 		//
-		double nChannels = countSetBits(xbee.ScanChannels);
+		double nChannels = countSetBits(xbee.ScanChannels_current);
 		xbee.scanDurarion = (((nChannels * (2 << AT_command.byte) * 16) + (38 * nChannels) + 20) / 1000)+1;
 		
 		return 1;
@@ -202,36 +205,54 @@ uint16_t xbee_get_Scan_duration(void){
 	
 	return 0;
 	
+	#endif
+	
+	#ifdef USE_LAN
+	return 0;
+	#endif
 	
 }
 
 
-int8_t xbee_get_DB(void){
-		AT_commandType AT_command;
-		
-		initAt_read(&AT_command,DB_MSG_TYPE);
-		
-		send_AT(&AT_command);
-		
-		if (AT_command.AnswerReceived == false)  	// NO Answer from xbee --> not associated
-		{
-			return 0;
-		}
-		if (AT_command.byte != 0)
-		{
-			xbee.RSSI = AT_command.byte;
-			
-			return 1;
-					
-			
-		}
-		
+uint8_t xbee_get_DB(void)
+{
+	
+	#ifdef USE_XBEE
+
+	AT_commandType AT_command;
+	
+	initAt_read(&AT_command,DB_MSG_TYPE);
+	
+	send_AT(&AT_command);
+	
+	if (AT_command.AnswerReceived == false)  	// NO Answer from xbee --> not associated
+	{
 		return 0;
+	}
+	if (AT_command.byte != 0)
+	{
+		xbee.RSSI = AT_command.byte;
 		
+		return 1;
+		
+		
+	}
+	
+	return 0;
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
+	
 }
 
 
 uint8_t xbee_set_Scan_Duration(uint8_t dur_exp){
+	
+	
+	#ifdef USE_XBEE
+
 	
 	AT_commandType AT_command;
 
@@ -244,11 +265,18 @@ uint8_t xbee_set_Scan_Duration(uint8_t dur_exp){
 		return 0;
 	}
 	return 1;
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 	
 }
 
 uint8_t xbee_WR(void){
 	
+	#ifdef USE_XBEE
+
 	AT_commandType AT_command;
 
 	initAt_read(&AT_command,WR_MSG_TYPE);
@@ -260,10 +288,17 @@ uint8_t xbee_WR(void){
 		return 0;
 	}
 	return 1;
-	
+	#endif
+
+
+	#ifdef USE_LAN
+	return 1;
+	#endif
 }
 
 uint8_t xbee_coordIdentifier(void){
+	#ifdef USE_XBEE
+
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,NI_MSG_TYPE);
@@ -284,6 +319,11 @@ uint8_t xbee_coordIdentifier(void){
 	
 	return 1;
 	
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 }
 
 uint32_t countSetBits(uint32_t n)
@@ -298,6 +338,8 @@ uint32_t countSetBits(uint32_t n)
 
 
 uint8_t AT_read_Byte( AT_MESSAGE AT_Code){
+	#ifdef USE_XBEE
+
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,AT_Code);
@@ -306,10 +348,17 @@ uint8_t AT_read_Byte( AT_MESSAGE AT_Code){
 	if(AT_command.AnswerReceived == false) return 0;
 	
 	return AT_command.byte;
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 }
 
 
 uint8_t AT_set_Byte( AT_MESSAGE AT_Code,uint8_t param){
+	#ifdef USE_XBEE
+
 	AT_commandType AT_command;
 	
 	initAt_set(&AT_command,AT_Code,&param,1);
@@ -320,10 +369,17 @@ uint8_t AT_set_Byte( AT_MESSAGE AT_Code,uint8_t param){
 	
 	return 1;
 	
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 }
 
 uint8_t xbee_is_connected(void)
 {
+	#ifdef USE_XBEE
+
 
 	AT_commandType AT_command;
 	
@@ -351,6 +407,12 @@ uint8_t xbee_is_connected(void)
 	//Xbee is associated to a Coordinator
 	return 0;
 
+	
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 }
 
 
@@ -386,6 +448,7 @@ uint32_t xbee_SL_address(void){
 uint32_t xbee_get_address_block(uint8_t cmd_type)
 {
 	
+	#ifdef USE_XBEE
 
 	_delay_ms(100);
 	AT_commandType AT_command;
@@ -408,9 +471,17 @@ uint32_t xbee_get_address_block(uint8_t cmd_type)
 		return AT_command.Address;
 	}
 	else return 0;		// Couldn't read addr_high or addr_low
+	
+	#endif
+
+	#ifdef USE_LAN
+	return 0;
+	#endif
 }
 
 uint8_t xbee_DA_initiate_reassociation(void){
+	#ifdef USE_XBEE
+
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,DA_MSG_TYPE);
@@ -419,9 +490,17 @@ uint8_t xbee_DA_initiate_reassociation(void){
 	if(AT_command.AnswerReceived == false) return 0;
 	
 	return 1;
+	
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 }
 
 uint8_t xbee_JV_verification(void){
+	#ifdef USE_XBEE
+
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,JV_MSG_TYPE);
@@ -431,9 +510,16 @@ uint8_t xbee_JV_verification(void){
 	
 	return AT_command.byte;
 	
+	#endif
+	
+	#ifdef USE_LAN
+	return 0;
+	#endif
 }
 
 uint8_t xbee_Node_Join(void){
+	#ifdef USE_XBEE
+
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,NJ_MSG_TYPE);
@@ -443,9 +529,16 @@ uint8_t xbee_Node_Join(void){
 	
 	return AT_command.byte;
 	
+	#endif
+	
+	#ifdef USE_LAN
+	return 0;
+	#endif
 }
 
 uint8_t xbee_set_Node_Join(uint8_t NJ){
+	#ifdef USE_XBEE
+
 	AT_commandType AT_command;
 	
 	initAt_set(&AT_command,CE_MSG_TYPE,&NJ,1);
@@ -456,6 +549,11 @@ uint8_t xbee_set_Node_Join(uint8_t NJ){
 	
 	return 1;
 	
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 }
 
 
@@ -463,6 +561,8 @@ uint8_t xbee_set_Node_Join(uint8_t NJ){
 
 
 uint8_t xbee_stack_profile(void){
+	#ifdef USE_XBEE
+	
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,ZS_MSG_TYPE);
@@ -471,9 +571,15 @@ uint8_t xbee_stack_profile(void){
 	if(AT_command.AnswerReceived == false) return 0;
 	
 	return AT_command.byte;
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 }
 
 uint8_t xbee_channel(void){
+	#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,CH_MSG_TYPE);
@@ -482,6 +588,12 @@ uint8_t xbee_channel(void){
 	if(AT_command.AnswerReceived == false) return 0xff;
 	
 	return AT_command.byte;
+	
+	#endif
+	
+	#ifdef USE_LAN
+	return 0xff;
+	#endif
 }
 
 
@@ -535,6 +647,7 @@ uint16_t xbee_firmware_version(void){
 }
 
 uint8_t xbee_coordinator_Enable(void){
+		#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,CE_MSG_TYPE);
@@ -547,9 +660,16 @@ uint8_t xbee_coordinator_Enable(void){
 	
 	return CE;
 	
+	#endif
+	
+	#ifdef USE_LAN
+	return 0xFF;
+	#endif
+	
 }
 
 uint8_t xbee_set_coordinator_Enable(uint8_t CE){
+		#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_set(&AT_command,CE_MSG_TYPE,&CE,1);
@@ -559,11 +679,17 @@ uint8_t xbee_set_coordinator_Enable(uint8_t CE){
 	
 	
 	return 1;
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 	
 }
 
 
 uint8_t xbee_sleep_Mode(void){
+		#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,SM_MSG_TYPE);
@@ -575,10 +701,16 @@ uint8_t xbee_sleep_Mode(void){
 	
 	
 	return SM;
+	#endif
+	
+	#ifdef USE_LAN
+	return 0xFF;
+	#endif
 	
 }
 
 uint8_t xbee_set_sleep_Mode(uint8_t SM){
+		#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_set(&AT_command,SM_MSG_TYPE,&SM,1);
@@ -588,11 +720,17 @@ uint8_t xbee_set_sleep_Mode(uint8_t SM){
 	
 	
 	return 1;
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 	
 }
 
 
 uint8_t xbee_Assiciation_indication(void){
+		#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,AI_MSG_TYPE);
@@ -604,11 +742,17 @@ uint8_t xbee_Assiciation_indication(void){
 	
 	
 	return AI;
+	#endif
+	
+	#ifdef USE_LAN
+	return 0xFF;
+	#endif
 	
 }
 
 
 uint8_t xbee_clear_Curr_Channel_from_SC(void){
+		#ifdef USE_XBEE
 	
 	// get current operating CH
 	uint8_t currCh = xbee_channel();
@@ -621,13 +765,17 @@ uint8_t xbee_clear_Curr_Channel_from_SC(void){
 	
 	// set new SC Mask
 	return xbee_Set_Scan_Channels(xbee.ScanChannels_current);
+	#endif
 	
-	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 	
 	
 }
 
 uint16_t xbee_Scan_Channels(void){
+		#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,SC_MSG_TYPE);
@@ -639,13 +787,20 @@ uint16_t xbee_Scan_Channels(void){
 	
 	uint16_t ScanChannels = AT_command.dataword ;
 	
+	xbee.ScanChannels_current = ScanChannels;
 	
 	return ScanChannels;
+	#endif
+	
+	#ifdef USE_LAN
+	return 0;
+	#endif
 	
 }
 
 
 uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
+		#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	uint8_t buffer[2];
@@ -659,12 +814,22 @@ uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
 	
 	if(AT_command.AnswerReceived == false) return 0;
 	
+	xbee.ScanChannels_current = SC_Bitfield;
 	
 	return 1;
+	#endif
+	
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 	
 }
 
 uint8_t xbee_Active_Scan(void){
+		#ifdef USE_XBEE
+	
+	
 	print_info_AT("Active Scan    ",1);
 	
 	uint8_t panArr_index = 0;
@@ -721,6 +886,11 @@ uint8_t xbee_Active_Scan(void){
 	print_info_AT("",0);
 	Pans.nPans = panArr_index;
 	return 1;
+	#endif
+	
+	#ifdef USE_LAN
+	return 1;
+	#endif
 }
 
 uint8_t addFrameToPanPool(uint8_t reply_ID,uint8_t panArrIndex){

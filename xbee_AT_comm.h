@@ -12,7 +12,7 @@
 #include "heap.h"
 #include "xbee.h"
 
-#define CHANNEL_MASK 0x1F80
+
 
 typedef struct
 {
@@ -72,7 +72,7 @@ typedef struct
 extern XbeeType xbee;
 
 
-#define  AT_START 18
+#define  AT_START 200
 
 typedef enum
 {
@@ -125,7 +125,7 @@ uint8_t xbee_coordinator_Enable(void);
 uint8_t xbee_set_coordinator_Enable(uint8_t CE);
 uint8_t xbee_Assiciation_indication(void);
 uint16_t xbee_Scan_Channels(void);
-int8_t xbee_get_DB(void);
+uint8_t xbee_get_DB(void);
 uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield);
 uint8_t xbee_clear_Curr_Channel_from_SC(void);
 uint8_t xbee_Active_Scan(void);

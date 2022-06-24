@@ -10,7 +10,7 @@
 
 
 #include "gcm_old_lcd_driver.h"
-
+#include <avr/io.h>
 
 //TODO move to display file
 
@@ -135,6 +135,11 @@ void init_LCD(void)
 	
 	LCD_Clear();
 	LCD_gotoXY(0, 0);
+	
+	
+	// turns on LED backlight
+	//DDRD |=_BV(PIND6);
+	//PORTD |=_BV(PIND6);
 	
 }
 

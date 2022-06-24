@@ -33,7 +33,7 @@ typedef struct
 	uint8_t      dev_id_str_len; // max len of dev_id
 	
 	double       scanDurarion;
-	uint16_t     ScanChannels;
+	const uint16_t     ScanChannels;
 	uint16_t     ScanChannels_current;
 	
 	char         CoordIdentifier[21] ;

@@ -160,15 +160,18 @@ inline void xbee_build_frame(uint8_t *buffer, uint8_t length)
 		
 		case API_AT_CMD: //0x08
 		
-		if (buffer[4] && (buffer[5] == (uint8_t) 'C') && (buffer[6] == (uint8_t) 'E'))
-		{
-			newFrame.type = SIMULATE_XBEE_CMD;
-			newFrame.status = 0;
+		newFrame.type = get_at_frame_type((char*) &buffer[5], 2);
+		newFrame.status = 0;
+		
+		// no payload data
+		if (length < (7+1)) return;
+		
+		for (uint8_t i = 7; i < length; ++i){
+		newFrame.data[data_counter++] = buffer[i];
 		}
-		else
-		{
-			newFrame.status = 0xFF;
-		}
+		newFrame.data_len = --data_counter;
+		
+		
 		break;
 		
 		default:
