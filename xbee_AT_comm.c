@@ -326,6 +326,8 @@ uint8_t xbee_coordIdentifier(void){
 	#endif
 }
 
+
+
 uint32_t countSetBits(uint32_t n)
 {
 	uint32_t count = 0;
@@ -647,7 +649,7 @@ uint16_t xbee_firmware_version(void){
 }
 
 uint8_t xbee_coordinator_Enable(void){
-		#ifdef USE_XBEE
+	#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,CE_MSG_TYPE);
@@ -669,7 +671,7 @@ uint8_t xbee_coordinator_Enable(void){
 }
 
 uint8_t xbee_set_coordinator_Enable(uint8_t CE){
-		#ifdef USE_XBEE
+	#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_set(&AT_command,CE_MSG_TYPE,&CE,1);
@@ -689,7 +691,7 @@ uint8_t xbee_set_coordinator_Enable(uint8_t CE){
 
 
 uint8_t xbee_sleep_Mode(void){
-		#ifdef USE_XBEE
+	#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,SM_MSG_TYPE);
@@ -710,7 +712,7 @@ uint8_t xbee_sleep_Mode(void){
 }
 
 uint8_t xbee_set_sleep_Mode(uint8_t SM){
-		#ifdef USE_XBEE
+	#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_set(&AT_command,SM_MSG_TYPE,&SM,1);
@@ -730,7 +732,7 @@ uint8_t xbee_set_sleep_Mode(uint8_t SM){
 
 
 uint8_t xbee_Assiciation_indication(void){
-		#ifdef USE_XBEE
+	#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,AI_MSG_TYPE);
@@ -752,7 +754,7 @@ uint8_t xbee_Assiciation_indication(void){
 
 
 uint8_t xbee_clear_Curr_Channel_from_SC(void){
-		#ifdef USE_XBEE
+	#ifdef USE_XBEE
 	
 	// get current operating CH
 	uint8_t currCh = xbee_channel();
@@ -775,7 +777,7 @@ uint8_t xbee_clear_Curr_Channel_from_SC(void){
 }
 
 uint16_t xbee_Scan_Channels(void){
-		#ifdef USE_XBEE
+	#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,SC_MSG_TYPE);
@@ -800,7 +802,7 @@ uint16_t xbee_Scan_Channels(void){
 
 
 uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
-		#ifdef USE_XBEE
+	#ifdef USE_XBEE
 	AT_commandType AT_command;
 	
 	uint8_t buffer[2];
@@ -827,7 +829,7 @@ uint8_t xbee_Set_Scan_Channels(uint16_t SC_Bitfield){
 }
 
 uint8_t xbee_Active_Scan(void){
-		#ifdef USE_XBEE
+	#ifdef USE_XBEE
 	
 	
 	print_info_AT("Active Scan    ",1);

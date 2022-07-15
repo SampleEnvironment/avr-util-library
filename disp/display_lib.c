@@ -620,7 +620,7 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 	
 	
 	
-	const uint16_t centerbar_w = FONT2_W*2 - 4;
+	const uint16_t centerbar_w = 12*2 - 4;
 	const uint16_t centerbar_y = 12 + y ;
 	
 	const uint16_t box_w = 6;

@@ -68,9 +68,23 @@ typedef enum
 
 
 #ifdef HZB
+
+#ifdef GASCOUNTER_MODULE
 #define SC_MASK_DEFAULT 0x1F80
+#endif
+
+#ifdef LEVELMETER
+#define SC_MASK_DEFAULT 0x1F80
+#endif
+
+#ifdef ILM_MODULE
+#define SC_MASK_DEFAULT 0x1F80
+#endif
+
 #else 
+
 #define SC_MASK_DEFAULT 0x1FFE
+
 #endif
 
 
@@ -98,7 +112,7 @@ extern XbeeType xbee;
 
 
 
-//TODO clean up message Codes
+
 
 //==============================================================
 // Database server commands
@@ -195,7 +209,7 @@ extern XbeeType xbee;
 #define SET_FUNTRACE_CMD               101 /**< @brief Command for enabling or disabling the Functiontrace saving in eeprom */
 #define GET_FUNTRACE_CMD			   102 /**< @brief Command prompting the device to send the function Trace that was saved in its eeprom*/
 #define SET_PING_INTERVALL_CMD		   103 /**< @brief Command prompting the device to set the Ping Intervall*/
-#define SET_IP_LAN_GASCOUNTER_CMD      104 /**< @brief Command prompting the device to set ist IP address. The ip addres acts as identifier for the GCM */
+#define SET_IP_LAN_GASCOUNTER_CMD      104 /**< @brief Command prompting the device to set its IP address. The ip addres acts as identifier for the LAN-GCM */
 
 
 //Dummy codes
