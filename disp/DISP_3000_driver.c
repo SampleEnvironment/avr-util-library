@@ -5,7 +5,9 @@
  *  Author: qfj
  */ 
 
+#include "../../config.h"
 #include "DISP_3000_driver.h"
+
 
 
 #define RELEASE_DISPLAY 1.03
@@ -45,7 +47,9 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "DISP_3000_driver.h"
+
+
+
 
 
 const unsigned int LCD_Width  = MAX_X;

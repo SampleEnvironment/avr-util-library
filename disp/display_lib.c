@@ -40,7 +40,10 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "../../config.h"
+
 #include "display_lib.h"
+
 
 #ifdef ili9341
 #include "ili9341_driver.h"

@@ -3,10 +3,11 @@
 
 
 
-#ifdef ili9341
-#include "PinAllocation.h"
-#include "ili9341_driver.h"
 
+#include "../../config.h"
+#include "../PinAllocation.h"
+#include "ili9341_driver.h"
+#ifdef ili9341
 /*
 * ----------------------------------------------------------------------------
 * "THE BEER-WARE LICENSE" (Revision 42):
@@ -26,6 +27,7 @@
 
 #include "ili9341cmd.h"
 #include "spi.h" //SPI-Utilities for communicating with Display
+
 
 
 EWindowOrientation Orientation = Landscape180;

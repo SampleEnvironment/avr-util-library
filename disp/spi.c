@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include "spi.h"
 
+#include "../../config.h"
 #include "gcm_old_lcd_driver.h"
 
 

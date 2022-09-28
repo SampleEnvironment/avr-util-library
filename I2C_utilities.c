@@ -7,7 +7,7 @@
 
 #include "I2C_utilities.h"
 #include "i2cmaster.h"
-
+#include "../config.h"
 
 
 /**

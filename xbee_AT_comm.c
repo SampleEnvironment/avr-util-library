@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../config.h"
 #include "xbee_AT_comm.h"
 #include "xbee.h"
 #include "xbee_utilities.h"

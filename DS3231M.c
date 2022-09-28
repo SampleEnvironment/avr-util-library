@@ -16,8 +16,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <util/eu_dst.h>
-
-
+#include "../config.h"
 #include "DS3231M.h"
 #include "status.h"
 

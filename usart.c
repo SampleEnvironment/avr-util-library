@@ -8,6 +8,8 @@
 #include <avr/interrupt.h>
 #include <string.h>
 
+#include "../config.h"
+
 #include "xbee.h"
 #include "xbee_utilities.h"
 #include "usart.h"

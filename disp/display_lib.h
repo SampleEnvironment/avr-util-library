@@ -8,6 +8,7 @@
 
 #ifndef DISPLAY_LIB_H_
 #define DISPLAY_LIB_H_
+#include "../../config.h"
 
 // Display.h - Copyright 2016, HZB, ILL/SANE & ISIS
 

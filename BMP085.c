@@ -16,7 +16,7 @@
 #include "I2C_utilities.h"
 #include "status.h"
 
-
+#include "../config.h"
 
 // specific constants varying from BMP to BMP
 volatile int16_t AC1;

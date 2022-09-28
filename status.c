@@ -5,6 +5,7 @@
  *  Author: qfj
  */ 
 #include "status.h"
+#include "../config.h"
 
 uint16_t status; 
 uint16_t status_reset_on_send;

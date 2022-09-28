@@ -1,5 +1,4 @@
-#include "../disp/fontConfig.h"
-#ifdef Lucida_Console_Alpha_Num
+
 //WARNING: This Font Require X-GLCD Lib.
 //         You can not use it with MikroE GLCD Lib.
 
@@ -54,5 +53,3 @@ const uint8_t Font5[] PROGMEM = {
         };
      
 
-
-#endif

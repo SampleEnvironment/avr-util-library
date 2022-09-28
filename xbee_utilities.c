@@ -9,6 +9,7 @@
 
 
 
+#include "../config.h"
 
 #include "xbee.h"
 #include "xbee_utilities.h"

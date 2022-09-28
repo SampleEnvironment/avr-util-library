@@ -6,6 +6,8 @@
  */ 
 
 #include "module_globals.h"
+#include "../config.h"
+
 
 VersionType version = {
 	.Fw_version = 0,
