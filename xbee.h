@@ -67,7 +67,7 @@ typedef enum
 }XBEE_HW_VERSION;
 
 
-#ifdef HZB-HE-NETWORK
+#ifdef HZB_HE_NETWORK
 
 #define SC_MASK_DEFAULT 0x1F80
 
