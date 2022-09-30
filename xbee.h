@@ -67,19 +67,9 @@ typedef enum
 }XBEE_HW_VERSION;
 
 
-#ifdef HZB
+#ifdef HZB-HE-NETWORK
 
-#ifdef GASCOUNTER_MODULE
 #define SC_MASK_DEFAULT 0x1F80
-#endif
-
-#ifdef LEVELMETER
-#define SC_MASK_DEFAULT 0x1F80
-#endif
-
-#ifdef ILM_MODULE
-#define SC_MASK_DEFAULT 0x1F80
-#endif
 
 #else 
 
