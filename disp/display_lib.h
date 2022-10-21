@@ -91,6 +91,7 @@
 	#define dark_green 		0b0000001101100000
 	#define white 			0b1111111111111111
 	#define grey 			0b0011100011100111
+	#define light_grey 		0b0111100111101111
 	#define black 			0b0000000000000000
 
 	#define HZB_Blue        0b0000001011010011

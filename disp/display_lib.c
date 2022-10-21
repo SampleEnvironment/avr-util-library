@@ -556,11 +556,13 @@ void LCD_conn_Stregth(uint8_t NoNetw,int8_t RSSI,uint16_t x, uint16_t y, uint16_
 	
 	LCD_Box(x,y,x+BOX_W_SIGSTRENGTH*2,y+BOX_H_SIGSTRENGTH,black);
 	
+
+	
 	uint16_t colors [5][4]= {
 		{white,white, white, white},
-		{color,grey, grey, grey},
-		{color,color,grey, grey},
-		{color,color,color,grey},
+		{color,light_grey, light_grey, light_grey},
+		{color,color,light_grey, light_grey},
+		{color,color,color,light_grey},
 		{color,color,color,color}
 	};
 
