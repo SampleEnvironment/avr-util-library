@@ -67,16 +67,9 @@ typedef enum
 }XBEE_HW_VERSION;
 
 
-#ifdef HZB_HE_NETWORK
-
-#define SC_MASK_DEFAULT 0x1F80
-
-#else 
 
 #define SC_MASK_DEFAULT 0x1FFE
-
-#endif
-
+#define SC_already_received_Pattern 0b10101010
 
 
 
@@ -157,6 +150,7 @@ extern XbeeType xbee;
 #define TRIGGER_REMOTE_U_OVER_I 28		// Trigger a remote U over I Pulse
 #define TRIGGER_REMOTE_PULSE_CUSTOM_PARAMS_CMD 29 // Trigger a remote Pulse with custom Parameters
 #define TRIGGER_REMOTE_PULSE_CONSTANT_I 30 // Trigger a remote Pulse with constant current I
+#define SET_SC_XBEE_MASK        31      /**< @brief writes SC Channel Mask to device EEPROM */
 
 
 //dummy Codes
@@ -200,7 +194,7 @@ extern XbeeType xbee;
 #define GET_FUNTRACE_CMD			   102 /**< @brief Command prompting the device to send the function Trace that was saved in its eeprom*/
 #define SET_PING_INTERVALL_CMD		   103 /**< @brief Command prompting the device to set the Ping Intervall*/
 #define SET_IP_LAN_GASCOUNTER_CMD      104 /**< @brief Command prompting the device to set its IP address. The ip addres acts as identifier for the LAN-GCM */
-
+#define SET_SC_XBEE_MASK               105 /**< @brief writes SC Channel Mask to device EEPROM */
 
 //Dummy codes
 #define FILLING_BEGIN_MSG   5
@@ -232,6 +226,7 @@ extern XbeeType xbee;
 #define GET_OPTIONS_CMD		   123 /**< @brief Prompts device to send current #options to the server */
 #define SET_PING_INTERVALL_CMD 124 /**< @brief Command prompting the device to set the Ping Intervall*/
 #define GET_RAW_DATA_CMD	   125 /**< @brief Command prompting the device to send raw ADC Values for all three channels */
+#define SET_SC_XBEE_MASK       126 /**< @brief writes SC Channel Mask to device EEPROM */
 
 
 //Dummy codes
@@ -248,7 +243,7 @@ extern void (*print_info_AT)(char *, _Bool );
 // XBee commands
 //==============================================================
 
-void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len);
+void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len,uint16_t SC_mask));
 
 void xbee_set_busy(_Bool busy_state);
 _Bool xbee_get_busy(void);
