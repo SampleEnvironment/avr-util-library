@@ -53,11 +53,13 @@ XbeeType xbee = {
 	
 };
 
-void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len){
+void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len,uint16_t SC_mask){
 	print_info_xbee = printInfoFun;
 	print_info_AT   = printInfoFun;
 	xbee.dev_id_str = dev_ID_str;
 	xbee.dev_id_str_len = max_devid_str_len;
+	xbee.ScanChannels = SC_mask;
+	xbee.ScanChannels_current = SC_mask;
 	//xbee_Set_Scan_Channels(CHANNEL_MASK);
 	//xbee_WR();
 

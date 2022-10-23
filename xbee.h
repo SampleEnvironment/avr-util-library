@@ -243,7 +243,7 @@ extern void (*print_info_AT)(char *, _Bool );
 // XBee commands
 //==============================================================
 
-void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len,uint16_t SC_mask));
+void xbee_init(void (*printInfoFun)(char *,_Bool),char * dev_ID_str,uint8_t max_devid_str_len,uint16_t SC_mask);
 
 void xbee_set_busy(_Bool busy_state);
 _Bool xbee_get_busy(void);
