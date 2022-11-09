@@ -151,6 +151,7 @@ extern XbeeType xbee;
 #define TRIGGER_REMOTE_PULSE_CUSTOM_PARAMS_CMD 29 // Trigger a remote Pulse with custom Parameters
 #define TRIGGER_REMOTE_PULSE_CONSTANT_I 30 // Trigger a remote Pulse with constant current I
 #define SET_SC_XBEE_MASK        31      /**< @brief writes SC Channel Mask to device EEPROM */
+#define GET_SC_XBEE_MASK        32 /**< @brief reads current SC Channel Mask from device*/
 
 
 //dummy Codes
@@ -195,6 +196,7 @@ extern XbeeType xbee;
 #define SET_PING_INTERVALL_CMD		   103 /**< @brief Command prompting the device to set the Ping Intervall*/
 #define SET_IP_LAN_GASCOUNTER_CMD      104 /**< @brief Command prompting the device to set its IP address. The ip addres acts as identifier for the LAN-GCM */
 #define SET_SC_XBEE_MASK               105 /**< @brief writes SC Channel Mask to device EEPROM */
+#define GET_SC_XBEE_MASK               106 /**< @brief reads current SC Channel Mask from device*/
 
 //Dummy codes
 #define FILLING_BEGIN_MSG   5
@@ -227,6 +229,7 @@ extern XbeeType xbee;
 #define SET_PING_INTERVALL_CMD 124 /**< @brief Command prompting the device to set the Ping Intervall*/
 #define GET_RAW_DATA_CMD	   125 /**< @brief Command prompting the device to send raw ADC Values for all three channels */
 #define SET_SC_XBEE_MASK       126 /**< @brief writes SC Channel Mask to device EEPROM */
+#define GET_SC_XBEE_MASK       127 /**< @brief reads current SC Channel Mask from device*/
 
 
 //Dummy codes
