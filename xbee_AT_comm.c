@@ -320,7 +320,7 @@ uint8_t xbee_coordIdentifier(void){
 	xbee.CoordIdentifier[AT_command.data_len] = '\0'; // null terminator anfügen
 	
 	
-	xbee.CoordIdChanged = (!strncmp(tempold,xbee.CoordIdentifier))?true:false;
+	xbee.CoordIdChanged = (!strcmp(tempold,xbee.CoordIdentifier))?true:false;
 
 	
 	
