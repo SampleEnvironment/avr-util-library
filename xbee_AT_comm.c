@@ -299,7 +299,8 @@ uint8_t xbee_WR(void){
 
 uint8_t xbee_coordIdentifier(void){
 	#ifdef USE_XBEE
-
+	char tempold[21];
+	strcpy(xbee.CoordIdentifier,tempold);
 	AT_commandType AT_command;
 	
 	initAt_read(&AT_command,NI_MSG_TYPE);
@@ -314,8 +315,13 @@ uint8_t xbee_coordIdentifier(void){
 
 	}
 	
+
 	memcpy(xbee.CoordIdentifier,AT_command.data,AT_command.data_len*sizeof(char));
 	xbee.CoordIdentifier[AT_command.data_len] = '\0'; // null terminator anfügen
+	
+	
+	xbee.CoordIdChanged = (!strncmp(tempold,xbee.CoordIdentifier))?true:false;
+
 	
 	
 	return 1;

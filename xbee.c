@@ -48,6 +48,7 @@ XbeeType xbee = {
 	.ScanChannels = SC_MASK_DEFAULT,
 	.ScanChannels_current = SC_MASK_DEFAULT,
 	.CoordIdentifier = "",
+	.CoordIdChanged = false,
 	.netstat = ONLINE,
 	.RSSI = 0
 	

@@ -37,6 +37,7 @@ typedef struct
 	uint16_t     ScanChannels_current;
 	
 	char         CoordIdentifier[21] ;
+	_Bool        CoordIdChanged;
 	NETSTAT_TYPE netstat;
 	
 	int8_t  RSSI; // rssi of last received packet
