@@ -241,6 +241,40 @@ extern XbeeType xbee;
 
 #endif
 
+
+#ifdef SENSOR_MODULE
+//==============================================================
+// Database server commands ILM_MODULE
+//==============================================================
+// Requests with answer sent from the device
+
+#define LOGIN_MSG			200		/**< @brief Command for Registration with the Server. The server will answer a 200 Commad containing device options*/
+#define PING_MSG			202     /**< @brief Command for Ping, the server will send a Pong with the same code  */
+#define MEAS_MSG            203     /**< @brief Sensor Module Measurement Message*/
+
+
+// Requests without answer sent from the device
+#define OPTIONS_SET_ACK		201 /**< @brief Sent to the server after options were received and set (#ILM_received_set_options) */
+
+#define LAST_NON_CMD_MSG		209		// Search no ack commands only (see xbee_hasReply)
+
+#define SET_OPTIONS_CMD		   210 /**< @brief Received during the login process or during normal operation. It is used to send new options to the Gascounter module   */
+#define TRIGGER_MEAS_CMD	   211 /**< @brief Prompts device to send measurement data to the server */
+#define GET_OPTIONS_CMD		   212 /**< @brief Prompts device to send current #options to the server */
+#define SET_PING_INTERVALL_CMD 213 /**< @brief Command prompting the device to set the Ping Intervall*/
+#define SET_SC_XBEE_MASK       214 /**< @brief writes SC Channel Mask to device EEPROM */
+#define GET_SC_XBEE_MASK       215 /**< @brief reads current SC Channel Mask from device*/
+
+
+//Dummy codes
+#define FILLING_BEGIN_MSG   5
+#define FILLING_END_MSG     7
+#define OPTIONS_CHANGED_MSG 4
+#define LONG_INTERVAL_MSG   3
+
+#endif
+
+
 extern void (*print_info_AT)(char *, _Bool );
 
 //==============================================================
