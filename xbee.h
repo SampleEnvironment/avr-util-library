@@ -138,6 +138,7 @@ extern XbeeType xbee;
 #define GET_XBEE_AWAKE_TIME_CMD	21		// Send XBee awake period to the database server
 #define GET_PULSE_I				25		// Send I Values of Pulse
 #define GET_PULSE_U				26		// Send U Values of Pulse
+#define GET_R_CALIBRATION       33		// Send Resistance calibration values to the database server (r_span and r_zero)
 
 // Requests sent from the database server
 #define SET_OPTIONS_CMD			13		// Set device settings received from the database server
