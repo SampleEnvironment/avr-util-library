@@ -279,7 +279,7 @@ uint8_t xbee_send_request_only(uint8_t db_cmd_type, uint8_t *buffer, uint8_t len
 uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length);	// Checks network connection and send request and receive answer
 uint8_t xbee_send_message(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length);      // Checks network connection and sends message
 // moved to main uint8_t xbee_send_login_msg(uint8_t db_cmd_type, uint16_t device_id, uint8_t *buffer, uint32_t dest_high, uint32_t dest_low);	// Login transaction
-
+void xbee_reset_SC(void);
 _Bool xbee_get_server_adrr(void);
 
 
