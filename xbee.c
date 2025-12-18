@@ -186,11 +186,7 @@ uint8_t xbee_reconnect(uint8_t force_DA)
 	// IF there is no network reset SC MASK
 	if (xbee.ScanChannels != xbee.ScanChannels_current && xbee.netstat == NO_NETWORK)
 	{
-		
-		xbee_Set_Scan_Channels(xbee.ScanChannels);
-		xbee_WR();
-		print_info_xbee(XBEE_RESET_SC,1);
-		_delay_ms(2000);
+		xbee_reset_SC();
 	}
 	
 	_delay_ms(300);
@@ -369,11 +365,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 	// IF there is no network reset SC MASK
 	if (xbee.ScanChannels != xbee.ScanChannels_current && xbee.netstat == NO_NETWORK)
 	{
-		
-		xbee_Set_Scan_Channels(xbee.ScanChannels);
-		xbee_WR();
-		print_info_xbee(XBEE_RESET_SC,1);
-		_delay_ms(2000);
+		xbee_reset_SC();
 	}
 	
 
@@ -482,10 +474,7 @@ uint8_t xbee_send_request(uint8_t db_cmd_type, uint8_t *buffer, uint8_t length)
 			xbee.netstat = NO_NETWORK;
 			_delay_ms(500);
 			// reset Scan Mask
-			print_info_xbee(XBEE_RESET_SC,0);
-			xbee_Set_Scan_Channels(xbee.ScanChannels);
-			xbee_WR();
-			_delay_ms(500);
+			xbee_reset_SC();
 		}
 		#endif
 		
@@ -597,4 +586,12 @@ void delay_ms(uint16_t period)	 //delay routine (milliseconds)
 {
 	for(unsigned int i=0; i<=period; i++)
 	_delay_ms(1);
+}
+
+void xbee_reset_SC(void)
+{
+	xbee_Set_Scan_Channels(xbee.ScanChannels);
+	xbee_WR();
+	print_info_xbee(XBEE_RESET_SC,1);
+	_delay_ms(2000);
 }
