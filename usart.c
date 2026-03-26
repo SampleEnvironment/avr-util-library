@@ -22,48 +22,32 @@ uint8_t lastUSART1_Message[50];
 
 
 // Initialize Interrupt Service Routine driven USART communication
-void usart_init(uint16_t UBRR_register)
+void usart_init(void)
 {
-	UCSR0B = 0; // Added by JG to be sure...
-	UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0) | (1 << TXCIE0);   					//Turn on the transmission and reception circuitry
-	// UCSR0B => USART Control and Status Register 0 B
-	// TXEN0 => Transmitter Enable: Writing this bit to one enables the USART Transmitter. Details on datasheet - page 187
-	// RXEN0 => Receiver Enable: Writing this bit to one enables the USART Receiver. Details on datasheet - page 187
-	// RXCIE0 => RX Complete Interrupt Enable: Writing this bit to one enables interrupt on the RXCn Flag. A USART Receive Complete interrupt will be generated only if the RXCIEn bit is written to one, the Global Interrupt Flag in SREG is written to one and the RXCn bit in UCSRnA is set.
-	// TXCIE0 => TX Complete Interrupt Enable: Writing this bit to one enables interrupt on the TXCn Flag. A USART Transmit Complete interrupt will be generated only if the TXCIEn bit is written to one, the Global Interrupt Flag in SREG is written to one and the TXCn bit in UCSRnA is set.
-	
-	UCSR0C = 0; // Added by JG to be sure...
-	UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00); 		// Use 8-bit character sizes
-	
-	// Load lower 8-bits of the baud rate value into the low byte of the UBRR register
-	UBRR0L = (unsigned char)UBRR_register;
-	// Load upper 8-bits of the baud rate value into the high byte of the UBRR register
-	UBRR0H = (unsigned char)(UBRR_register>>8);
+	UCSR0B = 0;
+	UCSR0B |= (1 << RXEN0) | (1 << TXEN0) | (1 << RXCIE0) | (1 << TXCIE0);
 
-	buffer_init();									//Init RingBuffer
+	UCSR0C = 0;
+	UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);
+
+	uint16_t ubrr = UBRR_VAL(USART_BAUDRATE);
+	UBRR0H = (uint8_t)(ubrr >> 8);
+	UBRR0L = (uint8_t)(ubrr);
+
+	buffer_init();
 }
 
-
-// Initialize Interrupt Service Routine driven USART communication
-void usart1_init(uint16_t UBRR_register)
+void usart1_init(void)
 {
-	UCSR1B = 0; // Added by JG to be sure...
-	UCSR1B |= (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1) | (1 << TXCIE1);   					//Turn on the transmission and reception circuitry
-	// UCSR0B => USART Control and Status Register 0 B
-	// TXEN0 => Transmitter Enable: Writing this bit to one enables the USART Transmitter. Details on datasheet - page 187
-	// RXEN0 => Receiver Enable: Writing this bit to one enables the USART Receiver. Details on datasheet - page 187
-	// RXCIE0 => RX Complete Interrupt Enable: Writing this bit to one enables interrupt on the RXCn Flag. A USART Receive Complete interrupt will be generated only if the RXCIEn bit is written to one, the Global Interrupt Flag in SREG is written to one and the RXCn bit in UCSRnA is set.
-	// TXCIE0 => TX Complete Interrupt Enable: Writing this bit to one enables interrupt on the TXCn Flag. A USART Transmit Complete interrupt will be generated only if the TXCIEn bit is written to one, the Global Interrupt Flag in SREG is written to one and the TXCn bit in UCSRnA is set.
-	
-	UCSR1C = 0; // Added by JG to be sure...
-	UCSR1C |= (1 << UCSZ11) | (1 << UCSZ10); 		// Use 8-bit character sizes
-	
-	// Load lower 8-bits of the baud rate value into the low byte of the UBRR register
-	UBRR1L = (unsigned char)UBRR_register;
-	// Load upper 8-bits of the baud rate value into the high byte of the UBRR register
-	UBRR1H = (unsigned char)(UBRR_register>>8);
+	UCSR1B = 0;
+	UCSR1B |= (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1) | (1 << TXCIE1);
 
-	//buffer_init();									//Init RingBuffer
+	UCSR1C = 0;
+	UCSR1C |= (1 << UCSZ11) | (1 << UCSZ10);
+
+	uint16_t ubrr = UBRR_VAL(USART1_BAUDRATE);
+	UBRR1H = (uint8_t)(ubrr >> 8);
+	UBRR1L = (uint8_t)(ubrr);
 }
 
 // USART0 data received interrupt service routine (from XBee module)

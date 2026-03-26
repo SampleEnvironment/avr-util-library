@@ -6,7 +6,12 @@
 #include <avr/interrupt.h>
 
 //RS232 USART constants
-#define USART_BAUDRATE 	9600			// Define USART0 baudrate
+//RS232 USART constants
+#define USART_BAUDRATE      9600
+#define USART1_BAUDRATE     9600   // set independently if needed
+
+#define UBRR_VAL(baud)      ((F_CPU / (16UL * (baud))) - 1)
+
 #define USART_IODR 		UDR0			// Define USART0 I/O Data Register
 #define USART_IODR1 	UDR1			// Define USART1 I/O Data Register
 
@@ -22,8 +27,9 @@ typedef struct{
 // USART commands
 //==============================================================
 
-void usart_init(uint16_t UBRR_register);			// Initialize Interrupt Service Routine driven USART communication USART0 --> xbee
-void usart1_init(uint16_t UBRR_register);			// Initialize Interrupt Service Routine driven USART communication USART1 --> other peripherals
+void usart_init(void);  // Initialize Interrupt Service Routine driven USART communication USART0 --> xbee
+void usart1_init(void);	// Initialize Interrupt Service Routine driven USART communication USART1 --> other peripherals
+
 ISR(USART0_RX_vect); 			// USART0 data received interrupt service routine (from XBee module)
 ISR(USART0_TX_vect); 			// USART0 data transmitted interrupt service routine (to XBee module)
 
